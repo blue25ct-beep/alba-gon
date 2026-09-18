@@ -128,6 +128,7 @@ export const WorkerApp: React.FC = () => {
 
   return (
     <div className="max-w-md mx-auto px-5 py-6 space-y-6 pb-24">
+      <div className="text-center text-ink-faint text-xs py-1">v2.0.0 (최신버전)</div>
       {/* 오늘 실사 현황 */}
       <section>
         <div className="flex items-baseline justify-between">
