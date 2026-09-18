@@ -1,4 +1,4 @@
-﻿import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings } from '../types';
+import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings } from '../types';
 import seedProducts from '../data/seedProducts.json';
 import seedAudits from '../data/seedAudits.json';
 import * as XLSX from 'xlsx';
@@ -266,14 +266,20 @@ export const storageService = {
       if (!data) return DEFAULT_SETTINGS;
       const raw = JSON.parse(data);
       // 鍮꾨?踰덊샇 蹂듯샇??(?뷀샇臾?prefix 'enc:' ?뺤씤)
-      if (raw.younmePw && raw.younmePw.startsWith('enc:')) {
-        try {
-          const decoded = atob(raw.younmePw.replace('enc:', ''));
-          raw.younmePw = decodeURIComponent(escape(decoded));
-        } catch {}
-      }
-      return { ...DEFAULT_SETTINGS, ...raw };
-    } catch {
+        if (raw.younmePw && raw.younmePw.startsWith('enc:')) {
+          try {
+            const decoded = atob(raw.younmePw.replace('enc:', ''));
+            raw.younmePw = decodeURIComponent(escape(decoded));
+          } catch {}
+        }
+
+        if (raw.workerName && (raw.workerName.includes('?') || raw.workerName.includes('켑') || raw.workerName.includes('뚮'))) {
+          raw.workerName = '주간알바';
+          localStorage.setItem(KEYS.SETTINGS, JSON.stringify({ ...DEFAULT_SETTINGS, ...raw }));
+        }
+
+        return { ...DEFAULT_SETTINGS, ...raw };
+      } catch {
       return DEFAULT_SETTINGS;
     }
   },
