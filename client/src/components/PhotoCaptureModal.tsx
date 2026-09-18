@@ -132,7 +132,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
           <div className="px-6 py-4 flex gap-2 overflow-x-auto shrink-0">
             {capturedPhotos.map((p, idx) => (
               <div key={idx} className="relative w-16 h-16 shrink-0 rounded-lg overflow-hidden border border-line">
-                <img src={p} alt={촬영본  + (idx + 1)} className="w-full h-full object-cover" />
+                <img src={p} alt={'촬영본 ' + (idx + 1)} className="w-full h-full object-cover" />
                 <button
                   onClick={() => setCapturedPhotos((prev) => prev.filter((_, i) => i !== idx))}
                   className="absolute top-1 right-1 w-5 h-5 bg-ink/50 text-white rounded-full flex items-center justify-center text-xs"
