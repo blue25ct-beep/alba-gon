@@ -134,7 +134,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
                 <Camera className="w-7 h-7 text-ink-faint mx-auto mb-2" />
                 <p className="text-sm text-ink-soft">카메라를 열 수 없습니다</p>
                 <label className="mt-3 inline-flex h-10 px-4 items-center justify-center rounded-full bg-surface text-sm font-medium text-ink-soft hover:text-ink transition-colors cursor-pointer">
-                  앨범에서 선택
+                  사진 촬영
                   <input
                     type="file"
                     accept="image/*"
@@ -197,7 +197,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
               ) : (
                 <label className="flex-1 h-12 rounded-full bg-sage hover:bg-sage-deep text-white text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors cursor-pointer">
                   <Camera className="w-4 h-4" />
-                  파일 선택
+                  사진 촬영
                   <input
                     type="file"
                     accept="image/*"
@@ -224,7 +224,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
                 ) : (
                   <label className="h-12 px-5 rounded-full bg-sunken text-ink-soft hover:text-ink text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors cursor-pointer">
                     <Plus className="w-4 h-4" />
-                    추가 선택
+                    추가 촬영
                     <input
                       type="file"
                       accept="image/*"
