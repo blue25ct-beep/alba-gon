@@ -796,6 +796,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
       )}
+      <div className="mt-8 text-center text-ink-faint text-sm pb-8">버전: v2.0.0 (업데이트 완료됨)</div>
     </div>
   );
 };
