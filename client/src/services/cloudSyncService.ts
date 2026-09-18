@@ -3,12 +3,13 @@ import { AuditItem } from '../types';
 import { storageService } from './storage';
 
 export interface AuditsSyncMessage {
-  type: 'AUDITS_UPDATE' | 'AUDITS_CLEAR' | 'PRODUCTS_UPDATE' | 'PING';
+  type: 'AUDITS_UPDATE' | 'AUDITS_CLEAR' | 'PRODUCTS_UPDATE' | 'PING' | 'BACKUP_DATA' | 'REQUEST_RESTORE' | 'RESTORE_DATA';
   senderId: string;
   senderRole: 'WORKER' | 'ADMIN';
   storeId: string;
   timestamp: number;
   audits: AuditItem[];
+  data?: any;
 }
 
 export type SyncStatus = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED' | 'ERROR';
@@ -131,7 +132,14 @@ class CloudSyncService {
             return;
           }
 
-          if (msg.type === 'PRODUCTS_UPDATE') {
+          if (msg.type === 'RESTORE_DATA' && msg.data) {
+            if (msg.data.products) storageService.saveProducts(msg.data.products);
+            if (msg.data.settings) storageService.saveSettings(msg.data.settings);
+            if (msg.data.aliases) storageService.saveAliases(msg.data.aliases);
+            this.productsUpdateListeners.forEach((l) => l());
+            alert('봇으로부터 백업 데이터를 성공적으로 복원했습니다!');
+            window.location.reload();
+          } else if (msg.type === 'PRODUCTS_UPDATE') {
             this.productsUpdateListeners.forEach((l) => l());
           } else if (msg.type === 'AUDITS_UPDATE') {
             storageService.saveAudits(msg.audits || []);
@@ -205,6 +213,39 @@ class CloudSyncService {
         }
       });
     });
+  }
+
+    public broadcastBackup(): void {
+    if (!this.client || !this.client.connected) return;
+    const topicSync = 'albagom/stores/store_' + this.currentStoreId + '/audits_sync';
+    const payload = {
+      type: 'BACKUP_DATA',
+      senderId: this.mySenderId,
+      senderRole: 'ADMIN',
+      storeId: this.currentStoreId,
+      timestamp: Date.now(),
+      audits: [],
+      data: {
+        products: storageService.getProducts(),
+        settings: storageService.getSettings(),
+        aliases: storageService.getAliases(),
+      }
+    };
+    this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true });
+  }
+
+  public requestRestore(): void {
+    if (!this.client || !this.client.connected) return;
+    const topicSync = 'albagom/stores/store_' + this.currentStoreId + '/audits_sync';
+    const payload = {
+      type: 'REQUEST_RESTORE',
+      senderId: this.mySenderId,
+      senderRole: 'ADMIN',
+      storeId: this.currentStoreId,
+      timestamp: Date.now(),
+      audits: [],
+    };
+    this.client.publish(topicSync, JSON.stringify(payload), { qos: 1 });
   }
 
   public broadcastProductsUpdate(role: 'WORKER' | 'ADMIN' = 'ADMIN'): Promise<boolean> {
