@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Camera, Check, X, Plus } from 'lucide-react';
 import { soundManager } from '../services/sound';
 
@@ -25,6 +25,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
     let stream: MediaStream | null = null;
 
     const startCamera = async () => {
+      await new Promise(resolve => setTimeout(resolve, 300));
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment', width: { ideal: 800 }, height: { ideal: 800 } },
@@ -63,17 +64,37 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          if (event.target?.result) {
-            setCapturedPhotos((prev) => [...prev, event.target!.result as string]);
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (!event.target?.result) return;
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_SIZE = 800;
+          let width = img.width;
+          let height = img.height;
+          if (width > height && width > MAX_SIZE) {
+            height *= MAX_SIZE / width;
+            width = MAX_SIZE;
+          } else if (height > MAX_SIZE) {
+            width *= MAX_SIZE / height;
+            height = MAX_SIZE;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            setCapturedPhotos((prev) => [...prev, dataUrl]);
           }
         };
-        reader.readAsDataURL(file);
-      });
-    }
+        img.src = event.target.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleConfirm = () => {

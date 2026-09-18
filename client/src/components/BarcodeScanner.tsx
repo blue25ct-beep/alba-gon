@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { BrowserMultiFormatReader } from '@zxing/browser';
+import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { DecodeHintType, BarcodeFormat } from '@zxing/library';
 import { CameraOff, Keyboard, Search, ChevronRight } from 'lucide-react';
 import { soundManager } from '../services/sound';
@@ -18,6 +18,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
   const [manualBarcode, setManualBarcode] = useState('');
   const [matchedProducts, setMatchedProducts] = useState<Product[]>([]);
   const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
+  const controlsRef = useRef<IScannerControls | null>(null);
 
   useEffect(() => {
     if (isPaused) return;
@@ -56,7 +57,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
           ) || videoInputDevices[0];
 
         if (videoRef.current && active) {
-          await codeReader.decodeFromConstraints(
+          const controls = await codeReader.decodeFromConstraints(
             {
               video: {
                 deviceId: selectedDevice.deviceId,
@@ -73,6 +74,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
               }
             }
           );
+          controlsRef.current = controls;
         }
       } catch (err: unknown) {
         if (active) {
@@ -88,6 +90,10 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
     return () => {
       active = false;
       setIsScanning(false);
+      if (controlsRef.current) {
+        controlsRef.current.stop();
+        controlsRef.current = null;
+      }
       if (videoRef.current && videoRef.current.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());

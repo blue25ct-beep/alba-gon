@@ -81,22 +81,30 @@ export const WorkerApp: React.FC = () => {
     const isUnmapped = !detectedProduct;
     const productName = detectedProduct ? detectedProduct.name : '미등록 상품';
 
-    storageService.saveAudit({
-      barcode: activeBarcode,
-      productName,
-      stockCount: quantity,
-      targetStock: detectedProduct ? detectedProduct.targetStock : 10,
-      minOrderQty: detectedProduct ? detectedProduct.minOrderQty : 1,
-      photoUrls: pendingPhotos,
-      isUnmapped,
-      workerName,
-    });
+    try {
+      storageService.saveAudit({
+        barcode: activeBarcode,
+        productName,
+        stockCount: quantity,
+        targetStock: detectedProduct ? detectedProduct.targetStock : 10,
+        minOrderQty: detectedProduct ? detectedProduct.minOrderQty : 1,
+        photoUrls: pendingPhotos,
+        isUnmapped,
+        workerName,
+      });
 
-    const updated = storageService.getAudits();
-    setAudits(updated);
-    handleCloseModals();
+      const updated = storageService.getAudits();
+      setAudits(updated);
+      handleCloseModals();
 
-    cloudSyncService.broadcastAudits(updated, 'WORKER');
+      cloudSyncService.broadcastAudits(updated, 'WORKER');
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'QuotaExceededError') {
+        alert('저장 공간이 꽉 찼습니다! 기존 실사 목록을 먼저 본사로 전송하고 비워주세요.');
+      } else {
+        alert('저장 중 오류가 발생했습니다.');
+      }
+    }
   };
 
   const handleCloseModals = () => {
