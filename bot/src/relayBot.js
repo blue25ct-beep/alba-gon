@@ -7,12 +7,14 @@ const mqtt = require('mqtt');
 // 유앤미 주문 처리 엔진 불러오기
 const { runDirectOrderAdd } = require('./orderEngine');
 
-const STORE_ID = process.env.YOUNME_USER_ID || '1060';
+const STORE_ID = process.env.YOUNME_USER_ID || '047458';
 const BROKER_URL = 'mqtts://broker.hivemq.com:8883'; // 보안 TLS 포트
 
 const TOPIC_REQ = `albagom/orders/store_${STORE_ID}/request`;
 const TOPIC_PROGRESS = `albagom/orders/store_${STORE_ID}/progress`;
 const TOPIC_RES = `albagom/orders/store_${STORE_ID}/response`;
+const TOPIC_SYNC = 'albagom/stores/store_' + STORE_ID + '/audits_sync';
+
 
 console.log('========================================================');
 console.log('  [편의점 알바곤] 유앤미24 클라우드 실시간 릴레이 봇');
@@ -44,7 +46,33 @@ client.on('connect', () => {
 });
 
 client.on('message', async (topic, message) => {
-  if (topic === TOPIC_SYNC) {\n    try {\n      const payload = JSON.parse(message.toString());\n      if (payload.type === 'BACKUP_DATA' && payload.data) {\n        fs.writeFileSync('alba-gon-backup.json', JSON.stringify(payload.data, null, 2), 'utf8');\n        console.log('\\n[백업] 대시보드 데이터가 alba-gon-backup.json 에 안전하게 저장되었습니다.');\n      }\n      if (payload.type === 'REQUEST_RESTORE') {\n        if (fs.existsSync('alba-gon-backup.json')) {\n          const data = JSON.parse(fs.readFileSync('alba-gon-backup.json', 'utf8'));\n          client.publish(TOPIC_SYNC, JSON.stringify({\n            type: 'RESTORE_DATA',\n            senderId: 'BOT',\n            senderRole: 'WORKER',\n            storeId: STORE_ID,\n            timestamp: Date.now(),\n            audits: [],\n            data: data\n          }), { qos: 1 });\n          console.log('\\n[복구] 백업 데이터를 본사 대시보드로 전송했습니다.');\n        } else {\n          console.log('\\n[복구 실패] 백업 파일이 없습니다.');\n        }\n      }\n    } catch(e) {}\n    return;\n  }
+    if (topic === TOPIC_SYNC) {
+    try {
+      const payload = JSON.parse(message.toString());
+      if (payload.type === 'BACKUP_DATA' && payload.data) {
+        fs.writeFileSync('alba-gon-backup.json', JSON.stringify(payload.data, null, 2), 'utf8');
+        console.log('\n[백업] 대시보드 데이터가 alba-gon-backup.json 에 안전하게 저장되었습니다.');
+      }
+      if (payload.type === 'REQUEST_RESTORE') {
+        if (fs.existsSync('alba-gon-backup.json')) {
+          const data = JSON.parse(fs.readFileSync('alba-gon-backup.json', 'utf8'));
+          client.publish(TOPIC_SYNC, JSON.stringify({
+            type: 'RESTORE_DATA',
+            senderId: 'BOT',
+            senderRole: 'WORKER',
+            storeId: STORE_ID,
+            timestamp: Date.now(),
+            audits: [],
+            data: data
+          }), { qos: 1 });
+          console.log('\n[복구] 백업 데이터를 본사 대시보드로 전송했습니다.');
+        } else {
+          console.log('\n[복구 실패] 백업 파일이 없습니다.');
+        }
+      }
+    } catch(e) {}
+    return;
+  }
 
   if (topic !== TOPIC_REQ) return;
 
