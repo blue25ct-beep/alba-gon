@@ -20,7 +20,7 @@ type VoidListener = () => void;
 
 class CloudSyncService {
   private client: MqttClient | null = null;
-  private currentStoreId: string = '047458';
+  private currentStoreId: string = '1060';
   private mySenderId: string = '';
   private syncListeners: Set<SyncListener> = new Set();
   private statusListeners: Set<StatusListener> = new Set();
@@ -92,7 +92,7 @@ class CloudSyncService {
   }
 
   public connect(storeId?: string, role: 'WORKER' | 'ADMIN' = 'WORKER') {
-    const targetStoreId = storeId || storageService.getSettings().younmeId || '047458';
+    const targetStoreId = storeId || storageService.getSettings().younmeId || '1060';
     this.currentStoreId = targetStoreId;
 
     if (this.client && this.client.connected) {

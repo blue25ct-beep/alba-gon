@@ -42,7 +42,7 @@ if not exist ".env" (
     if exist ".env.example" (
         copy ".env.example" ".env" > nul
     ) else (
-        echo YOUNME_USER_ID=047458 > .env
+        echo YOUNME_USER_ID=1060 > .env
         echo YOUNME_PASSWORD=여기에_유앤미비밀번호_입력 >> .env
     )
 )

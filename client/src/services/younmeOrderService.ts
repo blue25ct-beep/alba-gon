@@ -77,7 +77,7 @@ export const younmeOrderService = {
         percent: 10,
       });
 
-      const storeId = settings.younmeId || '047458';
+      const storeId = settings.younmeId || '1060';
       const orderId = `order_${Date.now()}`;
       const topicReq = `albagom/orders/store_${storeId}/request`;
       const topicProgress = `albagom/orders/store_${storeId}/progress`;

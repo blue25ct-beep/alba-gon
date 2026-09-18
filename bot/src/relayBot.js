@@ -7,7 +7,7 @@ const mqtt = require('mqtt');
 // 유앤미 주문 처리 엔진 불러오기
 const { runDirectOrderAdd } = require('./orderEngine');
 
-const STORE_ID = process.env.YOUNME_USER_ID || '047458';
+const STORE_ID = process.env.YOUNME_USER_ID || '1060';
 const BROKER_URL = 'mqtts://broker.hivemq.com:8883'; // 보안 TLS 포트
 
 const TOPIC_REQ = `albagom/orders/store_${STORE_ID}/request`;
