@@ -1,0 +1,4780 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+   
+
+
+
+<html>
+
+<head>
+
+
+    
+<meta http-equiv="Content-Type"  content="text/html; charset=EUC-KR" />    
+<meta http-equiv="Page-Enter" content="BlendTrans(Duration=0.4)"/>
+<meta http-equiv="Page-Exit" content="BlendTrans(Duration=0.4)"/>
+<meta http-equiv="X-UA-Compatible"  content="IE=Edge" />
+<meta http-equiv="X-UA-Compatible"  content="IE=11" />
+<meta http-equiv="X-UA-Compatible"  content="IE=10" />
+<meta http-equiv="X-UA-Compatible"  content="IE=9" />
+<meta http-equiv="X-UA-Compatible"  content="IE=8" />
+<meta http-equiv="X-UA-Compatible"  content="IE=7" />
+<meta http-equiv="X-UA-Compatible"  content="IE=6" />
+
+<script>
+var name = navigator.appName, ver = navigator.appVersion, ver_int = parseInt(navigator.appVersion), ua = navigator.userAgent, infostr;
+
+//alert(ver);
+/* 
+if(name == "Microsoft Internet Explorer"){
+	 if(ver.indexOf("MSIE 10.0") != -1)  {
+			document.getElementById("X-UA-Compatible").setAttribute("content", "IE=10;IE10");
+		//	document.getElementById("browser_mode").setAttribute("content", "IE=EmulateIE8");
+		}
+	else if(ver.indexOf("MSIE 9.0") != -1)  {
+			document.getElementById("X-UA-Compatible").setAttribute("content", "IE=9;IE9");
+		//	document.getElementById("browser_mode").setAttribute("content", "IE=EmulateIE8");
+		}
+	 else if(ver.indexOf("MSIE 8.0") != -1)  {
+		document.getElementById("X-UA-Compatible").setAttribute("content", "IE=8;IE8");
+	//	document.getElementById("browser_mode").setAttribute("content", "IE=EmulateIE8");
+	}else if(ver.indexOf("MSIE 7.0") != -1)  {
+		document.getElementById("X-UA-Compatible").setAttribute("content", "IE=7");
+	}else{
+		document.getElementById("X-UA-Compatible").setAttribute("content", "IE=8;IE8");
+	}
+}
+ */
+</script>
+
+<meta http-equiv="imagetoolbar" content="no" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="expries" content="0" />
+
+<link id="link1" rel="shortcut icon"   type="image/x-icon"   href="https://etop.spchain.co.kr:446/images/favicon.ico"/>
+<link rel="shortcut icon"     type="image/x-icon"  href="https://etop.spchain.co.kr:446/images/favicon.ico" >  <!-- 주소줄,즐계찾기에표시되는것 -->
+<link rel="icon"              type="image/x-icon"  href="https://etop.spchain.co.kr:446/images/swLogo.ico" >  <!-- 익스플로러 바로가기 -->
+<link rel="apple-touch-icon"  type="image/x-icon"  href="https://etop.spchain.co.kr:446/images/swLogo.ico" >  <!-- 사파리,구글 바로가기 -->
+<link rel="apple-touch-icon" href="https://etop.spchain.co.kr:446/images/apple-touch-icon.png" >  <!-- ios에서 -->
+<link rel="apple-touch-icon-precomposed " href="https://etop.spchain.co.kr:446/images/apple-touch-icon-precomposed.png" >  <!-- ios에서 -->
+    <title>서원유통탑훼밀리웹주문시스템-메인화면</title>
+
+    <!-- 스크립트 호출 -->
+    
+    
+<link rel="stylesheet" media="" href="../css/common.css?ver=9" />
+<script language="javascript" type="text/javascript" src="../js/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="../js/common.js"></script>
+<!-- <script language="javascript" type="text/javascript" src="../js/jQuery.slide.js"></script> -->
+  <script language="javascript" type="text/javascript">
+    //<![CDATA[
+    //]]>
+function MM_preloadImages() { //v3.0
+  var d=document; if(d.images){ if(!d.MM_p) d.MM_p=new Array();
+    var i,j=d.MM_p.length,a=MM_preloadImages.arguments; for(i=0; i<a.length; i++)
+    if (a[i].indexOf("#")!=0){ d.MM_p[j]=new Image; d.MM_p[j++].src=a[i];}}
+}
+function MM_swapImgRestore() { //v3.0
+  var i,x,a=document.MM_sr; for(i=0;a&&i<a.length&&(x=a[i])&&x.oSrc;i++) x.src=x.oSrc;
+}
+function MM_findObj(n, d) { //v4.01
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document);
+  if(!x && d.getElementById) x=d.getElementById(n); return x;
+}
+
+function MM_swapImage() { //v3.0
+  var i,j=0,x,a=MM_swapImage.arguments; document.MM_sr=new Array; for(i=0;i<(a.length-2);i+=3)
+   if ((x=MM_findObj(a[i]))!=null){document.MM_sr[j++]=x; if(!x.oSrc) x.oSrc=x.src; x.src=a[i+2];}
+}
+</script> 
+
+    <script language="JavaScript" SRC="../js/order_list_all.js?ver=4"></script>
+    <script language="JavaScript" SRC="../js/order_main_view.js?ver=3"></script>
+    <script language="javascript" type="text/javascript" src="../js/jQuery.slide.js?ver=5"></script>
+    <script>
+
+    //http로 들어오면 https로 변경(localhost 제외)
+	var protocol = document.location.protocol;
+	var port = document.location.port;
+	//alert("protocol : " + protocol +", port : " + port);
+	
+	if(protocol == 'http:'){
+		if(port != '7003' && port != '8808'){ //wastest 포트 7003, local 포트 8808
+			document.location.href = document.location.href.replace('http://etop.spchain.co.kr','https://etop.spchain.co.kr:446');
+		}
+	}
+    </script>
+    <script src="../js/popup.js"></script>
+
+</head>
+<body> <!--   oncontextmenu="return false" onselectstart="return false" ondragstart="return false"  -->
+<div id="doc_wrap" class="">
+
+
+    <!-- header_wrap start -->
+    <div id="header_wrap">
+    
+
+
+
+
+
+
+<script>
+
+//현재 페이지가 메인 페이지가 아닐경우 이미지들 세션 해제
+
+
+function logout(){
+     if (confirm("로그아웃 하시겠습니까 ?")) {
+            location.href="../order/logout.jsp";
+     }
+}
+
+function link_imghome(){
+	try{
+		var WshShell = new ActiveXObject("WScript.Shell");
+		Desktoptemp = WshShell.Specialfolders("Desktop");
+		var sName = WshShell.CreateShortcut(Desktoptemp + "\\가맹점웹주문.url");
+		sName.TargetPath = "http://etop.spchain.co.kr";
+		sName.Save();
+		alert("바탕화면에 가맹점 웹주문 바로가기가 생성되었습니다.");
+	}catch(exception){
+		alert("인터넷 옵션 - 보안 - 사용자 지정 수준 - 스크립팅하기 안전하지 않는 것으로 표시된 ActiveX 컨트롤 초기화 - 사용 으로 바꾸셔야 합니다.\n\n또는 Alt+F+E+S 를 순서대로 눌러주시면 됩니다.");
+	}
+}
+
+function callFunc(data1, data2){
+	location.href="../order/OrderMainView.do?board_id="+data1+"&termField=2&termWord="+encodeURI(data2,"euc-kr");
+}
+
+</script>
+
+<!-- TOP -->
+<div id="header">
+
+    <!--  <div class="header_ev"><a href="../order/OrderMainView.do?board_id=1012"><img src="../images/common/icon_event_01.gif" /></a></div>  --><!--추석 -->
+    <!-- <div class="header_ev"><a href="../order/OrderMainView.do?board_id=1012"><img src="../images/common/icon_event_02.gif" /></a></div> -->
+    <div class="header_top">
+        <div class="htop_left">
+            <div id="logo" class="htop_left">
+            	<a href="../order/OrderListAll.do"><img src="../images/common/sub_logo.png" ></a>
+            	<img src="../images/common/top_ban.png">
+            </div>
+
+            <!-- 명절 로고 <div style="float:left; padding-left: 10px;">
+            <a href="../order/OrderMainView.do?board_id=1012"><img src="../images/common/icon_event_02.gif" style="padding:0px; margin: 0px;  height: 60px; width: 170px;"/></a>
+            </div> -->
+
+            <div style="float:left; padding-left: 10px; padding-right: 30px;">
+            	<span><a href="../popup/pop_menual.jsp" target="_blank" style="vertical-align: top;font-weight: bold;font-size: 13px;color:#05ba21;">인터넷주문사용설명서</a></span>
+            
+            <br /><span><a href="javascript:link_imghome()" style="vertical-align: top;font-weight: bold;font-size: 13px;color:#05ba21;">바탕화면 바로가기 생성</a></span>
+            </div>
+
+            
+            	<!-- 주류 전단지 링크 -->
+           		
+
+           		<!-- 잡화 전단지 링크 -->
+           		
+
+           		<!-- 행사 전단지 링크 -->
+           		
+            		<a href="javascript:leaflet_list('/files/leaflet1')"><img src="../images/common/leaflet/leaflet_c.jpg" style="width:100px; height:30px;" />
+           		
+
+           		<!-- 추석 전단지 링크 -->
+           		
+           		
+           		<!-- 설날 전단지 링크 -->
+           		
+           	
+            	<!-- 주류 전단지 링크 -->
+           		
+
+           		<!-- 잡화 전단지 링크 -->
+           		
+
+           		<!-- 행사 전단지 링크 -->
+           		
+
+           		<!-- 추석 전단지 링크 -->
+           		
+            		<a href="javascript:leaflet_list('/files/leaflet2')"><img src="../images/common/leaflet/leaflet_d.jpg" style="width:100px; height:30px;" />
+           		
+           		
+           		<!-- 설날 전단지 링크 -->
+           		
+           	
+        </div>
+
+        <div class="htop_right">
+            <div id="top_global" style="float: left;">
+                <ul>
+                <li class="first f13 b"><span class="cgold ">0)블루25시타딘호텔점</span> 반갑습니다.
+                <!-- <br /><a href="javascript:link_imghome()"><img src="../images/common/link_img.jpg"/></a> -->
+                </li>
+                <li class="second"><a href="javascript:logout()"><img src="../images/common/gmenu_logout.jpg" alt="로그아웃"/></a></li>
+                <li class="first f11"><a href="../order/OrderListAll.do">홈</a></li>
+                <!-- <li class="f11"><a href="javascript:change_pw()">비밀번호변경</a></li> -->
+                <li class="f11"><a href="javascript:change_idpw()">비밀번호변경</a></li>
+                
+                </ul>
+            </div>
+
+            <!-- <div id="top_global" style="float: left;"> -->
+            	<!-- 명절 로고 -->
+				
+				
+					<div class="header_ev" style="float:left; border-left: 2px solid #07E133; border-right: 2px solid #07E133;"><a href="../order/OrderMainView.do?board_id=1012"><img src="../images/common/icon_event_01.gif" /></a></div>
+				
+		   	<!-- </div> -->
+
+        </div>
+    </div>
+
+
+<!-- 메뉴  -->
+<script>
+function searchOk_term(board_id, busi_code_nm){
+    var frm = document.frmOrder;
+    frm.termWord.value=busi_code_nm;
+    frm.termField[1].checked=true;
+    frm.save.value==1;//  저장
+    searchOk(board_id, 'Y');
+
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 잡화인기상품 20151110 생필체인 요청 -->
+<!-- 과거주문상품 20160201 생필체인 요청 -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+function event_list(){
+//	var frm = document.frmEventView;
+// 	alert("event_size>>>" +  frm.event_list_size.value + "<<<");
+//	if(frm.event_list_size.value!="") {
+
+	w= 1150;
+	h= 600;
+	leftP = (screen.width - w)/2;
+	topP  = (screen.height - h) /2;
+
+    window.open('../order/OrderEventList.do?event_flag=event','DINTEC','scrollbars=yes,width=1150,height=600,top='+ topP + ',left=' + leftP);
+//    }
+}
+
+function change_pw(){
+	w= 500;
+	h= 400;
+	leftP = (screen.width - w)/2;
+	topP  = (screen.height - h) /2;
+
+	window.open('../order/changePw.jsp','DINTEC','scrollbars=no,width=500,height=400,top='+ topP + ',left=' + leftP);
+}
+
+function change_idpw(){
+	w= 550;
+	h= 400;
+	leftP = (screen.width - w)/2;
+	topP  = (screen.height - h) /2;
+
+	window.open('../order/changeID_Pw.jsp','DINTEC','scrollbars=no,width=550,height=400,top='+ topP + ',left=' + leftP);
+
+}
+
+function change_logoimg(){
+	w= 550;
+	h= 400;
+	leftP = (screen.width - w)/2;
+	topP  = (screen.height - h) /2;
+
+	window.open('../order/change_logoimg.jsp','DINTEC','scrollbars=no,width=550,height=515,top='+ topP + ',left=' + leftP);
+
+}
+
+function screen_size() {
+	var screen_size = screen.availWidth;
+//	alert("해상도: " +screen_size);
+	if (screen_size <= 1024) {
+	   return 950;
+	} else {
+	   return 1020;
+	}
+}
+</script>
+
+    <div id="menu_wrap">
+        <div class="menu_top">
+            <div class="menu_left">
+                <ul>
+                <li><a href="../order/OrderMainList.do" class="roll_over"><img src="../images/common/top_btn_01.jpg"  class="show"><img src="../images/common/top_btn_01_o.jpg" class="hide"></a></li>
+                <li> <a href="../order/OrderMainView.do?flag=total"  class="roll_over"><img src="../images/common/top_btn_02.jpg"  class="show"><img src="../images/common/top_btn_02_o.jpg" class="hide"></a></li>
+                <li><a href="../order/OrderNoticeList.do" class="roll_over"><img src="../images/common/top_btn_03.jpg"  class="show"><img src="../images/common/top_btn_03_o.jpg" class="hide"></a></li>
+                </ul>
+            </div>                      <!--행사상품리스트 링크 -->
+            <div class="fl pad30l"><a href="javascript:event_list()"><img src='../images/common/icon_salelist_02.gif?ver=4' /></a></div>
+            <div class="menu_right">
+                <div id="menu_wrap">
+                    <div id="menu" class="galignR">
+                        <ul class='depth1' id='topmenu'>
+
+                        <!-- 과거주문상품 -->
+                        <li class='mn_li1 first'>
+                        	<a href='../order/OrderFavView.do?sort_price=up&board_id=1015' class='mn '><span><img src='../images/menu/mm_15.png'   ovImg='../images/menu/mm_15_o.png'/></span></a>
+                        </li>
+
+                        <!-- 전단상품(주류) -->
+                        <li class='mn_li1  first'>
+                        	<a href='../order/OrderMainView.do?board_id=1013'  class='mn '><span><img src='../images/menu/mm_13.png'   ovImg='../images/menu/mm_13_o.png'/></span></a>
+                        </li>
+
+                        <!-- 소주류 -->
+                        <li class='mn_li1  first'>
+                           <a href='../order/OrderMainView.do?board_id=1001'  class='mn '><span><img src='../images/menu/mm_03.png'   onClick="btnSave('1001', 'Y')" ovImg='../images/menu/mm_03_o.png'/></span></a>
+                            <ul class='depth2 hidden'  >
+                              
+                                      
+                                      
+                                       
+                                      
+                                      
+                                      
+
+                                <li class="mn_li2  first" >
+                                    
+                                    <a href="javascript:callFunc('1001', '(주)한라산경기지점');" class='mn'>
+                                    <span>(주)한라산경기지점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1001', '대선주조(주)기장공장');" class='mn'>
+                                    <span>대선주조(주)기장공</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1001', '롯데칠성음료(주)소주');" class='mn'>
+                                    <span>롯데칠성음료(주)소</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1001', '무학부산지점');" class='mn'>
+                                    <span>무학부산지점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1001', '보해양조(주)부산지점');" class='mn'>
+                                    <span>보해양조(주)부산지</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1001', '선양소주이천지점');" class='mn'>
+                                    <span>선양소주이천지점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1001', '선양소주화성지점');" class='mn'>
+                                    <span>선양소주화성지점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1001', '하이트진로(서부산)-참이슬');" class='mn'>
+                                    <span>하이트진로(서부산)</span></a>
+                                </li>
+                              
+                            </ul>
+                        </li>
+
+                        <!-- 맥주류 -->
+                        <li class='mn_li1  first'>
+                           <a href='../order/OrderMainView.do?board_id=1002'  class='mn '><span><img src='../images/menu/mm_04.png'   ovImg='../images/menu/mm_04_o.png'/></span></a>
+                            <ul class='depth2 hidden'  >
+                              
+                                      
+                                      
+                                       
+                                      
+                                      
+                                      
+
+                               <li class="mn_li2  first" >
+                                    
+                                    <a href="javascript:callFunc('1002', '(주)롯데아사히주류');" class='mn'>
+                                    <span>(주)롯데아사히주류</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '(주)무학수입지점');" class='mn'>
+                                    <span>(주)무학수입지점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '(주)비어케이');" class='mn'>
+                                    <span>(주)비어케이</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '(주)에스비씨코리아');" class='mn'>
+                                    <span>(주)에스비씨코리아</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '(주)엠디에스글로벌');" class='mn'>
+                                    <span>(주)엠디에스글로벌</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '(주)웰그린라들러');" class='mn'>
+                                    <span>(주)웰그린라들러</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '(주)카브루비전브루어리');" class='mn'>
+                                    <span>(주)카브루비전브루</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '디아지오코리아');" class='mn'>
+                                    <span>디아지오코리아</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '롯데칠성음료(주)맥주');" class='mn'>
+                                    <span>롯데칠성음료(주)맥</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '산미상사');" class='mn'>
+                                    <span>산미상사</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '세븐브로이용인점');" class='mn'>
+                                    <span>세븐브로이용인점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '스퀴즈');" class='mn'>
+                                    <span>스퀴즈</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '에이이브랜드코리아유한회사
+');" class='mn'>
+                                    <span>에이이브랜드코리아유</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '엠즈베버리지(주)');" class='mn'>
+                                    <span>엠즈베버리지(주)</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '오비맥주(주)동부산직매장');" class='mn'>
+                                    <span>오비맥주(주)동부산</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '오비맥주(코로나)');" class='mn'>
+                                    <span>오비맥주(코로나)</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '정덕글로벌');" class='mn'>
+                                    <span>정덕글로벌</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '주식회사 한울앤제주');" class='mn'>
+                                    <span>주식회사 한울앤제주</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '주식회사마이비어');" class='mn'>
+                                    <span>주식회사마이비어</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '칼스버그코리아유한책임회사');" class='mn'>
+                                    <span>칼스버그코리아유한책</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '프로스트');" class='mn'>
+                                    <span>프로스트</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '하이네켄코리아(주)');" class='mn'>
+                                    <span>하이네켄코리아(주)</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '하이트맥주(주)서부산직매장');" class='mn'>
+                                    <span>하이트맥주(주)서부</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1002', '하이트진로(주)남천안직매장');" class='mn'>
+                                    <span>하이트진로(주)남천</span></a>
+                                </li>
+                              
+                            </ul>
+                        </li>
+
+                        <!-- 기타주류 -->
+                        <li class='mn_li1  first'>
+                           <a href='../order/OrderMainView.do?board_id=1004'  class='mn '><span><img src='../images/menu/mm_06.png'  ovImg='../images/menu/mm_06_o.png'/></span></a>
+                            <ul class='depth2 hidden'  >
+                               
+                                      
+                                      
+                                       
+                                      
+                                      
+                                      
+
+                               <li class="mn_li2  first" >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)골든블루');" class='mn'>
+                                    <span>(주)골든블루</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)골든블루영남권물류센터');" class='mn'>
+                                    <span>(주)골든블루영남권</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)국순당');" class='mn'>
+                                    <span>(주)국순당</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)국제무역');" class='mn'>
+                                    <span>(주)국제무역</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)금복주부산지점');" class='mn'>
+                                    <span>(주)금복주부산지점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)롯데아사히주류');" class='mn'>
+                                    <span>(주)롯데아사히주류</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)비이엑스스피리츠코리아
+');" class='mn'>
+                                    <span>(주)비이엑스스피리</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)수성주류');" class='mn'>
+                                    <span>(주)수성주류</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)신세계앨엔비');" class='mn'>
+                                    <span>(주)신세계앨엔비</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)아영에프비씨');" class='mn'>
+                                    <span>(주)아영에프비씨</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)에프제이코리아');" class='mn'>
+                                    <span>(주)에프제이코리아</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)젠니혼주류');" class='mn'>
+                                    <span>(주)젠니혼주류</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)태산주류');" class='mn'>
+                                    <span>(주)태산주류</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)태안교역');" class='mn'>
+                                    <span>(주)태안교역</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '(주)페르노리카코리아');" class='mn'>
+                                    <span>(주)페르노리카코리</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '경주법주(주)부산사무소');" class='mn'>
+                                    <span>경주법주(주)부산사</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '금양인터내셔날');" class='mn'>
+                                    <span>금양인터내셔날</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '대선주조(주)기장공장');" class='mn'>
+                                    <span>대선주조(주)기장공</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '디아지오코리아');" class='mn'>
+                                    <span>디아지오코리아</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '디앤에스무역');" class='mn'>
+                                    <span>디앤에스무역</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '롯데칠성음료(예거)');" class='mn'>
+                                    <span>롯데칠성음료(예거)</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '롯데칠성음료(주)소주');" class='mn'>
+                                    <span>롯데칠성음료(주)소</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '롯데프리미엄와인');" class='mn'>
+                                    <span>롯데프리미엄와인</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '리커팟컴퍼니');" class='mn'>
+                                    <span>리커팟컴퍼니</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '무학부산지점');" class='mn'>
+                                    <span>무학부산지점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '백운주가');" class='mn'>
+                                    <span>백운주가</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '보해양조(주)부산지점');" class='mn'>
+                                    <span>보해양조(주)부산지</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '빔산토리코리아');" class='mn'>
+                                    <span>빔산토리코리아</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '서해안복분자주영농조합법인');" class='mn'>
+                                    <span>서해안복분자주영농조</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '세븐브로이용인점');" class='mn'>
+                                    <span>세븐브로이용인점</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '안동소주일품');" class='mn'>
+                                    <span>안동소주일품</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '원스피리츠주식회사');" class='mn'>
+                                    <span>원스피리츠주식회사</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '유한회사금용');" class='mn'>
+                                    <span>유한회사금용</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '제이트레이딩컴퍼니');" class='mn'>
+                                    <span>제이트레이딩컴퍼니</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '주식회사골든블루인터내셔널');" class='mn'>
+                                    <span>주식회사골든블루인터</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '주식회사모노드림');" class='mn'>
+                                    <span>주식회사모노드림</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '주식회사코차상사');" class='mn'>
+                                    <span>주식회사코차상사</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '주식회사포러스');" class='mn'>
+                                    <span>주식회사포러스</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '케이에프제이코리아');" class='mn'>
+                                    <span>케이에프제이코리아</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '하이트진로(서부산)-참이슬');" class='mn'>
+                                    <span>하이트진로(서부산)</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '하이트진로(주)남천안직매장');" class='mn'>
+                                    <span>하이트진로(주)남천</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '한국브라운포맨주식회사');" class='mn'>
+                                    <span>한국브라운포맨주식회</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                               <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1004', '화요이천직매장');" class='mn'>
+                                    <span>화요이천직매장</span></a>
+                                </li>
+                              
+                            </ul>
+                        </li>
+
+                        <!-- 식품 -->
+                        <li class='mn_li1  first'>
+                           <a href='../order/OrderMainView.do?board_id=1006'  class='mn '><span><img src='../images/menu/mm_08.png'   ovImg='../images/menu/mm_08_o.png'/></span></a>
+                            <ul class='depth2 hidden'  >
+                                
+                            </ul>
+                        </li>
+
+                        <!-- 잡화 -->
+                        <li class='mn_li1  first'>
+                           <a href='../order/OrderMainView.do?board_id=1007'  class='mn '><span><img src='../images/menu/mm_09.png'   ovImg='../images/menu/mm_09_o.png'/></span></a>
+                            <ul class='depth2 hidden'  >
+                              
+                            </ul>
+                        </li>
+
+                        <!-- 낱개상품 -->
+                        <li class='mn_li1  first'>
+                           <a href='../order/OrderMainView.do?board_id=1010'  class='mn '><span><img src='../images/menu/mm_11.png'   ovImg='../images/menu/mm_11_o.png'/></span></a>
+                            <ul class='depth2 hidden'  >
+                             
+                                      
+                                      
+                                       
+                                      
+                                      
+                                      
+
+                                  <li class="mn_li2  first" >
+                                    
+                                    <a href="javascript:callFunc('1010', '(주)골든블루');" class='mn'>
+                                    <span>(주)골든블루</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                  <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1010', '(주)페르노리카코리아');" class='mn'>
+                                    <span>(주)페르노리카코리</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                  <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1010', '드링크인터내셔널주식회사
+');" class='mn'>
+                                    <span>드링크인터내셔널주식</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                  <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1010', '디아지오코리아');" class='mn'>
+                                    <span>디아지오코리아</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                  <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1010', '롯데칠성음료(예거)');" class='mn'>
+                                    <span>롯데칠성음료(예거)</span></a>
+                                </li>
+                              
+                                      
+                                      
+                                      
+                                      
+                                         
+                                      
+
+                                  <li class="mn_li2 " >
+                                    
+                                    <a href="javascript:callFunc('1010', '윈저글로벌주식회사');" class='mn'>
+                                    <span>윈저글로벌주식회사</span></a>
+                                </li>
+                              
+                            </ul>
+                        </li>
+                        </ul>
+                    </div>
+                </div>
+               	<!--
+                     <ul>
+                     <li><a href="../oder_write.php"><img src="../images/common/icon_salelist_02.gif" /></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_01.jpg" class="show"><img src="../images/menu/mm_01_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_02.jpg" class="show"><img src="../images/menu/mm_02_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_03.jpg" class="show"><img src="../images/menu/mm_03_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_04.jpg" class="show"><img src="../images/menu/mm_04_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_05.jpg" class="show"><img src="../images/menu/mm_05_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_06.jpg" class="show"><img src="../images/menu/mm_06_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_07.jpg" class="show"><img src="../images/menu/mm_07_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_08.jpg" class="show"><img src="../images/menu/mm_08_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_09.jpg" class="show"><img src="../images/menu/mm_09_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_10.jpg" class="show"><img src="../images/menu/mm_10_o.jpg" class="hide"></a></li>
+                     <li><a href="../oder_write.php" class="roll_over"><img src="../images/menu/mm_11.jpg" class="show"><img src="../images/menu/mm_11_o.jpg" class="hide"></a></li>
+                     </ul>
+                 -->
+            </div>
+        </div>
+
+    </div>
+
+<script type="text/javascript" language="javascript">initNavigation(12);</script>
+
+    <div id="quick_wrap">
+        <div id="quickmenu">
+            <ul>
+            <li><a href="#" onfocus="this.blur();"> <img src="../images/common/quick_top.png" /></a></li>
+            
+            </ul>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+     //new Floating(적용할개체 , X축여백 , Y축여백 , 미끄러지는속도:작을수록빠름..기본20 , 빠르기:작을수록부드러움..기본10,시작위치);
+      new Floating(document.getElementById("quick_wrap"),screen_size() + 100,0,30,5,150);
+    </script>
+
+</div>
+    </div>
+    <!-- header_wrap end -->
+
+    <!-- container_wrap start -->
+    <div id="container_wrap">
+        <div id="container" class="noleft">
+		<form name="frmOrder" method="post">
+		<input type="hidden" name="save" value="1" />
+		<input type="hidden" name="board_id" value="">
+		<table width="110%" border="0"  style="height:40px;">
+		<colgroup><col width="*" /><col width="40%" /></colgroup>
+		<tr>
+			<td align="center" style="padding-top: 10px;">
+			 
+   
+<div style=" background-color:#F2FDEE; width: 100%; border: 1px solid #9fd18d;" >
+                        <span class="font_black_11px">                         
+                        <img src="../images/Board/default/lbl_search.gif" />
+                        
+                        <!--    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -->
+                        
+                        
+                        
+                         
+			            
+			             <!-- <input type="radio" name="termField" id="radio"  value="0" checked="checked" />전체 -->
+                        <input type="radio" name="termField" id="radio"  value="1" checked="checked"/>상품명
+                         <input type="radio"  name="termField"  id="radio"  value="2" />업체명
+                         <input type="radio"  name="termField" id="radio"  value="3"  />상품코드
+			            
+			            
+                        <INPUT NAME="termWord" TYPE="text" style="border:5px solid #06BB21; height: 28px; font-size: 11pt;" size="25"  
+                         onkeypress="javascript:if(event.keyCode==13){searchOk('', 'N')}" maxlength="30"  value="" />
+                         <!-- onkeypress="if (event.keyCode==13) javascript:searchOk(, 'N')" maxlength="30"  value="" /> -->
+                         &nbsp;&nbsp;&nbsp;&nbsp;
+                        <img src="../images/Board/default/btn_search01.png" onClick="return searchOk('', 'N')" />
+                        </span>
+                        <br />
+                     
+                        </div> 
+
+			 </td>
+
+			<td><div  style="text-align: center; "><img src="../images/common/slogan.png?ver=4" /></div></td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center" style="padding-top: 10px;">
+			<!-- 3,4,5일 추석 6일발주로 임시변경예제부분(choose,when안에다가 넣어야함(choose는 만든다)) -->
+			
+			<!-- 원래 오리지널!!!(choose,when안에다가 넣어야함) -->
+			
+			
+				
+					<span style="color: red; font-size: 12pt; font-weight: bold;"><u>현재 주문시 배송일은 2026년  9월21일 월요일 입니다. </u></span>
+				
+				
+			
+			 <!--<span style="color: red; font-size: 12pt; font-weight: bold;"><u>현재 주문시 배송일은 2016년 9월 19일 월요일 입니다. </u></span>-->
+			</td>
+		</tr>
+		</table>
+		</form>
+
+        <!-- 전단상품(공산품) start -->
+        <form name="frmEventView" method="post" action="../order/OrderMainView.do">
+        <input type="hidden" name="h_rcv_date" />
+        <input type="hidden" id="event_list_size" name="event_list_size"  value="32" />
+        <input type="hidden" id="sinsang_event_list_size" name="sinsang_event_list_size"  value="36"/>
+
+        <input type="hidden" name="busi_code" >
+        <input type="hidden" name="event_item_code" >
+        <input type="hidden" id="currentPosition" name="currentPosition"  value="0"/>
+        <input type="hidden" id="numberOfSlides" name="numberOfSlides"  value="0"/>
+        <input type="hidden" id="slideWidth" name="slideWidth" value="960"/>
+        <input type="hidden" id="now_status" name="now_status" value="1"/>
+        <input type="hidden" id="event_total_page" name="event_total_page"  value="2"/>
+
+          	<!-- refresh((currentPosition + 1) * 5 + 1, (currentPosition + 1) * 5 + 5);  -->
+			<!-- <input type="button" value="Start" onclick="refresh(6, 20)" id="startBtn"> -->
+            <div class="cont_tit pad10t">
+                <div class="cont_left"><img src="../images/tit/tit_01.png?ver=4" />현재 진행중인 전단상품 리스트</div>
+                <!-- <div class="cont_right"><img src="../images/common/slogan.png?ver=4" /></div> -->
+            </div>
+
+            
+            
+            
+
+	            <div id="sale_event_list" class="sale_list_bind">
+	                <div class="arrow"><div id="slideshow2"></div></div>
+
+	                <!-- 전단상품(공산품) -->
+	                <div class="sale_list">
+	                  <div id="slideshow">
+	                    <div id="slidesContainer">
+	                      
+	                      <div class="slide">
+	                        <ul>
+	                          
+	                          
+		                        
+	                          
+	                          		
+	                          
+	                          
+	                          
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 0/0 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801037088205')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=0">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 오레오초코-100g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									23</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       1,000</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.08.31까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 0/1 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801043060370')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=1">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 농심)배홍동비빔면멀티-137g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									34</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       2,600</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 0/2 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801043650311')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=2">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 농심)카프리썬오렌지망고-200</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									6</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">         500</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 0/3 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801045440040')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=3">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 오)옛날참기름450ML</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									13</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       5,000</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                        </ul>
+	                      </div>
+	                      
+	                      <div class="slide">
+	                        <ul>
+	                          
+	                          
+		                        
+	                          
+	                          		
+	                          
+	                          
+	                          
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 4/4 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801045440224')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=4">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 오뚜기옛날참기름320ml</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									53</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       4,600</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 4/5 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801045491400')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=5">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 오뚜기)옛날국수소면-900g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									143</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       2,800</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 4/6 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801045492407')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=6">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 오뚜기)옛날국수중면-900g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									44</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       2,800</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 4/7 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801056018900')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=7">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 칸타타/아메리카노-275ml</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									57</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">         960</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                        </ul>
+	                      </div>
+	                      
+	                      <div class="slide">
+	                        <ul>
+	                          
+	                          
+		                        
+	                          
+	                          		
+	                          
+	                          
+	                          
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 8/8 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801056018948')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=8">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 칸타타/프리미엄-275ml</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									247</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">         870</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 8/9 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801073145085')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=9">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 1963삼양라면131g*4입</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									18</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       4,225</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 8/10 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801074256308')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=10">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 한성)런천미트-200g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									121</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       1,200</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 8/11 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801075015409')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=11">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 사조마일드참치200g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									25</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       2,600</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                        </ul>
+	                      </div>
+	                      
+	                      <div class="slide">
+	                        <ul>
+	                          
+	                          
+		                        
+	                          
+	                          		
+	                          
+	                          
+	                          
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 12/12 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801094012007')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=12">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 코카콜라1.8L</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									125</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       3,000</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 12/13 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801128503051')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=13">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 팔도)비빔면묶음-130g*5</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									17</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       3,812</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 12/14 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801223100278')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=14">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 맥콜1.5L</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									57</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       1,730</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 12/15 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8806002006437')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=15">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 광동)옥수수수염차-500ml</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									35</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       1,050</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                        </ul>
+	                      </div>
+	                      
+	                      <div class="slide">
+	                        <ul>
+	                          
+	                          
+		                        
+	                          
+	                          		
+	                          
+	                          
+	                          
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 16/16 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8806002009957')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=16">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 광동)헛개차500ml</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									50</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       1,050</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.08.31까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 16/17 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8809422042986')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=17">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 컨디션병120ml*10입</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									1</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">      25,500</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 16/18 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801097250703')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=18">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 포카리스웨트패트-900ml</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									36</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       1,600</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 16/19 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8804973304835')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=19">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 이클립스피치34g*8</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									9</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">      12,516</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                        </ul>
+	                      </div>
+	                      
+	                      <div class="slide">
+	                        <ul>
+	                          
+	                          
+		                        
+	                          
+	                          		
+	                          
+	                          
+	                          
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 20/20 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801045375038')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=20">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 오)옛날자른당면500g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									51</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       5,300</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 20/21 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801045375021')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=21">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 오)옛날자른당면300g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									29</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       3,400</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 20/22 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801056171063')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=22">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 롯데)칠성사이다-355ml</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									1</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">         680</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 20/23 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801047161592')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=23">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 동원)양반호박죽-285g</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									4</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       1,650</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                        </ul>
+	                      </div>
+	                      
+	                      <div class="slide">
+	                        <ul>
+	                          
+	                          
+		                        
+	                          
+	                          		
+	                          
+	                          
+	                          
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 24/24 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801392086557')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=24">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> cj2배바삭콩기름1.8L</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									10</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       5,400</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 24/25 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8809180746003')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=25">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 잘풀리는집키친타올150*4</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									96</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       3,600</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 24/26 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801154503407')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=26">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 물먹는하마참숯8입</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									50</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">      10,500</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 24/27 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8801551302016')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=27">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 하이썬부탄가스-4입</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									462</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       3,800</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                        </ul>
+	                      </div>
+	                      
+	                      <div class="slide">
+	                        <ul>
+	                          
+	                          
+		                        
+		                        	
+		                        
+	                          
+	                          
+	                          
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 28/28 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8809004772638')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=28">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 홈키파엘비수성에어졸500ml</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									35</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       2,800</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 28/29 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8809213890192')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=29">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 바베큐숯2kg</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									4</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       4,990</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 28/30 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8809431180877')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=30">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 한예지휴마일드캡물티슈100매</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									11</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">         800</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                          <li>
+								<div class="sale_list_item2" style="margin-right: 25px;">
+									<div class="img"> <!-- 28/31 -->
+											<a href="#" onclick="javascript:event_order('20260919','047458','1009','8809431181706')" >
+												
+												
+												
+													<img src="./image_include.jsp?flag=31">
+												
+												
+											</a>
+									</div>
+
+									<div class="title" style="font-size: 14px;"> 한예지가든플라워30*30</div>
+									<div style="font-size: 13px;">남은수량: <span class="order_ea">
+									199</span></div>
+									
+									
+									
+										<div style="font-size: 13px;">가격: <span class="retail_pay">원</span>&nbsp;<img src="../images/common/icon_right.gif" /><span class="now_pay">       9,900</span>원</div>
+									
+									
+
+									<!-- <div class="f11 pad5t">제품중량 : 180g</div> -->
+									<div style="font-size: 13px;">행사기한: 2026.09.30까지</div>
+									<div class="icon_img">
+									
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+										
+									
+									</div>
+								</div>
+							  </li>
+							  
+	                        </ul>
+	                      </div>
+	                      
+	                    </div>
+	                  </div>
+	                </div>
+	            </div>
+            
+            
+            </form>
+            <!-- 전단상품(공산품) end -->
+
+            <!-- 주문현황 start -->
+             <form name="frmOrderList" method="post" action="../order/OrderMainView.do">
+            <input type="hidden" name="h_rcv_date" >
+            <input type="hidden" name="busi_code" >
+            <input type="hidden" name="pageNo" >
+            <input type="hidden" name="busi_code_admin" >
+            <input type="hidden" name="rcv_date" >
+
+            <div class="cont_tit pad20t">
+                <div class="cont_left"><h3><img src="../images/tit/tit_14.png" /></h3>현재 주문하신 현황입니다.</div>
+                <div class="cont_right"><a href="../order/OrderMainList.do"><img src="../images/common/btn_more.png"  /></a></div>
+            </div>
+
+            <div class="board-wrap" >
+                <table width="100%"  class="board-list-table" summary="게시판 데이터 목록" >
+                <colgroup class="or_time"></colgroup>
+                <colgroup class="or_pnum" ></colgroup>
+                <colgroup class="or_price" ></colgroup>
+                <colgroup class="or_mprice" ></colgroup>
+                <colgroup class="or_date" ></colgroup>
+                <colgroup class="or_pres" ></colgroup>
+                
+                    
+                
+                <thead>
+                    <tr>
+                        <th style="font-size:14px">최종주문시간</th>
+                        <th style="font-size:14px">상품건수</th>
+                        <th style="font-size:14px">주문금액<br><pre>주류        잡화</pre></th>
+                        <th style="font-size:14px">미수금액<br><pre>주류        잡화        기타</pre></th>
+                        <th style="font-size:14px">배송일자</th>
+                        <th class="last" style="font-size:14px">주문상태</th>
+                        
+                             
+                       
+                    </tr>
+                </thead>
+                <tbody>
+                  
+                 
+
+	                 
+                 
+                 
+               
+                </tbody>
+                </table>
+
+                <!-- 페이징
+                <div class="board-list-paging">
+                    <div class='pagelist'><a class='firstpage1'><span>[처음]</span></a><a class='prevblock1'><span>[이전10페이지]</span></a><strong><span>1</span></strong><a class='nextblock1' ><span>[다음10페이지]</span></a><a class='lastpage1'><span>[끝]</span></a></div>
+                </div> -->
+            </div>
+            <!-- 주문현황 end -->
+            </form>
+            <div class="gap"></div>
+
+            <!-- 공지사항 start -->
+
+            <div class="contt_wrap">
+
+            <form name="frmNoticeView" method="post" action="../order/OrderNoticeView.do">
+            <input type="hidden" name="busi_date" >
+            <input type="hidden" name="seq" >
+            <input type="hidden" name="pageNo" >
+
+
+                <div class="cont01">
+                    <div class="cont_tit">
+                        <div class="cont_left"><h3><img src="../images/tit/tit_16.png" /></h3>오늘의 공지사항입니다.</div>
+                        <div class="cont_right"><a href="../order/OrderNoticeList.do"><img src="../images/common/btn_more.png" /></a></div>
+                    </div>
+                    <div class="board-wrap" >
+                        <table width="100%"  class="board-list-table" summary="게시판 데이터 목록" >
+                        <colgroup class="num"></colgroup>
+                        <colgroup class="subject"></colgroup>
+                        <colgroup class="date"></colgroup>
+                        <thead>
+                            <tr>
+                                <th class="first" style="font-size:14px;">번호</th>
+                                <th style="font-size:14px;">제목</th>
+                                <th style="font-size:14px;">등록일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                                
+                                
+
+                                    <tr class="first-child child_0 " >
+                                        <td class="num" style="font-size:14px;">
+                                            1
+                                        </td>
+                                        <td class="subject" style="font-size:14px;">
+                                            <a href=" ../order/OrderNoticeView.do?busi_date=20260916&seq=1" style="text-decoration:none">
+                                            ※ 생필체인 2026년 추석 영업안내
+
+- 9/23(수)까지 정상근무...
+                                            
+	                                         </a>
+                                         </td>
+                                        <td class="date" style="font-size:12px;">
+                                            <a href="javascript:order('20260916','1')" style="text-decoration:none">
+                                            2026년09월16일</a>
+                                        </td>
+                                    </tr>
+                             
+
+                                    <tr class="first-child child_1 " >
+                                        <td class="num" style="font-size:14px;">
+                                            2
+                                        </td>
+                                        <td class="subject" style="font-size:14px;">
+                                            <a href=" ../order/OrderNoticeView.do?busi_date=20260908&seq=1" style="text-decoration:none">
+                                            ※ 생필체인 2026년 추석 영업안내
+
+- 9/23(수)까지 정상근무...
+                                            
+	                                         </a>
+                                         </td>
+                                        <td class="date" style="font-size:12px;">
+                                            <a href="javascript:order('20260908','1')" style="text-decoration:none">
+                                            2026년09월08일</a>
+                                        </td>
+                                    </tr>
+                             
+
+                                    <tr class="first-child child_0 " >
+                                        <td class="num" style="font-size:14px;">
+                                            3
+                                        </td>
+                                        <td class="subject" style="font-size:14px;">
+                                            <a href=" ../order/OrderNoticeView.do?busi_date=20260831&seq=1" style="text-decoration:none">
+                                            ※ 상품주문방법 변경안내
+- 효율적인 수주업무와 신속한 상품 ...
+                                            
+	                                         </a>
+                                         </td>
+                                        <td class="date" style="font-size:12px;">
+                                            <a href="javascript:order('20260831','1')" style="text-decoration:none">
+                                            2026년08월31일</a>
+                                        </td>
+                                    </tr>
+                             
+
+                            
+                           
+                           
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                 </form>
+                <!-- 공지사항 end -->
+
+                <!-- 신상품 소개 start -->
+                <div class="cont02">
+                    <div class="cont_tit">
+                        <div class="cont_left"><h3><img src="../images/tit/tit_20.gif?v=2" /></h3></div>
+                        <div class="cont_right"><a href="javascript:sinsang_list()"><img src="../images/common/btn_more.png" /></a></div>
+                    </div>
+
+                    <div class="new_pro_wrap" style="height:300px;">
+                        <div class="new_pro">
+                            <div class="arr_left"><a href="javascript:imgStart('L')"><img src="../images/common/btn_left.jpg"  /></a></div>
+                            <div class="photo_wrap" id="viewArea">
+                                <div id="imgList">
+                                     
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=0&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">컨디션병120ml*10입</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">      25,500</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=1&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">아사히스타일프리캔-500ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">           0</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=2&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">만땅맥주캔5%-500ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">           0</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=3&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">효케츠복숭아캔-500ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">          71</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=4&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">효케츠레몬캔-500ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">           0</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=5&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">카스논알콜캔-350ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       1,160</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=6&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">테라제로캔-350ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">         692</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=7&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">기네스스타우드캔-440ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">           0</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=8&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">컨디션병120ml*10입</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">      25,500</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=9&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">농심)카프리썬오렌지망고-200ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">         500</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=10&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">포카리스웨트패트-900ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       1,600</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=11&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">광동)옥수수수염차-500ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       1,050</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=12&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">광동)헛개차500ml</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       1,050</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=13&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">한예지휴마일드캡물티슈100매</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">         800</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=14&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">한예지가든플라워30*30</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       9,900</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=15&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">키스헤링물티슈캡형-100매</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">         750</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=16&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">순하리상그리아진7.0캔-500ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=17&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">순하리유자진4.5캔-500ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=18&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">대선)부산소주15.7%-360ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=19&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">부산패트15.7-640ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=20&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">명주도감가시오가피-375ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=21&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">복받은부라더홍연11%-375ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=22&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">고마그라제17%375ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=23&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">광양매실주-375ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=24&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">톡소다자두캔5%-500ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=25&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">톡소다모히또7%-360ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=26&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">선양오크14.9%-360ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=27&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">선양오크패트14.9-400ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=28&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">순희막걸리750PET</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=29&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">블루문캔-500ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=30&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">오비라거캔-355ml</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=31&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">필굿엑스트라큐팩-1.6L</p>
+                                            
+                                         	
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=32&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">cj사골가득1분링80g</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       3,600</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=33&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">바지락멸치육수1분링</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       3,600</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=34&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">육수에는1분링야채</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       3,600</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+                                        <div class="img_bg">
+                                             
+                                             <a href="#" onclick="javascript:sinsang_list()">
+                                             	   
+                                             	   		
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+				                                        
+                                             	   
+	                                               
+		                                           
+		                                           
+		                                              	<img src="./image_include.jsp?flag=35&event_flag=sinsang" style="max-height: 150px; max-width: 150px; display: block; margin: 0 auto;"/>
+		                                           
+			                                       
+                                               </a>
+                                               <br>
+                                               <p class="f14 c3 b" style="padding-top: 20px; font-size:14px; text-align: center;">삼양)짜르르짜장-140*4</p>
+                                            
+                                         	
+                                            <p style="font-size:13px; text-align: center;">가격:<span class="now_pay">       4,001</span>원</p>
+                                            
+                                             <!-- <p class="f11 pad5t">제품중량 : 180g</p> -->
+                                             
+                                         </div>
+
+                                    
+
+                                </div>
+                            </div>
+                            <div class="arr_right"><a href="javascript:imgStart('R')"><img src="../images/common/btn_right.jpg" /></a></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 신상품 소개 end -->
+
+            </div>
+
+        </div><!-- container end -->
+    </div>
+    <!-- container_wrap end -->
+
+    <!-- 배너 목록 -->
+    <div style="display:grid; width:920px; margin:0 auto; grid-template-columns:1fr 1fr;">
+    	
+   			<div style="padding:7px; display: flex; justify-content: center; align-items: center;">
+   				<a href="#" onclick="javascript:order_banner(629)">
+				 	
+		            
+	                
+		                <img src="./banner_include.jsp?index=0" style="width: 460px; height: 150px;"/>
+		                <br>
+		            
+	            	
+	            </a>
+   			</div>
+        
+   			<div style="padding:7px; display: flex; justify-content: center; align-items: center;">
+   				<a href="#" onclick="javascript:order_banner(665)">
+				 	
+		            
+	                
+		                <img src="./banner_include.jsp?index=1" style="width: 460px; height: 150px;"/>
+		                <br>
+		            
+	            	
+	            </a>
+   			</div>
+        
+   			<div style="padding:7px; display: flex; justify-content: center; align-items: center;">
+   				<a href="#" onclick="javascript:order_banner(667)">
+				 	
+		            
+	                
+		                <img src="./banner_include.jsp?index=2" style="width: 460px; height: 150px;"/>
+		                <br>
+		            
+	            	
+	            </a>
+   			</div>
+        
+   			<div style="padding:7px; display: flex; justify-content: center; align-items: center;">
+   				<a href="#" onclick="javascript:order_banner(683)">
+				 	
+		            
+	                
+		                <img src="./banner_include.jsp?index=3" style="width: 460px; height: 150px;"/>
+		                <br>
+		            
+	            	
+	            </a>
+   			</div>
+        
+   			<div style="padding:7px; display: flex; justify-content: center; align-items: center;">
+   				<a href="#" onclick="javascript:order_banner(701)">
+				 	
+		            
+	                
+		                <img src="./banner_include.jsp?index=4" style="width: 460px; height: 150px;"/>
+		                <br>
+		            
+	            	
+	            </a>
+   			</div>
+        
+    </div>
+
+    <!-- footer_wrap start -->
+    <div id="footer_wrap">
+        <div id="footer">
+            
+            <div id="fcopyright">
+                <!-- <div class="flinker">
+                    <ul>
+                    <li class="first"><a href="http://www.seowon.com/company/c_Introduce.jsp" target="_blank" onfocus="this.blur();"><img src="../images/common/fmenu01.jpg" alt="회사소개"/></a></li>
+                    <li><a href="http://www.seowon.com/member/m_customShoutAddConfirm.jsp" target="_blank" onfocus="this.blur();" ><img src="../images/common/fmenu02.jpg" alt="고객센터"/></a></li>
+                    <li><a href="#" onclick="window.open('http://www.seowon.com/main/info.jsp','info','resizable=yes, scrollbars=yes');" onfocus="this.blur();" ><img src="../images/common/fmenu03.jpg" alt="개인정보취급방침"/></a></li>
+                    <li><a href="#" onclick="window.open('http://www.seowon.com/main/mail.jsp','mail','width=550,height=550,resizable=no,scrollbars=no');" onfocus="this.blur();">
+                    <img src="../images/common/fmenu04.jpg" alt="이메일무단수집거부"/></a></li>
+                    </ul>
+                </div> -->
+                <!-- <address><img src="../images/common/copy.png" alt=""/></address> -->
+                <address style="font-style: normal;color: black;font-size: 11px;font-weight:bold">(주)생필체인 사업자 소재지: 경상남도 양산시 동면 수질정화공원로 40 <font color="#cccc00">대표전화 1899-8596</font> 대표자:이윤서 개인정보보호책임자:강재경 FAX 055-380-4898~9</address>
+            </div>
+        </div>
+    </div>
+    <!--// footer_wrap end-->
+
+</div>
+
+  <script type="text/javascript">
+
+  //팝업창
+  
+</script>
+
+</body>
+</html>

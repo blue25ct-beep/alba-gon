@@ -32,6 +32,7 @@ client.on('connect', () => {
   console.log('✅ [2/2] 클라우드 릴레이 연결 완료!');
   console.log(`📡 원격 주문 대기 채널 구독 중: ${TOPIC_REQ}`);
   
+  client.subscribe(TOPIC_SYNC, {qos: 1});
   client.subscribe(TOPIC_REQ, { qos: 1 }, (err) => {
     if (err) {
       console.error('❌ 토픽 구독 실패:', err);
@@ -43,6 +44,8 @@ client.on('connect', () => {
 });
 
 client.on('message', async (topic, message) => {
+  if (topic === TOPIC_SYNC) {\n    try {\n      const payload = JSON.parse(message.toString());\n      if (payload.type === 'BACKUP_DATA' && payload.data) {\n        fs.writeFileSync('alba-gon-backup.json', JSON.stringify(payload.data, null, 2), 'utf8');\n        console.log('\\n[백업] 대시보드 데이터가 alba-gon-backup.json 에 안전하게 저장되었습니다.');\n      }\n      if (payload.type === 'REQUEST_RESTORE') {\n        if (fs.existsSync('alba-gon-backup.json')) {\n          const data = JSON.parse(fs.readFileSync('alba-gon-backup.json', 'utf8'));\n          client.publish(TOPIC_SYNC, JSON.stringify({\n            type: 'RESTORE_DATA',\n            senderId: 'BOT',\n            senderRole: 'WORKER',\n            storeId: STORE_ID,\n            timestamp: Date.now(),\n            audits: [],\n            data: data\n          }), { qos: 1 });\n          console.log('\\n[복구] 백업 데이터를 본사 대시보드로 전송했습니다.');\n        } else {\n          console.log('\\n[복구 실패] 백업 파일이 없습니다.');\n        }\n      }\n    } catch(e) {}\n    return;\n  }
+
   if (topic !== TOPIC_REQ) return;
 
   console.log('\n========================================================');

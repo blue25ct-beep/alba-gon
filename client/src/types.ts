@@ -15,6 +15,7 @@ export interface AuditItem {
   id: string;
   barcode: string;
   productName: string;
+  vendor?: 'younme' | 'spchain';
   stockCount: number;
   targetStock: number;
   minOrderQty: number;

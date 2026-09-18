@@ -1,4 +1,4 @@
-import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings } from '../types';
+﻿import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings } from '../types';
 import seedProducts from '../data/seedProducts.json';
 import seedAudits from '../data/seedAudits.json';
 import * as XLSX from 'xlsx';
@@ -15,17 +15,17 @@ const DEFAULT_SETTINGS: AppSettings = {
   managerPin: '1234',
   younmeId: '',
   younmePw: '',
-  workerName: '야간알바',
+  workerName: '?쇨컙?뚮컮',
   autoOrderEnabled: true,
 };
 
 export const storageService = {
-  // --- 상품 마스터 (Products) ---
+  // --- ?곹뭹 留덉뒪??(Products) ---
   getProducts(): Product[] {
     try {
       const data = localStorage.getItem(KEYS.PRODUCTS);
       if (!data) {
-        // 최초 실행 시 459개 엑셀 기본 상품 등록
+        // 理쒖큹 ?ㅽ뻾 ??459媛??묒? 湲곕낯 ?곹뭹 ?깅줉
         const initial = seedProducts as Product[];
         localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(initial));
         return initial;
@@ -94,34 +94,34 @@ export const storageService = {
     return { product, alias };
   },
 
-  // 사장님 요청: 바코드 마지막 4~5자리 빠른 패턴 매칭 및 상품명 검색
+  // ?ъ옣???붿껌: 諛붿퐫??留덉?留?4~5?먮━ 鍮좊Ⅸ ?⑦꽩 留ㅼ묶 諛??곹뭹紐?寃??
   searchProductsByPattern(query: string, maxResults = 10): Product[] {
     const q = query.trim().toLowerCase();
     if (!q || q.length < 2) return [];
 
     const products = this.getProducts();
 
-    // 1. 바코드 끝자리(Tail) 정확히 일치하는 상품 (가장 높은 우선순위: 예: 60205 로 끝나는 포카칩)
+    // 1. 諛붿퐫???앹옄由?Tail) ?뺥솗???쇱튂?섎뒗 ?곹뭹 (媛???믪? ?곗꽑?쒖쐞: ?? 60205 濡??앸굹???ъ뭅移?
     const tailMatches = products.filter(p => p.barcode.endsWith(q));
 
-    // 2. 바코드 중간에 포함되는 상품
+    // 2. 諛붿퐫??以묎컙???ы븿?섎뒗 ?곹뭹
     const barcodeMatches = products.filter(p => !p.barcode.endsWith(q) && p.barcode.includes(q));
 
-    // 3. 상품명에 검색어가 포함되는 상품 (한글/영문)
+    // 3. ?곹뭹紐낆뿉 寃?됱뼱媛 ?ы븿?섎뒗 ?곹뭹 (?쒓?/?곷Ц)
     const nameMatches = products.filter(p => 
       !p.barcode.includes(q) && p.name.toLowerCase().includes(q)
     );
 
-    // 우선순위 순서대로 합치고 최대 결과 개수 반환
+    // ?곗꽑?쒖쐞 ?쒖꽌?濡??⑹튂怨?理쒕? 寃곌낵 媛쒖닔 諛섑솚
     return [...tailMatches, ...barcodeMatches, ...nameMatches].slice(0, maxResults);
   },
 
-  // --- 재고 실사 (Audits) ---
+  // --- ?ш퀬 ?ㅼ궗 (Audits) ---
   getAudits(): AuditItem[] {
     try {
       const data = localStorage.getItem(KEYS.AUDITS);
       if (!data) {
-        // 최초 접속 시 사장님이 작업하신 65건 실사 품목 기본 탑재!
+        // 理쒖큹 ?묒냽 ???ъ옣?섏씠 ?묒뾽?섏떊 65嫄??ㅼ궗 ?덈ぉ 湲곕낯 ?묒옱!
         const initial = (seedAudits as unknown as AuditItem[]) || [];
         localStorage.setItem(KEYS.AUDITS, JSON.stringify(initial));
         return initial;
@@ -138,7 +138,7 @@ export const storageService = {
 
   saveAudit(item: Omit<AuditItem, 'id' | 'updatedAt'>): AuditItem {
     const audits = this.getAudits();
-    // 같은 바코드의 실사가 이미 있으면 최신 수량으로 업데이트
+    // 媛숈? 諛붿퐫?쒖쓽 ?ㅼ궗媛 ?대? ?덉쑝硫?理쒖떊 ?섎웾?쇰줈 ?낅뜲?댄듃
     const existingIndex = audits.findIndex(a => a.barcode === item.barcode);
     const updatedItem: AuditItem = {
       ...item,
@@ -155,12 +155,12 @@ export const storageService = {
     return updatedItem;
   },
 
-  // 사장님 요청: 바코드 번호에 상품명을 사장님이 직접 입력/등록하여 마스터 및 발주대기에 영구 반영
+  // ?ъ옣???붿껌: 諛붿퐫??踰덊샇???곹뭹紐낆쓣 ?ъ옣?섏씠 吏곸젒 ?낅젰/?깅줉?섏뿬 留덉뒪??諛?諛쒖＜?湲곗뿉 ?곴뎄 諛섏쁺
   registerProductName(barcode: string, newName: string): void {
     const trimmed = newName.trim();
     if (!trimmed) return;
 
-    // 1. 실사 목록(Audits)의 상품명 갱신 및 isUnmapped 해제
+    // 1. ?ㅼ궗 紐⑸줉(Audits)???곹뭹紐?媛깆떊 諛?isUnmapped ?댁젣
     const audits = this.getAudits().map(a => {
       if (a.barcode === barcode) {
         return {
@@ -173,7 +173,7 @@ export const storageService = {
     });
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
 
-    // 2. 마스터 상품(Products) 목록에 추가 또는 이름 수정 (영구 보관)
+    // 2. 留덉뒪???곹뭹(Products) 紐⑸줉??異붽? ?먮뒗 ?대쫫 ?섏젙 (?곴뎄 蹂닿?)
     const products = this.getProducts();
     const existingIdx = products.findIndex(p => p.barcode === barcode);
     if (existingIdx >= 0) {
@@ -182,7 +182,7 @@ export const storageService = {
       products.unshift({
         barcode,
         name: trimmed,
-        category: '미등록신상품',
+        category: '誘몃벑濡앹떊?곹뭹',
         price: 0,
         cost: 0,
         targetStock: 10,
@@ -201,7 +201,7 @@ export const storageService = {
     localStorage.setItem(KEYS.AUDITS, JSON.stringify([]));
   },
 
-  // --- 대체 바코드 매핑 (Aliases: 구형 바코드 ➡️ 신규 발주용 바코드) ---
+  // --- ?泥?諛붿퐫??留ㅽ븨 (Aliases: 援ы삎 諛붿퐫???∽툘 ?좉퇋 諛쒖＜??諛붿퐫?? ---
   getAliases(): BarcodeAlias[] {
     try {
       const data = localStorage.getItem(KEYS.ALIASES);
@@ -211,7 +211,7 @@ export const storageService = {
     }
   },
 
-  saveAlias(alias: Omit<BarcodeAlias, 'id' | 'updatedAt'>): BarcodeAlias {
+  saveAliases(aliases: any): void { localStorage.setItem(KEYS.ALIASES, JSON.stringify(aliases)); }, saveAlias(alias: Omit<BarcodeAlias, 'id' | 'updatedAt'>): BarcodeAlias {
     const list = this.getAliases();
     const existingIndex = list.findIndex(a => a.oldBarcode === alias.oldBarcode);
     const item: BarcodeAlias = {
@@ -234,7 +234,7 @@ export const storageService = {
     localStorage.setItem(KEYS.ALIASES, JSON.stringify(list));
   },
 
-  // --- 발주 실패 관리함 (Failures: 행 삭제 및 재시도 지원) ---
+  // --- 諛쒖＜ ?ㅽ뙣 愿由ы븿 (Failures: ????젣 諛??ъ떆??吏?? ---
   getOrderFailures(): OrderFailure[] {
     try {
       const data = localStorage.getItem(KEYS.FAILURES);
@@ -259,13 +259,13 @@ export const storageService = {
     localStorage.removeItem(KEYS.FAILURES);
   },
 
-  // --- 시스템 설정 (Settings: 유앤미 아이디/비번, 4자리 PIN - 안전한 암호화 저장) ---
+  // --- ?쒖뒪???ㅼ젙 (Settings: ?좎븻誘??꾩씠??鍮꾨쾲, 4?먮━ PIN - ?덉쟾???뷀샇????? ---
   getSettings(): AppSettings {
     try {
       const data = localStorage.getItem(KEYS.SETTINGS);
       if (!data) return DEFAULT_SETTINGS;
       const raw = JSON.parse(data);
-      // 비밀번호 복호화 (암호문 prefix 'enc:' 확인)
+      // 鍮꾨?踰덊샇 蹂듯샇??(?뷀샇臾?prefix 'enc:' ?뺤씤)
       if (raw.younmePw && raw.younmePw.startsWith('enc:')) {
         try {
           const decoded = atob(raw.younmePw.replace('enc:', ''));
@@ -282,7 +282,7 @@ export const storageService = {
     const current = this.getSettings();
     const updated = { ...current, ...settings };
     
-    // 로컬스토리지에는 암호화된 형태로만 보관 (알바나 F12 개발자도구로 평문 노출 방지)
+    // 濡쒖뺄?ㅽ넗由ъ??먮뒗 ?뷀샇?붾맂 ?뺥깭濡쒕쭔 蹂닿? (?뚮컮??F12 媛쒕컻?먮룄援щ줈 ?됰Ц ?몄텧 諛⑹?)
     const toStore = { ...updated };
     if (toStore.younmePw) {
       try {
@@ -295,7 +295,7 @@ export const storageService = {
     return updated;
   },
 
-  // --- 과거 발주 엑셀 파싱 및 마스터 DB 업데이트 ---
+  // --- 怨쇨굅 諛쒖＜ ?묒? ?뚯떛 諛?留덉뒪??DB ?낅뜲?댄듃 ---
   async importExcelFile(file: File): Promise<{ count: number; duplicates: number }> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -304,14 +304,14 @@ export const storageService = {
           const text = e.target?.result as string;
           let parsedProducts: Product[] = [];
 
-          // 유앤미24 HTML 형식 엑셀 파싱 (HTML Table)
+          // ?좎븻誘?4 HTML ?뺤떇 ?묒? ?뚯떛 (HTML Table)
           if (text.includes('<table') || text.includes('<TABLE')) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(text, 'text/html');
             const rows = doc.querySelectorAll('tr');
             
             rows.forEach((row, idx) => {
-              if (idx < 2) return; // 제목 및 헤더 행 스킵
+              if (idx < 2) return; // ?쒕ぉ 諛??ㅻ뜑 ???ㅽ궢
               const cells = row.querySelectorAll('td');
               if (cells.length >= 6) {
                 const barcode = cells[2]?.textContent?.trim() || '';
@@ -325,7 +325,7 @@ export const storageService = {
                     name,
                     price,
                     cost,
-                    category: '기타',
+                    category: '湲고?',
                     targetStock: 10,
                     minOrderQty: 10,
                   });
@@ -333,7 +333,7 @@ export const storageService = {
               }
             });
           } else {
-            // 일반 바이너리 XLSX / XLS 파싱
+            // ?쇰컲 諛붿씠?덈━ XLSX / XLS ?뚯떛
             const workbook = XLSX.read(text, { type: 'binary' });
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
             const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as string[][];
@@ -349,7 +349,7 @@ export const storageService = {
                     name,
                     price: Number(row[2]) || 0,
                     cost: Number(row[3]) || 0,
-                    category: '기타',
+                    category: '湲고?',
                     targetStock: 10,
                     minOrderQty: 10,
                   });
@@ -358,7 +358,7 @@ export const storageService = {
             }
           }
 
-          // 기존 마스터 DB와 병합
+          // 湲곗〈 留덉뒪??DB? 蹂묓빀
           const current = this.getProducts();
           const map = new Map<string, Product>();
           current.forEach(p => map.set(p.barcode, p));
@@ -379,8 +379,11 @@ export const storageService = {
         }
       };
       reader.onerror = reject;
-      // HTML 엑셀인 경우 텍스트로, 아닌 경우 바이너리로 읽기
+      // HTML ?묒???寃쎌슦 ?띿뒪?몃줈, ?꾨땶 寃쎌슦 諛붿씠?덈━濡??쎄린
       reader.readAsText(file, 'euc-kr');
     });
   },
 };
+
+
+
