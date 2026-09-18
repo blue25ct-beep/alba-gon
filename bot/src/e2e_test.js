@@ -16,7 +16,7 @@ async function runE2ETest() {
   console.log('[1/5] 웹 대시보드(http://localhost:5173) 접속 중...');
   await page.goto('http://localhost:5173/#/admin', { waitUntil: 'domcontentloaded' }).catch(async () => {
     console.log('      로컬 dev 서버 대신 정적 배포 페이지 접속 시도...');
-    await page.goto('https://teelukira.github.io/alba-gon/#/admin', { waitUntil: 'domcontentloaded' });
+    await page.goto('https://blue25ct-beep.github.io/alba-gon/#/admin', { waitUntil: 'domcontentloaded' });
   });
   await page.waitForTimeout(1000);
 

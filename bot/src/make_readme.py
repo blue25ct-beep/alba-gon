@@ -11,7 +11,7 @@ readme_content = """# 🏪 편의점 알바곤 (Alba-Gon)
 ---
 
 ## 📱 스마트폰 접속 주소 (평생 무료 & 앱 설치 필요 없음)
-👉 **[https://teelukira.github.io/alba-gon/](https://teelukira.github.io/alba-gon/)**
+👉 **[https://blue25ct-beep.github.io/alba-gon/](https://blue25ct-beep.github.io/alba-gon/)**
 *(아이폰, 갤럭시, 태블릿, PC 등 인터넷 브라우저만 있으면 어디서나 바로 열립니다!)*
 
 ---
@@ -62,14 +62,14 @@ readme_content = """# 🏪 편의점 알바곤 (Alba-Gon)
 ---
 
 ### 📱 2. 알바가 할 일 (월/목 퇴근 전)
-1. 매장 공용폰으로 **https://teelukira.github.io/alba-gon/** 접속 후 **[알바 모드]** 클릭
+1. 매장 공용폰으로 **https://blue25ct-beep.github.io/alba-gon/** 접속 후 **[알바 모드]** 클릭
 2. 매대를 돌며 부족한 상품 바코드를 카메라로 삑삑 스캔하고, 현재 매장에 남아있는 개수만 입력
 3. 스캔이 끝나면 폰을 카운터에 내려놓고 기분 좋게 퇴근!
 
 ---
 
 ### 👑 3. 사장님이 할 일 (퇴근길 지하철, 집 침대 어디서든)
-1. 스마트폰으로 **https://teelukira.github.io/alba-gon/** 접속 후 **[사장님 관리 대시보드]** 클릭 (기본 PIN: `1234`)
+1. 스마트폰으로 **https://blue25ct-beep.github.io/alba-gon/** 접속 후 **[사장님 관리 대시보드]** 클릭 (기본 PIN: `1234`)
 2. 알바가 찍어둔 재고를 바탕으로 시스템이 자동 계산한 **[추천 발주 수량]**을 훑어봅니다.
    *(더 시키고 싶거나 덜 시키고 싶은 것만 `+`, `-` 버튼으로 살짝 조절)*
 3. 화면 맨 위 파란색 **[🚀 유앤미24 자동 발주 시작]** 버튼을 뙇 누릅니다!

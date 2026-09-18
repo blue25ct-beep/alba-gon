@@ -65,7 +65,7 @@ echo ========================================================
 echo.
 echo   [앞으로 사용 방법]
 echo   1. 컴퓨터 켜실 때 '2_웹앱연동_자동발주봇_실행.bat' 을 더블클릭해두세요.
-echo   2. 스마트폰으로 https://teelukira.github.io/alba-gon/ 에 접속해서
+echo   2. 스마트폰으로 https://blue25ct-beep.github.io/alba-gon/ 에 접속해서
 echo      [유앤미24 자동 발주 시작] 버튼을 누르시면 됩니다!
 echo.
 pause

@@ -11,7 +11,7 @@
 ---
 
 ## 📱 스마트폰 접속 주소 (평생 무료 & 앱 설치 필요 없음)
-👉 **[https://teelukira.github.io/alba-gon/](https://teelukira.github.io/alba-gon/)**
+👉 **[https://blue25ct-beep.github.io/alba-gon/](https://blue25ct-beep.github.io/alba-gon/)**
 *(아이폰, 갤럭시, 태블릿, PC 등 인터넷 브라우저만 있으면 어디서나 바로 열립니다!)*
 
 ---
@@ -99,7 +99,7 @@ sequenceDiagram
 ---
 
 ### 📱 2. 알바가 할 일 (월/목 퇴근 전)
-1. 매장 공용폰으로 **https://teelukira.github.io/alba-gon/** 접속 후 **[알바 모드]** 클릭
+1. 매장 공용폰으로 **https://blue25ct-beep.github.io/alba-gon/** 접속 후 **[알바 모드]** 클릭
 2. **빠른 바코드 스캔 / 입력:**
    - 카메라로 바코드를 삑 비추거나,
    - **바코드 끝 4~5자리(예: 60205)만 키보드로 치면 일치하는 상품 리스트가 드롭박스로 뙇 뜹니다!**
@@ -111,7 +111,7 @@ sequenceDiagram
 ---
 
 ### 👑 3. 사장님이 할 일 (퇴근길 지하철, 집 침대 어디서든)
-1. 스마트폰으로 **https://teelukira.github.io/alba-gon/** 접속 후 **[사장님 관리 대시보드]** 클릭 (기본 PIN: `1234`)
+1. 스마트폰으로 **https://blue25ct-beep.github.io/alba-gon/** 접속 후 **[사장님 관리 대시보드]** 클릭 (기본 PIN: `1234`)
 2. 알바가 찍어둔 재고를 바탕으로 시스템이 자동 계산한 **[추천 발주 수량]**을 훑어봅니다.
    *(더 시키고 싶거나 덜 시키고 싶은 것만 `+`, `-` 버튼으로 살짝 조절)*
 3. 화면 맨 위 파란색 **[🚀 유앤미24 자동 발주 시작]** 버튼을 뙇 누릅니다!

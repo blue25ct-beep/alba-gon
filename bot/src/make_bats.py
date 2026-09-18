@@ -29,7 +29,7 @@ echo   [편의점 알바곤] 웹 앱 연동 유앤미 자동 발주 봇 실행
 echo ========================================================
 echo.
 echo   [안내] 봇 서버가 켜졌습니다 (대기 중...)
-echo   이제 사장님 폰이나 웹 브라우저(https://teelukira.github.io/alba-gon/)에서
+echo   이제 사장님 폰이나 웹 브라우저(https://blue25ct-beep.github.io/alba-gon/)에서
 echo   [유앤미24 자동 발주 시작] 버튼을 누르시면,
 echo   이 PC에서 크롬 창이 자동으로 열리며 유앤미24에 실제 발주가 들어갑니다!
 echo.
