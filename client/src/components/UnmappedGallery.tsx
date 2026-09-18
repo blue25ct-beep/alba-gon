@@ -95,10 +95,10 @@ export const UnmappedGallery: React.FC<UnmappedGalleryProps> = ({
           <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-5 px-6 pb-6">
             {/* 사진 */}
             <div className="space-y-3">
-              <div className="aspect-square bg-sunken rounded-2xl overflow-hidden flex items-center justify-center">
-                {selectedAudit?.photoUrl ? (
+              <div className="aspect-square bg-sunken rounded-2xl overflow-hidden flex items-center justify-center relative">
+                {(selectedAudit?.photoUrls?.[0] || selectedAudit?.photoUrl) ? (
                   <img
-                    src={selectedAudit.photoUrl}
+                    src={(selectedAudit.photoUrls?.[0] || selectedAudit.photoUrl)!}
                     alt="등록할 상품"
                     className="w-full h-full object-contain"
                   />
@@ -106,6 +106,11 @@ export const UnmappedGallery: React.FC<UnmappedGalleryProps> = ({
                   <div className="text-center">
                     <ImageIcon className="w-7 h-7 text-ink-faint mx-auto mb-2" />
                     <span className="text-[13px] text-ink-faint">사진 없음</span>
+                  </div>
+                )}
+                {selectedAudit?.photoUrls && selectedAudit.photoUrls.length > 1 && (
+                  <div className="absolute top-2 right-2 bg-ink/50 text-white text-[11px] px-2 py-0.5 rounded-full backdrop-blur-sm">
+                    +{(selectedAudit.photoUrls.length - 1)}장 더 있음 (기본화면 참고)
                   </div>
                 )}
               </div>
@@ -123,8 +128,8 @@ export const UnmappedGallery: React.FC<UnmappedGalleryProps> = ({
                           : 'opacity-60 hover:opacity-100'
                       }`}
                     >
-                      {a.photoUrl ? (
-                        <img src={a.photoUrl} alt="" className="w-full h-full object-cover" />
+                      {(a.photoUrls?.[0] || a.photoUrl) ? (
+                        <img src={(a.photoUrls?.[0] || a.photoUrl)!} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <span className="w-full h-full bg-sunken flex items-center justify-center text-[13px] text-ink-faint tabular">
                           {a.barcode.slice(-4)}

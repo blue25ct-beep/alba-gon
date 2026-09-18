@@ -119,7 +119,9 @@ export const AdminDashboard: React.FC = () => {
     };
   });
 
-  const itemsToOrder = orderItems.filter((item) => item.finalOrderQty > 0);
+  const allItemsToOrder = orderItems.filter((item) => item.finalOrderQty > 0);
+  const coupangItems = allItemsToOrder.filter((item) => item.productName.includes('쿠팡]'));
+  const itemsToOrder = allItemsToOrder.filter((item) => !item.productName.includes('쿠팡]'));
 
   const handleSnapToMultiple = (barcode: string, val: number, minQty: number) => {
     const step = Math.max(1, minQty);
@@ -151,11 +153,13 @@ export const AdminDashboard: React.FC = () => {
 
   const handleTargetStockChange = (barcode: string, val: number) => {
     storageService.updateProductTargetStock(barcode, Math.max(0, val));
+    cloudSyncService.broadcastProductsUpdate('ADMIN');
     loadData();
   };
 
   const handleMinOrderQtyChange = (barcode: string, val: number) => {
     storageService.updateProductMinOrderQty(barcode, Math.max(1, val));
+    cloudSyncService.broadcastProductsUpdate('ADMIN');
     loadData();
   };
 
@@ -190,6 +194,7 @@ export const AdminDashboard: React.FC = () => {
     const trimmed = editingName.trim();
     if (trimmed) {
       storageService.registerProductName(barcode, trimmed);
+      cloudSyncService.broadcastProductsUpdate('ADMIN');
       loadData();
     }
     setEditingBarcode(null);
@@ -297,6 +302,15 @@ export const AdminDashboard: React.FC = () => {
               {itemsToOrder.length}
             </p>
           </div>
+
+          {coupangItems.length > 0 && (
+            <div>
+              <p className="text-sm text-ink-faint">📦 쿠팡 주문 필요</p>
+              <p className="mt-1 text-[32px] leading-none font-semibold text-blue-500 tabular">
+                {coupangItems.length}
+              </p>
+            </div>
+          )}
 
           {unmappedAudits.length > 0 && (
             <button
@@ -527,20 +541,21 @@ export const AdminDashboard: React.FC = () => {
                             </div>
                           ) : (
                             <div className="flex items-center gap-2.5 group">
-                              {audit?.photoUrl && (
+                              {(audit?.photoUrls?.length ? audit.photoUrls : audit?.photoUrl ? [audit.photoUrl] : []).map((p, i) => (
                                 <button
                                   type="button"
-                                  onClick={() => setPreviewPhotoUrl(audit.photoUrl!)}
+                                  key={i}
+                                  onClick={() => setPreviewPhotoUrl(p)}
                                   className="w-9 h-9 rounded-lg overflow-hidden border border-line shrink-0"
                                   aria-label="촬영한 사진 보기"
                                 >
                                   <img
-                                    src={audit.photoUrl}
+                                    src={p}
                                     alt=""
                                     className="w-full h-full object-cover"
                                   />
                                 </button>
-                              )}
+                              ))}
 
                               <span className="min-w-0">
                                 <span
@@ -716,7 +731,7 @@ export const AdminDashboard: React.FC = () => {
       {showUnmappedModal && (
         <UnmappedGallery
           unmappedAudits={unmappedAudits}
-          onProductMapped={loadData}
+          onProductMapped={() => { cloudSyncService.broadcastProductsUpdate('ADMIN'); loadData(); }}
           onClose={() => setShowUnmappedModal(false)}
         />
       )}
@@ -725,6 +740,7 @@ export const AdminDashboard: React.FC = () => {
         <BarcodeAliasModal
           initialOldBarcode={aliasTargetBarcode}
           onClose={() => setShowAliasModal(false)}
+          onUpdate={() => { cloudSyncService.broadcastProductsUpdate('ADMIN'); loadData(); }}
         />
       )}
 
@@ -744,7 +760,7 @@ export const AdminDashboard: React.FC = () => {
       {showStockSetupModal && (
         <ProductStockSetupModal
           onClose={() => setShowStockSetupModal(false)}
-          onUpdated={loadData}
+          onUpdated={() => { cloudSyncService.broadcastProductsUpdate('ADMIN'); loadData(); }}
         />
       )}
 

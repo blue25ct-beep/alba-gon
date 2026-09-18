@@ -1,9 +1,9 @@
-﻿import mqtt, { MqttClient } from 'mqtt';
+import mqtt, { MqttClient } from 'mqtt';
 import { AuditItem } from '../types';
 import { storageService } from './storage';
 
 export interface AuditsSyncMessage {
-  type: 'AUDITS_UPDATE' | 'AUDITS_CLEAR' | 'PING';
+  type: 'AUDITS_UPDATE' | 'AUDITS_CLEAR' | 'PRODUCTS_UPDATE' | 'PING';
   senderId: string;
   senderRole: 'WORKER' | 'ADMIN';
   storeId: string;
@@ -15,6 +15,7 @@ export type SyncStatus = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED' | 'ERROR';
 
 type SyncListener = (audits: AuditItem[], message: AuditsSyncMessage) => void;
 type StatusListener = (status: SyncStatus, lastSyncTime?: string) => void;
+type VoidListener = () => void;
 
 class CloudSyncService {
   private client: MqttClient | null = null;
@@ -22,6 +23,8 @@ class CloudSyncService {
   private mySenderId: string = '';
   private syncListeners: Set<SyncListener> = new Set();
   private statusListeners: Set<StatusListener> = new Set();
+  private clearListeners: Set<VoidListener> = new Set();
+  private productsUpdateListeners: Set<VoidListener> = new Set();
   private connectionStatus: SyncStatus = 'DISCONNECTED';
   private lastSyncTime: string = '';
 
@@ -54,6 +57,16 @@ class CloudSyncService {
   public onSync(listener: SyncListener): () => void {
     this.syncListeners.add(listener);
     return () => this.syncListeners.delete(listener);
+  }
+
+  public onClearCommand(listener: VoidListener): () => void {
+    this.clearListeners.add(listener);
+    return () => this.clearListeners.delete(listener);
+  }
+
+  public onProductsUpdate(listener: VoidListener): () => void {
+    this.productsUpdateListeners.add(listener);
+    return () => this.productsUpdateListeners.delete(listener);
   }
 
   public onStatusChange(listener: StatusListener): () => void {
@@ -118,10 +131,13 @@ class CloudSyncService {
             return;
           }
 
-          if (msg.type === 'AUDITS_UPDATE') {
+          if (msg.type === 'PRODUCTS_UPDATE') {
+            this.productsUpdateListeners.forEach((l) => l());
+          } else if (msg.type === 'AUDITS_UPDATE') {
             storageService.saveAudits(msg.audits || []);
             this.notifySync(msg.audits || [], msg);
           } else if (msg.type === 'AUDITS_CLEAR') {
+            this.clearListeners.forEach((l) => l());
             storageService.clearAudits();
             this.notifySync([], msg);
           }
@@ -183,6 +199,34 @@ class CloudSyncService {
       this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
         if (err) {
           console.error('[CloudSync] 발행 실패:', err);
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      });
+    });
+  }
+
+  public broadcastProductsUpdate(role: 'WORKER' | 'ADMIN' = 'ADMIN'): Promise<boolean> {
+    return new Promise((resolve) => {
+      const topicSync = `albagom/stores/store_${this.currentStoreId}/audits_sync`;
+      const payload: AuditsSyncMessage = {
+        type: 'PRODUCTS_UPDATE',
+        senderId: this.mySenderId,
+        senderRole: role,
+        storeId: this.currentStoreId,
+        timestamp: Date.now(),
+        audits: [],
+      };
+
+      if (!this.client || !this.client.connected) {
+        resolve(false);
+        return;
+      }
+
+      this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
+        if (err) {
+          console.error('[CloudSync] 상품 업데이트 발행 실패:', err);
           resolve(false);
         } else {
           resolve(true);

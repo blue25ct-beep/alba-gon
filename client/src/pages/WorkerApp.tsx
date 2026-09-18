@@ -11,7 +11,7 @@ export const WorkerApp: React.FC = () => {
   const [audits, setAudits] = useState<AuditItem[]>([]);
   const [activeBarcode, setActiveBarcode] = useState<string | null>(null);
   const [detectedProduct, setDetectedProduct] = useState<Product | undefined>(undefined);
-  const [pendingPhoto, setPendingPhoto] = useState<string | null>(null);
+  const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [step, setStep] = useState<'IDLE' | 'QUANTITY' | 'PHOTO'>('IDLE');
   const [workerName, setWorkerName] = useState('주간알바');
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('DISCONNECTED');
@@ -20,8 +20,8 @@ export const WorkerApp: React.FC = () => {
   const [sendSuccessMsg, setSendSuccessMsg] = useState(false);
 
   useEffect(() => {
-    setAudits(storageService.getAudits());
     setWorkerName(storageService.getSettings().workerName);
+    setAudits(storageService.getAudits());
 
     cloudSyncService.connect(undefined, 'WORKER');
 
@@ -34,9 +34,22 @@ export const WorkerApp: React.FC = () => {
       if (time) setLastSyncTime(time);
     });
 
+    const unsubClear = cloudSyncService.onClearCommand(() => {
+      setAudits([]);
+      storageService.clearAudits();
+    });
+
+    const unsubProducts = cloudSyncService.onProductsUpdate(() => {
+      // 갱신 시 화면 새로고침 (간단한 구현)
+      window.location.reload();
+    });
+
     return () => {
       unsubSync();
       unsubStatus();
+      unsubClear();
+      unsubProducts();
+      cloudSyncService.disconnect();
     };
   }, []);
 
@@ -48,20 +61,20 @@ export const WorkerApp: React.FC = () => {
     setDetectedProduct(product);
 
     if (product) {
-      setPendingPhoto(null);
+      setPendingPhotos([]);
       setStep('QUANTITY');
     } else {
       setStep('PHOTO');
     }
   };
 
-  const handlePhotoCaptured = (photoBase64: string) => {
-    setPendingPhoto(photoBase64);
+  const handlePhotoCaptured = (photos: string[]) => {
+    setPendingPhotos(photos);
     setStep('QUANTITY');
   };
 
   const handlePhotoSkipped = () => {
-    setPendingPhoto(null);
+    setPendingPhotos([]);
     setStep('QUANTITY');
   };
 
@@ -77,7 +90,7 @@ export const WorkerApp: React.FC = () => {
       stockCount: quantity,
       targetStock: detectedProduct ? detectedProduct.targetStock : 10,
       minOrderQty: detectedProduct ? detectedProduct.minOrderQty : 1,
-      photoUrl: pendingPhoto || undefined,
+      photoUrls: pendingPhotos,
       isUnmapped,
       workerName,
     });

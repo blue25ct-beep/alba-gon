@@ -6,7 +6,8 @@ export interface Product {
   category: string;
   targetStock: number;  // 기본 목표 진열수량 (안전재고)
   minOrderQty: number;  // 최소 발주수량 (MOQ)
-  photoUrl?: string;    // 미등록 시 찍은 사진
+  photoUrl?: string;    // (하위호환) 미등록 시 찍은 사진
+  photoUrls?: string[]; // 미등록 시 찍은 여러 장의 사진
   isNewProduct?: boolean;
 }
 
@@ -17,7 +18,8 @@ export interface AuditItem {
   stockCount: number;
   targetStock: number;
   minOrderQty: number;
-  photoUrl?: string;
+  photoUrl?: string;    // (하위호환)
+  photoUrls?: string[]; // 여러 장의 사진
   isUnmapped?: boolean;
   workerName: string;
   updatedAt: string;

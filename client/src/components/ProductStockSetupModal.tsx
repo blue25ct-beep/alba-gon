@@ -43,20 +43,25 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     onUpdated();
   };
 
-  const handleBatchUpdate = () => {
-    if (
-      !confirm(
-        `${filtered.length}개 상품의 목표 재고를 ${batchTargetStock}개, 발주단위를 ${batchMinOrderQty}개로 바꿉니다.`
-      )
-    ) {
-      return;
-    }
+  const handleBatchUpdateTargetStock = () => {
+    if (!confirm(`${filtered.length}개 상품의 목표 재고를 ${batchTargetStock}개로 바꿉니다.`)) return;
 
     const filteredBarcodes = new Set(filtered.map((f) => f.barcode));
     const updated = products.map((p) =>
-      filteredBarcodes.has(p.barcode)
-        ? { ...p, targetStock: batchTargetStock, minOrderQty: batchMinOrderQty }
-        : p
+      filteredBarcodes.has(p.barcode) ? { ...p, targetStock: batchTargetStock } : p
+    );
+
+    setProducts(updated);
+    storageService.saveProducts(updated);
+    onUpdated();
+  };
+
+  const handleBatchUpdateMinOrderQty = () => {
+    if (!confirm(`${filtered.length}개 상품의 발주단위를 ${batchMinOrderQty}개로 바꿉니다.`)) return;
+
+    const filteredBarcodes = new Set(filtered.map((f) => f.barcode));
+    const updated = products.map((p) =>
+      filteredBarcodes.has(p.barcode) ? { ...p, minOrderQty: batchMinOrderQty } : p
     );
 
     setProducts(updated);
@@ -119,32 +124,39 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
             <span className="text-[13px] text-ink-faint">
               검색된 {filtered.length}개를 한 번에
             </span>
-            <label className="inline-flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-sunken rounded-full pr-1 pl-3 h-9">
               <span className="text-[13px]">목표</span>
               <input
                 type="number"
                 min="1"
                 value={batchTargetStock}
                 onChange={(e) => setBatchTargetStock(Math.max(1, parseInt(e.target.value) || 1))}
-                className={numberFieldClass}
+                className="w-12 h-7 text-center rounded bg-surface border-none text-sm tabular focus:outline-none"
               />
-            </label>
-            <label className="inline-flex items-center gap-2">
+              <button
+                onClick={handleBatchUpdateTargetStock}
+                className="h-7 px-3 rounded-full bg-white shadow-sm text-[12px] font-medium text-ink-soft hover:text-ink transition-colors"
+              >
+                적용
+              </button>
+            </div>
+            
+            <div className="flex items-center gap-2 bg-sunken rounded-full pr-1 pl-3 h-9">
               <span className="text-[13px]">발주단위</span>
               <input
                 type="number"
                 min="1"
                 value={batchMinOrderQty}
                 onChange={(e) => setBatchMinOrderQty(Math.max(1, parseInt(e.target.value) || 1))}
-                className={numberFieldClass}
+                className="w-12 h-7 text-center rounded bg-surface border-none text-sm tabular focus:outline-none"
               />
-            </label>
-            <button
-              onClick={handleBatchUpdate}
-              className="h-9 px-4 rounded-full bg-sunken hover:bg-line text-[13px] font-medium text-ink-soft transition-colors"
-            >
-              적용
-            </button>
+              <button
+                onClick={handleBatchUpdateMinOrderQty}
+                className="h-7 px-3 rounded-full bg-white shadow-sm text-[12px] font-medium text-ink-soft hover:text-ink transition-colors"
+              >
+                적용
+              </button>
+            </div>
           </div>
         </div>
 

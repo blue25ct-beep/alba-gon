@@ -1,9 +1,10 @@
-﻿const path = require('path');
+const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const http = require('http');
 const querystring = require('querystring');
+const iconv = require('iconv-lite');
 
 const USER_ID = process.env.YOUNME_USER_ID || '1060';
 const USER_PW = process.env.YOUNME_PASSWORD;
@@ -141,6 +142,22 @@ async function runDirectOrderAdd(items, onProgress) {
   // 3. 품목 순회하며 정확한 단가(price)를 포함하여 장바구니 추가
   for (let i = 0; i < items.length; i++) {
     const item = items[i];
+
+    // 쿠팡 전용 상품 건너뛰기
+    if (item.productName && item.productName.includes('쿠팡]')) {
+      failures.push({
+        id: `fail_${Date.now()}_${item.barcode}`,
+        barcode: item.barcode,
+        productName: item.productName,
+        failReason: 'COUPANG_ONLY',
+        failDetail: '쿠팡 별도 주문 상품입니다.',
+        attemptedQty: item.finalOrderQty,
+        minOrderQty: item.minOrderQty,
+        failedAt: new Date().toLocaleTimeString('ko-KR'),
+      });
+      continue;
+    }
+
     const targetBarcode = item.usingAliasBarcode || item.barcode;
     const isChilled = item.category?.includes('냉동') || item.category?.includes('저온');
     const folder = isChilled ? 'app3' : 'app1';
@@ -195,7 +212,18 @@ async function runDirectOrderAdd(items, onProgress) {
       });
 
       const location = addRes.headers['location'] || '';
-      const isSuccess = (addRes.statusCode === 200 || addRes.statusCode === 302) && !location.includes('msg=err');
+      const bodyStr = iconv.decode(addRes.body, 'EUC-KR');
+      const alertMatch = bodyStr.match(/<script>.*?alert\(['"]([^'"]+)['"]\)/i);
+
+      let isSuccess = (addRes.statusCode === 200 || addRes.statusCode === 302) && !location.includes('msg=err');
+      let failDetail = `서버 응답: ${addRes.statusCode} (${location || '오류'})`;
+      let failReason = 'HTTP_ERROR';
+
+      if (alertMatch) {
+        isSuccess = false;
+        failDetail = alertMatch[1];
+        failReason = 'OUT_OF_STOCK'; // alert으로 잡히는 건 보통 품절/판매중지/권한오류
+      }
 
       if (isSuccess) {
         successCount++;
@@ -204,8 +232,8 @@ async function runDirectOrderAdd(items, onProgress) {
           id: `fail_${Date.now()}_${item.barcode}`,
           barcode: item.barcode,
           productName: item.productName,
-          failReason: 'HTTP_ERROR',
-          failDetail: `서버 응답: ${addRes.statusCode} (${location || '오류'})`,
+          failReason: failReason,
+          failDetail: failDetail,
           attemptedQty: item.finalOrderQty,
           minOrderQty: item.minOrderQty,
           failedAt: new Date().toLocaleTimeString('ko-KR'),

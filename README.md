@@ -82,7 +82,7 @@ sequenceDiagram
 2. 메모장 내용 중 사장님의 진짜 유앤미 아이디와 비밀번호를 적어주세요:
    ```env
    YOUNME_USER_ID=1060
-   YOUNME_PASSWORD=사장님의_유앤미비밀번호
+   YOUNME_PASSWORD=7020
    ```
 3. 메모장 상단 메뉴에서 **[파일] ➡️ [저장]** (또는 단축키 `Ctrl + S`)을 누르고 메모장을 닫습니다.
 

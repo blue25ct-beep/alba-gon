@@ -198,7 +198,7 @@ export const storageService = {
   },
 
   clearAudits(): void {
-    localStorage.removeItem(KEYS.AUDITS);
+    localStorage.setItem(KEYS.AUDITS, JSON.stringify([]));
   },
 
   // --- 대체 바코드 매핑 (Aliases: 구형 바코드 ➡️ 신규 발주용 바코드) ---

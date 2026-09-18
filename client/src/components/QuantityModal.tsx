@@ -23,8 +23,7 @@ export const QuantityModal: React.FC<QuantityModalProps> = ({
     setQuantity((prev) => Math.max(0, prev + delta));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     onSave(quantity);
   };
 
@@ -52,7 +51,7 @@ export const QuantityModal: React.FC<QuantityModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <div className="p-6 space-y-5">
           {/* 수량 */}
           <div className="flex items-center justify-between gap-4">
             <button
@@ -106,12 +105,13 @@ export const QuantityModal: React.FC<QuantityModalProps> = ({
           </div>
 
           <button
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             className="w-full py-4 rounded-full bg-sage hover:bg-sage-deep text-white font-medium transition-colors"
           >
             저장하고 다음 스캔
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
