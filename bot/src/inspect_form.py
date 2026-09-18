@@ -10,7 +10,7 @@ with open(env_path, 'r', encoding='utf-8') as f:
             k, v = line.split('=', 1)
             env[k.strip()] = v.strip()
 
-user_id = env.get('YOUNME_USER_ID', '1060')
+user_id = env.get('YOUNME_USER_ID', '047458')
 user_pw = env.get('YOUNME_PASSWORD', '')
 
 print(f'Using User ID: {user_id}')
