@@ -1,6 +1,6 @@
 const mqtt = require('mqtt');
 
-const STORE_ID = '1060';
+const STORE_ID = '047458';
 const TOPIC_REQ = `albagom/orders/store_${STORE_ID}/request`;
 const TOPIC_RES = `albagom/orders/store_${STORE_ID}/response`;
 

@@ -6,7 +6,7 @@ const http = require('http');
 const querystring = require('querystring');
 const iconv = require('iconv-lite');
 
-const USER_ID = process.env.YOUNME_USER_ID || '1060';
+const USER_ID = process.env.YOUNME_USER_ID || '047458';
 const USER_PW = process.env.YOUNME_PASSWORD;
 
 // 1. 湲곕낯 留덉뒪???곗씠??濡쒕뱶 (460??媛??덈ぉ ?좎븻誘?怨듭떇 怨듦툒?④? 罹먯떆)
