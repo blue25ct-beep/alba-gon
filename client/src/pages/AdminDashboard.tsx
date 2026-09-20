@@ -95,7 +95,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     const { product, alias } = storageService.findProduct(audit.barcode);
 
     const targetStock =
-      audit.targetStock !== undefined ? audit.targetStock : product ? product.targetStock : 10;
+      audit.targetStock !== undefined ? audit.targetStock : product ? product.targetStock : 1;
 
     const minOrderQty =
       audit.minOrderQty !== undefined

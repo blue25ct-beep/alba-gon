@@ -25,6 +25,13 @@ async function runSpchainOrder(orderPayload, sendProgress) {
     try {
         browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox'] });
         const page = await browser.newPage();
+    page.on('dialog', async dialog => {
+        try {
+            await dialog.accept();
+        } catch (e) {
+            // Ignore already handled dialogs
+        }
+    });
         
         console.log('[SPChain] 로그인 중...');
         await page.goto('https://etop.spchain.co.kr:446/order/login.do', { waitUntil: 'networkidle2' });
@@ -71,7 +78,7 @@ async function runSpchainOrder(orderPayload, sendProgress) {
 
             if (found) {
                 let box = Math.max(1, Math.round(item.finalOrderQty / (item.minOrderQty || 1))); console.log(`[SPChain] ${item.productName} - ${box}박스 (${item.finalOrderQty}병) 저장 완료`);
-                page.on('dialog', async dialog => { await dialog.accept(); });
+                
                 try { await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 10000 }); } catch (e) {}
                 results.push({ barcode: item.barcode, status: 'success' });
             } else {

@@ -98,7 +98,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         barcode: activeBarcode,
         productName,
         stockCount: quantity,
-        targetStock: detectedProduct ? detectedProduct.targetStock : 10,
+        targetStock: detectedProduct ? detectedProduct.targetStock : 1,
         minOrderQty: detectedProduct ? detectedProduct.minOrderQty : 1,
         photoUrls: pendingPhotos,
         isUnmapped,
