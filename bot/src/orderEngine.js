@@ -198,7 +198,9 @@ async function runDirectOrderAdd(items, onProgress) {
 
     try {
       // ★ price 파라미터에 실제 공급단가를 넘겨 유앤미 장바구니 및 총 주문금액이 정상 계산되도록 함!
-      const addPath = `/${folder}/orderAdd.asp?order_dev=j&dev=${determinedCs}&order_type=1&pcode=${targetBarcode}&quantity=${item.finalOrderQty}&unit=${determinedUnit}&price=${determinedPrice}&order_date=${orderDate}&valid=y`;
+      // product_name 파라미터 추가 (유앤미 본사 사이트 누락 방지)
+      const escapedName = escape(item.productName.replace(/\+/g, '***'));
+      const addPath = `/${folder}/orderAdd.asp?order_dev=j&dev=${determinedCs}&order_type=1&pcode=${targetBarcode}&quantity=${item.finalOrderQty}&unit=${determinedUnit}&price=${determinedPrice}&order_date=${orderDate}&product_name=${escapedName}&valid=y`;
 
       const addRes = await httpRequest({
         hostname: 'www.younme24.com',
