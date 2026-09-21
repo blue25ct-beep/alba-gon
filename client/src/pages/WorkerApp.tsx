@@ -17,8 +17,9 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [pinInput, setPinInput] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [authList, setAuthList] = useState<any[]>([]);
-  const [requireAuth, setRequireAuth] = useState(false);
+  const initialWorkers = storageService.getSettings().workers || [];
+  const [authList, setAuthList] = useState<any[]>(initialWorkers);
+  const [requireAuth, setRequireAuth] = useState(initialWorkers.length > 0);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('DISCONNECTED');
   const [lastSyncTime, setLastSyncTime] = useState<string>('');
   const [isSending, setIsSending] = useState(false);
@@ -224,7 +225,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
           </div>
           <h2 className="text-2xl font-bold text-ink mb-2">근무자 로그인</h2>
           <p className="text-sm text-ink-soft mb-8 break-keep">
-            점장님이 발급한 고유번호(PIN) 또는 점장 PIN을 입력해주세요.
+            점장님이 발급한 고유번호(PIN) 또는 점장 PIN을 입력해주세요.<br/><span className="text-blue-500 font-medium">💡 근무자 핀 번호를 모르신다면 점장님께 문의해 주세요.</span>
           </p>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
