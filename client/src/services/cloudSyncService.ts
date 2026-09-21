@@ -109,7 +109,7 @@ class CloudSyncService {
     this.notifyStatus('CONNECTING');
 
     const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
-    const brokerUrl = 'wss://broker.hivemq.com:8884/mqtt';
+    const brokerUrl = 'wss://broker.emqx.io:8084/mqtt';
 
     const clientId = `web_${role.toLowerCase()}_${this.mySenderId}_${Math.random().toString(16).substring(2, 6)}`;
 
