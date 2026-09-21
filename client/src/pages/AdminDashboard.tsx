@@ -37,17 +37,14 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [newWorkerName, setNewWorkerName] = useState('');
   const [newWorkerId, setNewWorkerId] = useState('');
 
-  useEffect(() => {
-    if (syncStatus === 'CONNECTED') {
-      cloudSyncService.publishAuthList(workers);
-    }
-  }, [syncStatus, workers]);
+
 
   const addWorker = () => {
     if (!newWorkerName || !newWorkerId) return;
     const newList = [...workers, { id: newWorkerId, name: newWorkerName }];
     setWorkers(newList);
     storageService.saveSettings({ ...storageService.getSettings(), workers: newList });
+    cloudSyncService.publishAuthList(newList);
     setNewWorkerName('');
     setNewWorkerId('');
   };
@@ -56,6 +53,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     const newList = workers.filter(w => w.id !== id);
     setWorkers(newList);
     storageService.saveSettings({ ...storageService.getSettings(), workers: newList });
+    cloudSyncService.publishAuthList(newList);
   };
   const [lastSyncTime, setLastSyncTime] = useState<string>('');
   const [isRefreshingSync, setIsRefreshingSync] = useState(false);
@@ -922,7 +920,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold flex items-center gap-2">
                 <Users className="w-6 h-6 text-blue-500" />
-                근무자 관리 (PIN 로그인)
+                근무자 관리 (전화번호 뒷자리)
               </h3>
               <button onClick={() => setShowWorkerModal(false)} className="p-2 hover:bg-sunken rounded-xl text-ink-faint">
                 <X className="w-5 h-5" />
@@ -939,7 +937,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               />
               <input
                 type="password"
-                placeholder="PIN 4자리"
+                placeholder="전화번호 뒷자리"
                 maxLength={4}
                 className="w-28 h-12 px-4 rounded-xl border border-line bg-sunken focus:bg-white transition-colors"
                 value={newWorkerId}
@@ -965,7 +963,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                     <li key={w.id} className="flex items-center justify-between p-4 bg-sunken rounded-xl">
                       <div>
                         <p className="font-bold">{w.name}</p>
-                        <p className="text-sm text-ink-soft mt-1">PIN: {w.id}</p>
+                        <p className="text-sm text-ink-soft mt-1">전화번호 뒷자리: {w.id}</p>
                       </div>
                       <button
                         onClick={() => removeWorker(w.id)}

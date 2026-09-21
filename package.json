@@ -8,5 +8,8 @@
     "build": "npm --prefix client run build",
     "bot": "npm --prefix bot start",
     "deploy": "npm --prefix client run build && npx surge client/dist --domain alba-gon-pos.surge.sh"
+  },
+  "dependencies": {
+    "mqtt": "^5.16.0"
   }
 }
