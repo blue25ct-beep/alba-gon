@@ -301,7 +301,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
   return (
     <div className="max-w-6xl mx-auto px-5 sm:px-6 py-8 space-y-8 pb-24">
-      <div className="text-center text-ink-faint text-xs py-1">v{__APP_VERSION__} (최신버전)</div>
+      <div className="text-center text-ink-faint text-xs py-1">최종 업데이트: {__BUILD_TIME__}</div>
       {/* 요약 */}
       <section className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
         <div className="flex flex-wrap items-end gap-x-10 gap-y-5">

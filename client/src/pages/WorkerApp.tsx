@@ -188,7 +188,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
 
   return (
     <div className="max-w-md mx-auto px-5 py-6 space-y-6 pb-24">
-      <div className="text-center text-ink-faint text-xs py-1">v{__APP_VERSION__} (최신버전)</div>
+      <div className="text-center text-ink-faint text-xs py-1">최종 업데이트: {__BUILD_TIME__}</div>
       {/* 오늘 실사 현황 */}
       <section>
         <div className="mb-4">

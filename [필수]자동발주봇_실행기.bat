@@ -13,6 +13,9 @@ echo.
 echo (Younme / SPChain Unified Version)
 echo.
 
+echo Opening Admin Dashboard in your browser...
+start https://blue25ct-beep.github.io/alba-gon/
+
 cd bot
 node src/unifiedBot.js
 
