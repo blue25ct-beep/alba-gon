@@ -55,6 +55,10 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
 
     const unsubAuth = cloudSyncService.onAuthUpdate((workers) => {
       setAuthList(workers);
+      
+      const settings = storageService.getSettings();
+      storageService.saveSettings({ ...settings, workers });
+
       if (workers && workers.length > 0) {
         setRequireAuth(true);
       } else {
