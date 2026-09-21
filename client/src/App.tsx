@@ -64,7 +64,7 @@ export function App() {
     <div className="min-h-screen bg-canvas text-ink flex flex-col selection:bg-sage-100">
       <Header currentMode={mode} onSwitchMode={setMode} theme={theme} title={title} />
       <main className="flex-1 w-full">
-        {mode === 'WORKER' ? <WorkerApp selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} onThemeChange={setTheme} onTitleChange={setTitle} /> : <AdminDashboard initialCategory={selectedCategory} onThemeChange={setTheme} onTitleChange={setTitle} />}
+        {mode === 'WORKER' ? <WorkerApp selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} onThemeChange={setTheme} onTitleChange={setTitle} onSwitchMode={setMode} /> : <AdminDashboard initialCategory={selectedCategory} onThemeChange={setTheme} onTitleChange={setTitle} />}
       </main>
     </div>
   );

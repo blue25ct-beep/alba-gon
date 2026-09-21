@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({ currentMode, onSwitchMode, title
 
   return (
     <>
-      <header className={`text-white sticky top-0 z-30 shadow-md ${theme === "blue" ? "bg-blue-600" : theme === "sage" ? "bg-sage" : "bg-ink"}`}>
+      <header className={`text-white sticky top-0 z-[60] shadow-md ${theme === "blue" ? "bg-blue-600" : theme === "sage" ? "bg-sage" : "bg-ink"}`}>
         <div className="max-w-5xl mx-auto px-5 sm:px-6 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className={`w-9 h-9 rounded-full bg-white flex items-center justify-center shrink-0 ${theme === "blue" ? "text-blue-600" : theme === "sage" ? "text-sage" : "text-ink"}`}>

@@ -7,7 +7,7 @@ import { storageService } from '../services/storage';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
 import { Trash2, Camera, RefreshCw, Check, Lock } from 'lucide-react';
 
-export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange }) => {
+export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void; onSwitchMode?: (mode: 'WORKER' | 'ADMIN') => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange, onSwitchMode }) => {
   const [audits, setAudits] = useState<AuditItem[]>([]);
   const [activeBarcode, setActiveBarcode] = useState<string | null>(null);
   const [detectedProduct, setDetectedProduct] = useState<Product | undefined>(undefined);
@@ -195,6 +195,16 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   if (requireAuth && !isLoggedIn) {
     const handleLogin = (e: React.FormEvent) => {
       e.preventDefault();
+      const managerPin = storageService.getSettings().managerPin || '1234';
+      if (pinInput === managerPin) {
+        if (onSwitchMode) {
+          onSwitchMode('ADMIN');
+          setPinInput('');
+          setLoginError('');
+          return;
+        }
+      }
+      
       const worker = authList.find(w => w.id === pinInput);
       if (worker) {
         setWorkerName(worker.name);
@@ -207,14 +217,14 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
     };
 
     return (
-      <div className="fixed inset-0 bg-canvas flex flex-col items-center justify-center p-6 z-50">
+      <div className="fixed inset-0 top-16 bg-canvas flex flex-col items-center justify-center p-6 z-40">
         <div className="w-full max-w-sm bg-white rounded-3xl p-8 shadow-sm border border-line text-center">
           <div className="w-16 h-16 bg-sage-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <Lock className="w-8 h-8 text-sage" />
           </div>
           <h2 className="text-2xl font-bold text-ink mb-2">근무자 로그인</h2>
           <p className="text-sm text-ink-soft mb-8 break-keep">
-            점장님이 발급한 고유번호(PIN)를 입력해주세요.
+            점장님이 발급한 고유번호(PIN) 또는 점장 PIN을 입력해주세요.
           </p>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
