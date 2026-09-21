@@ -123,7 +123,8 @@ class CloudSyncService {
 
       this.client.on('connect', () => {
         this.notifyStatus('CONNECTED');
-        this.client?.subscribe(topicSync, { qos: 1 }, (err) => {
+        this.client?.subscribe(topicSync, { qos: 1 });
+        this.client?.subscribe(`albagom-v2/sync/store_${this.currentStoreId}/auth`, { qos: 1 }, (err) => {
           if (err) {
             console.error('[CloudSync] 토픽 구독 실패:', err);
             this.notifyStatus('ERROR');
@@ -132,6 +133,16 @@ class CloudSyncService {
       });
 
       this.client.on('message', (topic, payload) => {
+        const authTopic = `albagom-v2/sync/store_${this.currentStoreId}/auth`;
+        if (topic === authTopic) {
+          try {
+            const workers = JSON.parse(payload.toString());
+            this.authListeners.forEach(l => l(workers));
+          } catch (e) {
+            console.error('Auth parse error:', e);
+          }
+          return;
+        }
         if (topic !== topicSync) return;
         try {
           const msg: AuditsSyncMessage = JSON.parse(payload.toString());
