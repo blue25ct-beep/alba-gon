@@ -1,13 +1,18 @@
+export interface WorkerAuth {
+  id: string;
+  name: string;
+}
+
 export interface Product {
   barcode: string;
   name: string;
   price: number;
   cost: number;
   category: string;
-  targetStock: number;  // 기본 목표 진열수량 (안전재고)
-  minOrderQty: number;  // 최소 발주수량 (MOQ)
-  photoUrl?: string;    // (하위호환) 미등록 시 찍은 사진
-  photoUrls?: string[]; // 미등록 시 찍은 여러 장의 사진
+  targetStock: number;
+  minOrderQty: number;
+  photoUrl?: string;
+  photoUrls?: string[];
   isNewProduct?: boolean;
 }
 
@@ -19,8 +24,8 @@ export interface AuditItem {
   stockCount: number;
   targetStock: number;
   minOrderQty: number;
-  photoUrl?: string;    // (하위호환)
-  photoUrls?: string[]; // 여러 장의 사진
+  photoUrl?: string;
+  photoUrls?: string[];
   isUnmapped?: boolean;
   workerName: string;
   updatedAt: string;
@@ -28,8 +33,8 @@ export interface AuditItem {
 
 export interface BarcodeAlias {
   id: string;
-  oldBarcode: string;      // 알바가 실물로 찍는 구형 바코드
-  newBarcode: string;      // 유앤미24 주문용 신규 바코드
+  oldBarcode: string;
+  newBarcode: string;
   productName: string;
   note?: string;
   updatedAt: string;
@@ -44,13 +49,14 @@ export interface OrderItem {
   finalOrderQty: number;
   minOrderQty: number;
   isBelowMinQty: boolean;
-  usingAliasBarcode?: string; // 대체 바코드로 변경된 경우
-  category?: string;          // 저온/상온 여부
+  usingAliasBarcode?: string;
+  category?: string;
   vendor?: "younme" | "spchain";
-  cost?: number;              // 유앤미 공급단가(원가)
-  price?: number;             // 판매가
+  cost?: number;
+  price?: number;
   status: 'PENDING' | 'ORDERED' | 'FAILED';
   failReason?: string;
+  workerName?: string;
 }
 
 export interface OrderFailure {
@@ -65,9 +71,10 @@ export interface OrderFailure {
 }
 
 export interface AppSettings {
-  managerPin: string;         // 사장님 4자리 PIN (기본: 1234)
-  younmeId: string;           // 유앤미24 아이디
-  younmePw: string;           // 유앤미24 비밀번호
-  workerName: string;         // 공용폰 알바 기본 이름
+  managerPin: string;
+  younmeId: string;
+  younmePw: string;
+  workerName: string;
+  workers?: WorkerAuth[];
   autoOrderEnabled: boolean;
 }

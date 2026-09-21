@@ -5,7 +5,7 @@ import { PhotoCaptureModal } from '../components/PhotoCaptureModal';
 import { AuditItem, Product } from '../types';
 import { storageService } from '../services/storage';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
-import { Trash2, Camera, RefreshCw, Check } from 'lucide-react';
+import { Trash2, Camera, RefreshCw, Check, Lock } from 'lucide-react';
 
 export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange }) => {
   const [audits, setAudits] = useState<AuditItem[]>([]);
@@ -14,6 +14,11 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [step, setStep] = useState<'IDLE' | 'QUANTITY' | 'PHOTO'>('IDLE');
   const [workerName, setWorkerName] = useState('주간알바');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [authList, setAuthList] = useState<any[]>([]);
+  const [requireAuth, setRequireAuth] = useState(false);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('DISCONNECTED');
   const [lastSyncTime, setLastSyncTime] = useState<string>('');
   const [isSending, setIsSending] = useState(false);
@@ -46,6 +51,17 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
       if (time) setLastSyncTime(time);
     });
 
+
+    const unsubAuth = cloudSyncService.onAuthUpdate((workers) => {
+      setAuthList(workers);
+      if (workers && workers.length > 0) {
+        setRequireAuth(true);
+      } else {
+        setRequireAuth(false);
+        setIsLoggedIn(true);
+      }
+    });
+  
     const unsubClear = cloudSyncService.onClearCommand(() => {
       setAudits([]);
       storageService.clearAudits();
@@ -57,6 +73,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
       unsubSync();
       unsubStatus();
       unsubClear();
+      if(typeof unsubAuth !== "undefined") unsubAuth();
       unsubProducts();
       cloudSyncService.disconnect();
     };

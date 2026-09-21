@@ -10,8 +10,9 @@ import {
   Edit3,
   X,
   AlertTriangle,
+  Users,
 } from 'lucide-react';
-import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias } from '../types';
+import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias, WorkerAuth } from '../types';
 import { storageService } from '../services/storage';
 import { unifiedOrderService, OrderProgressEvent } from '../services/unifiedOrderService';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
@@ -31,6 +32,31 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [customQuantities, setCustomQuantities] = useState<Record<string, number>>({});
 
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('DISCONNECTED');
+  const [showWorkerModal, setShowWorkerModal] = useState(false);
+  const [workers, setWorkers] = useState<WorkerAuth[]>(storageService.getSettings().workers || []);
+  const [newWorkerName, setNewWorkerName] = useState('');
+  const [newWorkerId, setNewWorkerId] = useState('');
+
+  useEffect(() => {
+    if (syncStatus === 'CONNECTED') {
+      cloudSyncService.publishAuthList(workers);
+    }
+  }, [syncStatus, workers]);
+
+  const addWorker = () => {
+    if (!newWorkerName || !newWorkerId) return;
+    const newList = [...workers, { id: newWorkerId, name: newWorkerName }];
+    setWorkers(newList);
+    storageService.saveSettings({ ...storageService.getSettings(), workers: newList });
+    setNewWorkerName('');
+    setNewWorkerId('');
+  };
+
+  const removeWorker = (id: string) => {
+    const newList = workers.filter(w => w.id !== id);
+    setWorkers(newList);
+    storageService.saveSettings({ ...storageService.getSettings(), workers: newList });
+  };
   const [lastSyncTime, setLastSyncTime] = useState<string>('');
   const [isRefreshingSync, setIsRefreshingSync] = useState(false);
 

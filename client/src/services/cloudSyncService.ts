@@ -17,11 +17,13 @@ export type SyncStatus = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED' | 'ERROR';
 type SyncListener = (audits: AuditItem[], message: AuditsSyncMessage) => void;
 type StatusListener = (status: SyncStatus, lastSyncTime?: string) => void;
 type VoidListener = () => void;
+type AuthListener = (workers: any[]) => void;
 
 class CloudSyncService {
   private client: MqttClient | null = null;
   private currentStoreId: string = '1060';
   private mySenderId: string = '';
+  private authListeners: Set<AuthListener> = new Set();
   private syncListeners: Set<SyncListener> = new Set();
   private statusListeners: Set<StatusListener> = new Set();
   private clearListeners: Set<VoidListener> = new Set();
@@ -53,6 +55,11 @@ class CloudSyncService {
 
   public getLastSyncTime(): string {
     return this.lastSyncTime;
+  }
+
+  public onAuthUpdate(listener: AuthListener) {
+    this.authListeners.add(listener);
+    return () => this.authListeners.delete(listener);
   }
 
   public onSync(listener: SyncListener): () => void {
@@ -302,6 +309,12 @@ class CloudSyncService {
         }
       });
     });
+  }
+
+  public publishAuthList(workers: any[]) {
+    if (!this.client || !this.client.connected) return;
+    const topic = `albagom-v2/sync/store_${this.currentStoreId}/auth`;
+    this.client.publish(topic, JSON.stringify(workers), { retain: true });
   }
 
   public disconnect() {
