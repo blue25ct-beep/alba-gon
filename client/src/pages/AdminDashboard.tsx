@@ -10,8 +10,6 @@ import {
   Edit3,
   X,
   AlertTriangle,
-  Users,
-  Key,
 } from 'lucide-react';
 import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias } from '../types';
 import { storageService } from '../services/storage';
@@ -40,29 +38,6 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [showAliasModal, setShowAliasModal] = useState(false);
   const [aliasTargetBarcode, setAliasTargetBarcode] = useState('');
   const [showFailureModal, setShowFailureModal] = useState(false);
-  const [showWorkerModal, setShowWorkerModal] = useState(false);
-  const [workers, setWorkers] = useState<{id: string, name: string}[]>(storageService.getSettings().workers || []);
-  const [newWorkerId, setNewWorkerId] = useState('');
-  const [newWorkerName, setNewWorkerName] = useState('');
-
-  const handleAddWorker = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newWorkerId.trim() || !newWorkerName.trim()) return;
-    const newWorkers = [...workers, { id: newWorkerId.trim(), name: newWorkerName.trim() }];
-    setWorkers(newWorkers);
-    storageService.saveSettings({ ...storageService.getSettings(), workers: newWorkers });
-    cloudSyncService.publishAuthList(newWorkers);
-    setNewWorkerId('');
-    setNewWorkerName('');
-  };
-
-  const handleRemoveWorker = (id: string) => {
-    const newWorkers = workers.filter(w => w.id !== id);
-    setWorkers(newWorkers);
-    storageService.saveSettings({ ...storageService.getSettings(), workers: newWorkers });
-    cloudSyncService.publishAuthList(newWorkers);
-  };
-
   const [showStockSetupModal, setShowStockSetupModal] = useState(false);
 
   const [editingBarcode, setEditingBarcode] = useState<string | null>(null);
@@ -83,12 +58,6 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   };
 
     useEffect(() => {
-    if (syncStatus === 'CONNECTED') {
-      cloudSyncService.publishAuthList(workers);
-    }
-  }, [syncStatus]);
-
-  useEffect(() => {
     if (tempFilter === 'SPCHAIN') {
       onThemeChange?.('blue');
       onTitleChange?.('🍺 [주류 전용] 자동발주 관리');
@@ -615,13 +584,6 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                         <td className="px-5 py-3 max-w-md">
                           {editingBarcode === item.barcode ? (
                             <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowWorkerModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-line rounded-full hover:bg-sunken transition-colors shadow-sm"
-          >
-            <Users className="w-3.5 h-3.5 text-ink-faint" />
-            <span className="text-[13px] font-medium text-ink-soft">근무자 관리</span>
-          </button>
                               <input
                                 type="text"
                                 value={editingName}

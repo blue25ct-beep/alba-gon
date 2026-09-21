@@ -69,11 +69,5 @@ export interface AppSettings {
   younmeId: string;           // 유앤미24 아이디
   younmePw: string;           // 유앤미24 비밀번호
   workerName: string;         // 공용폰 알바 기본 이름
-  workers?: WorkerAuth[];
   autoOrderEnabled: boolean;
-}
-
-export interface WorkerAuth {
-  id: string;
-  name: string;
 }

@@ -7,27 +7,29 @@ import { storageService } from '../services/storage';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
 import { Trash2, Camera, RefreshCw, Check } from 'lucide-react';
 
-export const WorkerApp: React.FC<{
-  selectedCategory?: 'YOUNME' | 'SPCHAIN' | null;
-  onCategoryChange?: (cat: 'YOUNME' | 'SPCHAIN' | null) => void;
-  onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void;
-  onTitleChange?: (title: string) => void;
-}> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange }) => {
+export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange }) => {
   const [audits, setAudits] = useState<AuditItem[]>([]);
   const [activeBarcode, setActiveBarcode] = useState<string | null>(null);
   const [detectedProduct, setDetectedProduct] = useState<Product | undefined>(undefined);
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
   const [step, setStep] = useState<'IDLE' | 'QUANTITY' | 'PHOTO'>('IDLE');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [pinInput, setPinInput] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [authList, setAuthList] = useState<{id: string, name: string}[]>([]);
-  const [requireAuth, setRequireAuth] = useState(false);
   const [workerName, setWorkerName] = useState('주간알바');
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('DISCONNECTED');
   const [lastSyncTime, setLastSyncTime] = useState<string>('');
   const [isSending, setIsSending] = useState(false);
   const [sendSuccessMsg, setSendSuccessMsg] = useState(false);
+  useEffect(() => {
+    if (selectedCategory === 'SPCHAIN') {
+      onThemeChange?.('blue');
+      onTitleChange?.('🍺 [주류 전용] 자동발주');
+    } else if (selectedCategory === 'YOUNME') {
+      onThemeChange?.('sage');
+      onTitleChange?.('🌿 [상온/냉장] 자동발주');
+    } else {
+      onThemeChange?.('neutral');
+      onTitleChange?.('🏢 편의점 통합 자동발주');
+    }
+  }, [selectedCategory, onThemeChange, onTitleChange]);
 
   useEffect(() => {
     setWorkerName(storageService.getSettings().workerName);
@@ -49,7 +51,7 @@ export const WorkerApp: React.FC<{
       storageService.clearAudits();
     });
 
-    const unsubProducts = cloudSyncService.onProductsUpdate(() => { window.location.reload(); });
+    const unsubProducts = cloudSyncService.onProductsUpdate(() => { /* reload prevented */ });
 
     return () => {
       unsubSync();
@@ -109,11 +111,12 @@ export const WorkerApp: React.FC<{
         barcode: activeBarcode,
         productName,
         stockCount: quantity,
-        targetStock: detectedProduct ? detectedProduct.targetStock : 10,
+        targetStock: detectedProduct ? detectedProduct.targetStock : 1,
         minOrderQty: detectedProduct ? detectedProduct.minOrderQty : 1,
         photoUrls: pendingPhotos,
         isUnmapped,
         workerName,
+        vendor: selectedCategory === 'SPCHAIN' ? 'spchain' : 'younme',
       });
 
       const updated = storageService.getAudits();
@@ -154,99 +157,43 @@ export const WorkerApp: React.FC<{
     }
   };
 
-  const unmappedCount = audits.filter((a) => a.isUnmapped).length;
+  
   const isConnected = syncStatus === 'CONNECTED';
 
-  
-  if (selectedCategory === null && onCategoryChange) {
+  const getProductCategory = (barcode: string) => {
+    const product = storageService.findProduct(barcode).product;
+    return product ? product.category : '상온';
+  };
+
+  const filteredAudits = selectedCategory === null ? [] : audits.filter((a: AuditItem) => {
+    const cat = getProductCategory(a.barcode);
+    if (selectedCategory === 'YOUNME') return a.vendor === 'younme' || (!a.vendor && (cat === '상온' || cat === '냉장' || !cat));
+    if (selectedCategory === 'SPCHAIN') return a.vendor === 'spchain' || (!a.vendor && cat === '주류');
+    return true;
+  });
+
+  const unmappedCount = filteredAudits.filter((a: AuditItem) => a.isUnmapped).length;
+
+  if (selectedCategory === null) {
     return (
-      <div className="max-w-md mx-auto h-screen bg-canvas p-6 flex flex-col justify-center gap-6 pb-20">
-        <div className="text-center mb-4">
-          <h2 className="text-2xl font-bold text-ink mb-2">어떤 발주를 하시나요?</h2>
-          <p className="text-sm text-ink-soft">실사를 진행할 항목을 선택해주세요.</p>
-        </div>
-        
-        <button
-          onClick={() => onCategoryChange('YOUNME')}
-          className="flex flex-col items-center justify-center gap-3 p-8 bg-white rounded-3xl border border-line shadow-sm hover:border-sage hover:shadow-md transition-all group"
-        >
-          <div className="w-16 h-16 bg-sage-50 rounded-2xl flex items-center justify-center text-sage group-hover:scale-110 transition-transform">
-            <span className="text-3xl">🌿</span>
-          </div>
-          <div className="text-center">
-            <h3 className="text-xl font-bold text-ink mb-1">상온/냉장 상품</h3>
-            <p className="text-sm text-ink-soft">과자, 라면, 음료, 생수 등 (유앤미)</p>
-          </div>
-        </button>
-
-        <button
-          onClick={() => onCategoryChange('SPCHAIN')}
-          className="flex flex-col items-center justify-center gap-3 p-8 bg-white rounded-3xl border border-line shadow-sm hover:border-blue-500 hover:shadow-md transition-all group"
-        >
-          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-            <span className="text-3xl">🍺</span>
-          </div>
-          <div className="text-center">
-            <h3 className="text-xl font-bold text-ink mb-1">주류 전용</h3>
-            <p className="text-sm text-ink-soft">소주, 맥주, 양주 등 (생필체인)</p>
-          </div>
-        </button>
-      </div>
-    );
-  }
-
-  if (requireAuth && !isLoggedIn) {
-    const handleLogin = (e: React.FormEvent) => {
-      e.preventDefault();
-      const worker = authList.find(w => w.id === pinInput);
-      if (worker) {
-        setWorkerName(worker.name);
-        setIsLoggedIn(true);
-        setLoginError('');
-      } else {
-        setLoginError('등록되지 않은 번호입니다.');
-        setPinInput('');
-      }
-    };
-
-    return (
-      <div className="fixed inset-0 bg-canvas flex flex-col items-center justify-center p-6 z-50">
-        <div className="w-full max-w-sm bg-white rounded-3xl p-8 shadow-sm border border-line text-center">
-          <div className="w-16 h-16 bg-sage-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">🔒</span>
-          </div>
-          <h2 className="text-2xl font-bold text-ink mb-2">근무자 로그인</h2>
-          <p className="text-sm text-ink-soft mb-8 break-keep">
-            점장님이 발급한 고유번호(PIN)를 입력해주세요.
-          </p>
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <input
-                type="password"
-                pattern="[0-9]*"
-                inputMode="numeric"
-                placeholder="PIN 번호 입력"
-                value={pinInput}
-                onChange={(e) => {
-                  setPinInput(e.target.value);
-                  setLoginError('');
-                }}
-                className="w-full h-14 bg-sunken rounded-2xl text-center text-xl tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-sage focus:bg-white transition-all font-mono"
-                autoFocus
-              />
-              {loginError && (
-                <p className="text-clay text-sm font-medium mt-2 animate-shake">{loginError}</p>
-              )}
-            </div>
-            <button
-              type="submit"
-              disabled={!pinInput}
-              className="w-full h-14 bg-sage hover:bg-sage-deep text-white rounded-2xl text-lg font-bold transition-colors disabled:opacity-50"
-            >
-              접속하기
-            </button>
-          </form>
+      <div className="max-w-md mx-auto px-5 py-12 space-y-8 flex flex-col min-h-[80vh] justify-center items-center">
+        <h2 className="text-2xl font-bold text-ink mb-4">어떤 작업을 시작할까요?</h2>
+        <div className="flex flex-col gap-4 w-full">
+          <button
+            onClick={() => onCategoryChange?.('YOUNME')}
+            className="w-full h-24 rounded-3xl bg-sage-50 hover:bg-sage-100 border border-sage-200 text-sage-deep font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-2"
+          >
+            <span>상온 / 냉장</span>
+            <span className="text-sm font-medium text-sage opacity-80">(유앤미 발주)</span>
+          </button>
+          
+          <button
+            onClick={() => onCategoryChange?.('SPCHAIN')}
+            className="w-full h-24 rounded-3xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-2"
+          >
+            <span>주류</span>
+            <span className="text-sm font-medium text-blue-600 opacity-80">(생필체인 발주)</span>
+          </button>
         </div>
       </div>
     );
@@ -257,28 +204,18 @@ export const WorkerApp: React.FC<{
       <div className="text-center text-ink-faint text-xs py-1">최종 업데이트: {__BUILD_TIME__}</div>
       {/* 오늘 실사 현황 */}
       <section>
+        <div className="mb-4">
+          <button type="button" onClick={() => onCategoryChange?.(null)}
+            className="text-sm font-medium text-ink-soft hover:text-ink flex items-center gap-1 bg-surface py-2 px-4 rounded-full border border-line"
+          >
+            ← 카테고리 선택으로 돌아가기
+          </button>
+        </div>
         <div className="flex items-baseline justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <p className="text-sm text-ink-faint font-medium flex items-center gap-1">
-                <div className="w-3.5 h-3.5" />
-                {workerName}
-              </p>
-              {requireAuth && (
-                <button 
-                  onClick={() => {
-                    setIsLoggedIn(false);
-                    setPinInput('');
-                  }}
-                  className="text-[11px] px-2 py-0.5 rounded-full bg-sunken text-ink-faint hover:bg-line transition-colors flex items-center gap-1"
-                >
-                  <div className="w-3 h-3" />
-                  로그아웃
-                </button>
-              )}
-            </div>
+            <p className="text-sm text-ink-faint">{workerName}</p>
             <p className="mt-1 text-[28px] leading-none font-semibold text-ink tabular">
-              {audits.length}
+              {filteredAudits.length}
               <span className="ml-1.5 text-base font-normal text-ink-faint">개 확인</span>
             </p>
           </div>
@@ -307,7 +244,7 @@ export const WorkerApp: React.FC<{
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-ink-soft">스캔한 재고</h2>
-          {audits.length > 0 && (
+          {filteredAudits.length > 0 && (
             <button
               type="button"
               onClick={handleManualSendToAdmin}
@@ -324,13 +261,13 @@ export const WorkerApp: React.FC<{
           )}
         </div>
 
-        {audits.length === 0 ? (
+        {filteredAudits.length === 0 ? (
           <p className="py-12 text-center text-sm text-ink-faint leading-relaxed text-balance break-keep">
             상품 바코드를 비추면 자동으로 인식합니다
           </p>
         ) : (
           <ul className="divide-y divide-line">
-            {audits.map((item) => (
+            {filteredAudits.map((item) => (
               <li key={item.id} className="py-3 flex items-center gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-[15px] text-ink leading-snug break-keep">
@@ -361,7 +298,7 @@ export const WorkerApp: React.FC<{
           </ul>
         )}
 
-        {lastSyncTime && audits.length > 0 && (
+        {lastSyncTime && filteredAudits.length > 0 && (
           <p className="pt-1 text-[13px] text-ink-faint">마지막 전송 {lastSyncTime}</p>
         )}
       </section>
