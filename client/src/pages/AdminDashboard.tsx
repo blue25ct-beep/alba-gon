@@ -556,7 +556,16 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                 목록 비우기
               </button>
             )}
+            {/* Worker Management Button */}
+            <button
+              onClick={() => setShowWorkerModal(true)}
+              className="h-9 px-4 rounded-full font-medium text-white bg-blue-500 hover:bg-blue-600 transition-colors flex items-center gap-2"
+            >
+              <Users className="w-4 h-4" />
+              👥 근무자 관리
+            </button>
           </div>
+
 
           <div className="relative w-full md:w-72">
             <Search className="w-4 h-4 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2" />
