@@ -229,7 +229,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
           </div>
           <h2 className="text-2xl font-bold text-ink mb-2">근무자 로그인</h2>
           <p className="text-sm text-ink-soft mb-8 break-keep">
-            근무자 본인의 <span className="font-bold text-sage">전화번호 뒷자리 4자리</span>를 입력해주세요.<br/><span className="text-blue-500 font-medium text-xs mt-2 inline-block">💡 점장님은 점장 PIN(1234)으로 바로 접속 가능합니다.</span>
+            근무자 본인의 <span className="font-bold text-sage">전화번호 뒷자리 4자리</span>를 입력해주세요.<br/><span className="text-blue-500 font-medium text-xs mt-2 inline-block">💡 번호를 모르신다면 점장님께 문의해 주세요.</span>
           </p>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>

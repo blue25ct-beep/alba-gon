@@ -106,6 +106,11 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       setAudits(newAudits);
     });
 
+    const unsubAuth = cloudSyncService.onAuthUpdate((newWorkers) => {
+      setWorkers(newWorkers);
+      storageService.saveSettings({ ...storageService.getSettings(), workers: newWorkers });
+    });
+
     const unsubStatus = cloudSyncService.onStatusChange((st, time) => {
       setSyncStatus(st);
       if (time) setLastSyncTime(time);
