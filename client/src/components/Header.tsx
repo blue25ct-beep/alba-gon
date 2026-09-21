@@ -49,9 +49,7 @@ export const Header: React.FC<HeaderProps> = ({ currentMode, onSwitchMode, title
             </div>
             <div className="min-w-0">
               <h1 className="font-bold text-[16px] text-white truncate">{title || "편의점 자동발주"}</h1>
-              <p className={`text-[13px] truncate ${theme === "blue" ? "text-blue-100" : theme === "sage" ? "text-sage-100" : "text-line"}`}>
-                {title || (currentMode === 'WORKER' ? '재고 실사' : '재고 · 발주 관리')}
-              </p>
+              
             </div>
           </div>
 

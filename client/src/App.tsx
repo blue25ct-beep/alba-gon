@@ -9,7 +9,7 @@ export function App() {
   const [mode, setMode] = useState<'WORKER' | 'ADMIN'>('WORKER');
   const [selectedCategory, setSelectedCategory] = useState<'YOUNME' | 'SPCHAIN' | null>(null);
   const [theme, setTheme] = useState<'sage' | 'blue' | 'neutral'>('neutral');
-  const [title, setTitle] = useState('편의점 자동발주');
+  const [title, setTitle] = useState('재고 & 발주 관리');
 
   useEffect(() => {
     // Force update DB with latest seedProducts (migration)
