@@ -642,14 +642,16 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                   {item.usingAliasBarcode && ` → ${item.usingAliasBarcode}`}
                                 </span>
                                 {(item.productName.includes('쿠팡]') || item.productName.startsWith('CP]')) && (
-                                  <a
-                                    href={`https://www.coupang.com/np/search?component=&q=${encodeURIComponent(item.productName.replace('쿠팡]', '').replace('CP]', '').trim())}`}
-                                    target="_blank"
-                                    rel="noreferrer"
+                                  <button
+                                    onClick={() => {
+                                      const url = `https://www.coupang.com/np/search?q=${encodeURIComponent(item.productName.replace('쿠팡]', '').replace('CP]', '').trim())}`;
+                                      const w = window.open('', '_blank');
+                                      if (w) w.location.href = url;
+                                    }}
                                     className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
                                   >
                                     쿠팡 구매 링크
-                                  </a>
+                                  </button>
                                 )}
                               </span>
 
