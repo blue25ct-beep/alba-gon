@@ -48,7 +48,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [isSpchainOrdering, setIsSpchainOrdering] = useState(false);
   const [younmeProgress, setYounmeProgress] = useState<OrderProgressEvent | null>(null);
   const [spchainProgress, setSpchainProgress] = useState<OrderProgressEvent | null>(null);
-  const [tempFilter, setTempFilter] = useState<'ALL' | 'YOUNME' | 'SPCHAIN'>(initialCategory || 'ALL');
+  const [tempFilter, setTempFilter] = useState<'ALL' | 'YOUNME' | 'SPCHAIN' | 'COUPANG'>(initialCategory || 'ALL');
 
   const loadData = () => {
     setAudits(storageService.getAudits());
@@ -64,6 +64,9 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     } else if (tempFilter === 'YOUNME') {
       onThemeChange?.('sage');
       onTitleChange?.('🌿 [상온/냉장] 자동발주 관리');
+    } else if (tempFilter === 'COUPANG') {
+      onThemeChange?.('neutral');
+      onTitleChange?.('📦 [수동발주] 쿠팡 전용 관리');
     } else {
       onThemeChange?.('neutral');
       onTitleChange?.('🏢 편의점 통합 자동발주 관리');
@@ -293,6 +296,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     
     if (tempFilter === 'YOUNME') matchesTemp = isYounmeItem;
     if (tempFilter === 'SPCHAIN') matchesTemp = !isYounmeItem && !isCoupangItem;
+    if (tempFilter === 'COUPANG') matchesTemp = isCoupangItem;
 
     return matchesSearch && matchesTemp;
   });
@@ -502,6 +506,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                 ['ALL', '전체'],
                 ['YOUNME', '유앤미24'],
                 ['SPCHAIN', '생필체인(주류)'],
+                ['COUPANG', '쿠팡(수동)'],
                 
               ] as const
             ).map(([key, label]) => (
