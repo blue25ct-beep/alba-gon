@@ -1,16 +1,16 @@
 @echo off
-chcp 65001 > nul
-title 편의점 자동발주 로봇 (V2)
+cd /d "%~dp0"
+title ALBA-GON BOT (V2)
 
 echo ========================================================
-echo   [편의점 통합 자동발주 로봇 (V2)]
-echo   - 깃허브 실서버(스마트폰)와 연결 대기 중...
+echo   [Convenience Store Auto-Order Bot (V2)]
+echo   - Waiting for signals from GitHub Live Site...
 echo ========================================================
 echo.
-echo 이 검은 창을 켜두셔야 스마트폰에서 발주 버튼을 눌렀을 때
-echo PC가 신호를 받아서 발주를 진행합니다!
+echo Please DO NOT close this black window.
+echo It needs to be running to receive your smartphone orders!
 echo.
-echo (상온 유앤미 / 주류 생필체인 통합 버전)
+echo (Younme / SPChain Unified Version)
 echo.
 
 cd bot

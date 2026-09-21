@@ -31,7 +31,9 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
       BarcodeFormat.EAN_8,
       BarcodeFormat.UPC_A,
       BarcodeFormat.UPC_E,
-      BarcodeFormat.CODE_128
+      BarcodeFormat.CODE_128,
+      BarcodeFormat.QR_CODE,
+      BarcodeFormat.DATA_MATRIX
     ]);
     const codeReader = new BrowserMultiFormatReader(hints);
     codeReaderRef.current = codeReader;

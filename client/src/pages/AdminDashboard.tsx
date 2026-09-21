@@ -136,8 +136,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   });
 
   const allItemsToOrder = orderItems.filter((item) => item.finalOrderQty > 0);
-  const coupangItems = allItemsToOrder.filter((item) => item.productName.includes('쿠팡]'));
-  const itemsToOrder = allItemsToOrder.filter((item) => !item.productName.includes('쿠팡]'));
+  const coupangItems = allItemsToOrder.filter((item) => item.productName.includes('쿠팡]') || item.productName.startsWith('CP]'));
+  const itemsToOrder = allItemsToOrder.filter((item) => !item.productName.includes('쿠팡]') && !item.productName.startsWith('CP]'));
   const younmeItems = itemsToOrder.filter(item => item.vendor === 'younme' || (!item.vendor && (item.category === '상온' || item.category === '냉장' || !item.category)));
   const spchainItems = itemsToOrder.filter(item => item.vendor === 'spchain' || (!item.vendor && item.category === '주류'));
 
@@ -288,9 +288,11 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       item.category?.includes('냉동') || item.category?.includes('저온')
     );
     let matchesTemp = true;
-    const isYounmeItem = item.vendor === 'younme' || (!item.vendor && (item.category === '상온' || item.category === '냉장' || !item.category));
-      if (tempFilter === 'YOUNME') matchesTemp = isYounmeItem;
-      if (tempFilter === 'SPCHAIN') matchesTemp = !isYounmeItem;
+    const isCoupangItem = item.productName.includes('쿠팡]') || item.productName.startsWith('CP]');
+    const isYounmeItem = !isCoupangItem && (item.vendor === 'younme' || (!item.vendor && (item.category === '상온' || item.category === '냉장' || !item.category)));
+    
+    if (tempFilter === 'YOUNME') matchesTemp = isYounmeItem;
+    if (tempFilter === 'SPCHAIN') matchesTemp = !isYounmeItem && !isCoupangItem;
 
     return matchesSearch && matchesTemp;
   });
@@ -415,7 +417,6 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           )}
         </section>
         )}
-        {/* 생필체인 발주 섹션 */}
         {(tempFilter === "ALL" || tempFilter === "SPCHAIN") && (
         <section className="bg-white border border-blue-100 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
           <div>
@@ -501,6 +502,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                 ['ALL', '전체'],
                 ['YOUNME', '유앤미24'],
                 ['SPCHAIN', '생필체인(주류)'],
+                
               ] as const
             ).map(([key, label]) => (
               <button
@@ -634,6 +636,16 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                   {item.barcode}
                                   {item.usingAliasBarcode && ` → ${item.usingAliasBarcode}`}
                                 </span>
+                                {(item.productName.includes('쿠팡]') || item.productName.startsWith('CP]')) && (
+                                  <a
+                                    href={`https://www.coupang.com/np/search?component=&q=${encodeURIComponent(item.productName.replace('쿠팡]', '').replace('CP]', '').trim())}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                                  >
+                                    쿠팡 구매 링크
+                                  </a>
+                                )}
                               </span>
 
                               <button
