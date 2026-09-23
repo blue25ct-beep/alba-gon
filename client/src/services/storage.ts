@@ -117,18 +117,15 @@ export const storageService = {
   },
 
   // --- ?ш퀬 ?ㅼ궗 (Audits) ---
-  getAudits(): AuditItem[] {
+    getAudits(): AuditItem[] {
     try {
       const data = localStorage.getItem(KEYS.AUDITS);
       if (!data) {
-        // 理쒖큹 ?묒냽 ???ъ옣?섏씠 ?묒뾽?섏떊 65嫄??ㅼ궗 ?덈ぉ 湲곕낯 ?묒옱!
-        const initial = (seedAudits as unknown as AuditItem[]) || [];
-        localStorage.setItem(KEYS.AUDITS, JSON.stringify(initial));
-        return initial;
+        return [];
       }
       return JSON.parse(data);
     } catch {
-      return (seedAudits as unknown as AuditItem[]) || [];
+      return [];
     }
   },
 

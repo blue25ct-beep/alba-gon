@@ -21,6 +21,8 @@ const TOPIC_PROGRESS_YOUNME = `albagom-v2/orders/store_${STORE_ID}/progress`;
 const TOPIC_REQ_SPCHAIN = `albagom-v2/orders/store_${SPCHAIN_ID}/request`;
 const TOPIC_RES_SPCHAIN = `albagom-v2/orders/store_${SPCHAIN_ID}/response`;
 const TOPIC_PROGRESS_SPCHAIN = `albagom-v2/orders/store_${SPCHAIN_ID}/progress`;
+const TOPIC_AUTH_1060 = `albagom-v2/sync/store_1060/auth`; // 하드코딩된 점포 ID 1060
+const AUTH_BACKUP_FILE = path.join(__dirname, '..', 'auth_backup.json');
 
 console.log('========================================================');
 console.log('  [편의점 알바곤] 통합 클라우드 실시간 자동발주 봇');
