@@ -32,7 +32,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
         });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          videoRef.current.play();
+          videoRef.current.play().catch(e => console.error('Video play error:', e));
           setStreamActive(true);
         }
       } catch {
@@ -139,9 +139,8 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
 
         <div className="px-6 shrink-0">
           <div className="relative aspect-square bg-sunken rounded-2xl overflow-hidden flex items-center justify-center">
-            {streamActive ? (
-              <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
-            ) : (
+            <video ref={videoRef} className={`w-full h-full object-cover ${streamActive ? '' : 'hidden'}`} playsInline muted autoPlay />
+            {!streamActive && (
               <div className="text-center px-6">
                 <Camera className="w-7 h-7 text-ink-faint mx-auto mb-2" />
                 <p className="text-sm text-ink-soft">카메라를 열 수 없습니다</p>

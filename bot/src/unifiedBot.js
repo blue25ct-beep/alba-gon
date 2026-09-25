@@ -23,6 +23,8 @@ const TOPIC_RES_SPCHAIN = `albagom-v2/orders/store_${SPCHAIN_ID}/response`;
 const TOPIC_PROGRESS_SPCHAIN = `albagom-v2/orders/store_${SPCHAIN_ID}/progress`;
 const TOPIC_AUTH_1060 = `albagom-v2/sync/store_1060/auth`; // 하드코딩된 점포 ID 1060
 const AUTH_BACKUP_FILE = path.join(__dirname, '..', 'auth_backup.json');
+const TOPIC_SYNC_1060 = `albagom-v2/stores/store_1060/audits_sync`;
+const AUDITS_BACKUP_FILE = path.join(__dirname, '..', 'audits_backup.json');
 
 console.log('========================================================');
 console.log('  [편의점 알바곤] 통합 클라우드 실시간 자동발주 봇');
@@ -40,11 +42,34 @@ const client = mqtt.connect(BROKER_URL, {
 });
 
 client.on('connect', () => {
-  console.log('[2/2] 브로커 연결 성공! 주문 신호 대기 중...\n');
-  client.subscribe([TOPIC_REQ_YOUNME, TOPIC_REQ_SPCHAIN]);
+  console.log('[2/2] 브로커 연결 성공! 주문 신호 및 데이터 대기 중...\n');
+  client.subscribe([TOPIC_REQ_YOUNME, TOPIC_REQ_SPCHAIN, TOPIC_AUTH_1060, TOPIC_SYNC_1060]);
+  
+  // 봇 재시작 시, 혹은 클라우드 리셋 시 백업된 데이터로 강제 복구
+  try {
+      let restored = false;
+      if (fs.existsSync(AUTH_BACKUP_FILE)) {
+          client.publish(TOPIC_AUTH_1060, fs.readFileSync(AUTH_BACKUP_FILE, 'utf8'), { retain: true });
+          restored = true;
+      }
+      if (fs.existsSync(AUDITS_BACKUP_FILE)) {
+          client.publish(TOPIC_SYNC_1060, fs.readFileSync(AUDITS_BACKUP_FILE, 'utf8'), { retain: true });
+          restored = true;
+      }
+      if (restored) console.log('[백업 시스템] 클라우드 데이터 증발 방어 성공! (근무자/실사 내역 유지)');
+  } catch(e) {}
 });
 
 client.on('message', async (topic, message) => {
+  if (topic === TOPIC_AUTH_1060) {
+      try { fs.writeFileSync(AUTH_BACKUP_FILE, message.toString(), 'utf8'); } catch(e){}
+      return;
+  }
+  if (topic === TOPIC_SYNC_1060) {
+      try { fs.writeFileSync(AUDITS_BACKUP_FILE, message.toString(), 'utf8'); } catch(e){}
+      return;
+  }
+
   if (topic !== TOPIC_REQ_YOUNME && topic !== TOPIC_REQ_SPCHAIN) return;
 
   const isYounme = topic === TOPIC_REQ_YOUNME;
