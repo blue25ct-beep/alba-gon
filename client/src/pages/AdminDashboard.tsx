@@ -164,6 +164,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       cost: product ? product.cost : 0,
       price: product ? product.price : 0,
       status: 'PENDING',
+      workerName: audit.workerName,
+      updatedAt: audit.updatedAt,
     };
   });
 
@@ -674,6 +676,11 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                   }`}
                                 >
                                   {item.productName}
+                                  {item.workerName && (
+                                    <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-700 align-middle whitespace-nowrap">
+                                      👤 {item.workerName} {item.updatedAt ? `(${item.updatedAt.replace(/:d{2}$/, '')})` : ''}
+                                    </span>
+                                  )}
                                 </span>
                                 <span className="block mt-0.5 text-[13px] text-ink-faint tabular">
                                   {item.barcode}

@@ -57,6 +57,7 @@ export interface OrderItem {
   status: 'PENDING' | 'ORDERED' | 'FAILED';
   failReason?: string;
   workerName?: string;
+  updatedAt?: string;
 }
 
 export interface OrderFailure {
