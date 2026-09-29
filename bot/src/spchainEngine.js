@@ -23,7 +23,7 @@ async function runSpchainOrder(orderPayload, sendProgress) {
     const results = [];
     
     try {
-        browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox'] });
+        browser = await puppeteer.launch({ headless: false, executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", args: ['--no-sandbox'] });
         const page = await browser.newPage();
     page.on('dialog', async dialog => {
         try {
@@ -73,8 +73,9 @@ async function runSpchainOrder(orderPayload, sendProgress) {
                     const tr = qtyInput.closest('tr');
                     if (tr) {
                         const trText = tr.innerText.replace(/\s+/g, '');
-                        // 이름의 3글자 이상 일치하거나 바코드가 일치해야 함
-                        const safeName = name.replace(/\s+/g, '').substring(0, 3);
+                        // 이름에서 제조사명(예: 오비], 무학]) 등을 제거하고 핵심 이름 3글자를 추출
+                        const cleanName = name.replace(/^[^\]]+\]/, '').replace(/\s+/g, '');
+                        const safeName = cleanName.substring(0, 3);
                         if (!trText.includes(barcode) && !trText.includes(safeName)) {
                             return false; // 불일치 (검색 실패 후 엉뚱한 리스트 노출됨)
                         }
