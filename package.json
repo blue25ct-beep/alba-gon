@@ -10,6 +10,7 @@
     "deploy": "npm --prefix client run build && npx surge client/dist --domain alba-gon-pos.surge.sh"
   },
   "dependencies": {
-    "mqtt": "^5.16.0"
+    "mqtt": "^5.16.0",
+    "xlsx": "^0.18.5"
   }
 }

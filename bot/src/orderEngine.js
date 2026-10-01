@@ -159,7 +159,7 @@ async function runDirectOrderAdd(items, onProgress) {
     }
 
     const targetBarcode = item.usingAliasBarcode || item.barcode;
-    const isChilled = item.category?.includes('냉동') || item.category?.includes('저온');
+    const isChilled = item.category?.includes('냉동') || item.category?.includes('저온') || item.category?.includes('냉장');
     const folder = isChilled ? 'app3' : 'app1';
 
     const percent = Math.round(20 + ((i + 1) / items.length) * 75);

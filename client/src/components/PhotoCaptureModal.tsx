@@ -107,6 +107,8 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
       };
       reader.readAsDataURL(file);
     });
+    // iOS 등에서 같은 파일을 다시 선택하거나 연속 촬영할 때 onChange가 안 먹히는 버그 방지
+    e.target.value = '';
   };
 
   const handleConfirm = () => {
