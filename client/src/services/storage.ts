@@ -140,7 +140,7 @@ export const storageService = {
     const updatedItem: AuditItem = {
       ...item,
       id: existingIndex >= 0 ? audits[existingIndex].id : Date.now().toString(),
-      updatedAt: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     };
 
     if (existingIndex >= 0) {
