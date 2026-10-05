@@ -127,7 +127,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
             <h2 className="text-lg font-semibold text-ink">처음 보는 상품입니다</h2>
             <p className="mt-1 text-[13px] text-ink-faint tabular">{barcode}</p>
             <p className="mt-2 text-sm text-ink-soft leading-relaxed break-keep">
-              상품을 여러 각도에서 찍어두면 관리가 편해집니다.
+              상품을 여러 각도에서 찍어두면 관리가 편해집니다. (최대 3장)
             </p>
           </div>
           <button
@@ -226,27 +226,31 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 {streamActive ? (
-                  <button
-                    type="button"
-                    onClick={handleCaptureSnapshot}
-                    className="h-12 px-5 rounded-full bg-sunken text-ink-soft hover:text-ink text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    추가 촬영
-                  </button>
+                  capturedPhotos.length < 3 ? (
+                    <button
+                      type="button"
+                      onClick={handleCaptureSnapshot}
+                      className="h-12 px-5 rounded-full bg-sunken text-ink-soft hover:text-ink text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      추가 촬영
+                    </button>
+                  ) : null
                 ) : (
-                  <label className="h-12 px-5 rounded-full bg-sunken text-ink-soft hover:text-ink text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors cursor-pointer">
-                    <Plus className="w-4 h-4" />
-                    추가 촬영
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      multiple
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
+                  capturedPhotos.length < 3 ? (
+                    <label className="h-12 px-5 rounded-full bg-sunken text-ink-soft hover:text-ink text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                      <Plus className="w-4 h-4" />
+                      추가 촬영
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        multiple
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                    </label>
+                  ) : null
                 )}
                 <button
                   type="button"

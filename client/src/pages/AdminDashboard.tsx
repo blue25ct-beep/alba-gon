@@ -13,6 +13,7 @@ import {
   Users,
 } from 'lucide-react';
 import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias, WorkerAuth } from '../types';
+import * as XLSX from 'xlsx';
 import { storageService } from '../services/storage';
 import { unifiedOrderService, OrderProgressEvent } from '../services/unifiedOrderService';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
@@ -296,6 +297,29 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       if (vendor === 'YOUNME') setIsYounmeOrdering(false);
       else setIsSpchainOrdering(false);
     }
+  };
+
+  const handleExcelDownload = () => {
+    const products = storageService.getProducts();
+    if (products.length === 0) {
+      alert('내보낼 상품 데이터가 없습니다.');
+      return;
+    }
+
+    const data = products.map(p => ({
+      '바코드': p.barcode,
+      '상품명': p.name,
+      '카테고리': p.category,
+      '매가': p.price,
+      '원가': p.cost,
+      '목표재고': p.targetStock,
+      '최소발주단위': p.minOrderQty
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '마스터_상품목록');
+    XLSX.writeFile(wb, `알바곤_상품마스터_${new Date().toISOString().slice(0,10)}.xlsx`);
   };
 
   const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

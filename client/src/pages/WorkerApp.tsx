@@ -401,15 +401,18 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         />
       )}
 
-      {step === 'QUANTITY' && activeBarcode && (
-        <QuantityModal
-          barcode={activeBarcode}
-          product={detectedProduct}
-          initialQuantity={1}
-          onSave={handleSaveQuantity}
-          onClose={handleCloseModals}
-        />
-      )}
+      {step === 'QUANTITY' && activeBarcode && (() => {
+          const currentAudit = audits.find(a => a.barcode === activeBarcode);
+          return (
+            <QuantityModal
+              barcode={activeBarcode}
+              product={detectedProduct}
+              initialQuantity={currentAudit ? currentAudit.stockCount : 1}
+              onSave={handleSaveQuantity}
+              onClose={handleCloseModals}
+            />
+          );
+        })()}
           </div>
   );
 };
