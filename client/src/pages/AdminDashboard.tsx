@@ -597,7 +597,16 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                 {label}
               </button>
             ))}
-            {audits.length > 0 && (
+            
+          {audits.length === 0 && (
+            <button
+              onClick={handleRestoreAudits}
+              className="h-9 px-4 rounded-full font-medium text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
+            >
+              🚨 삭제된 데이터 복구하기
+            </button>
+          )}
+          {audits.length > 0 && (
               <button
                 onClick={handleClearAllAudits}
                 className="h-9 px-4 rounded-full font-medium text-ink-faint hover:text-brick hover:bg-brick-soft transition-colors"
