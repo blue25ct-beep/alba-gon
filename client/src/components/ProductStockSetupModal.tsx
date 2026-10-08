@@ -34,7 +34,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     val: number
   ) => {
     const updated = products.map((p) =>
-      p.barcode === barcode ? { ...p, [field]: Math.max(1, val) } : p
+      p.barcode === barcode ? { ...p, [field]: Math.max(1, val), updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) } : p
     );
     setProducts(updated);
     storageService.saveProducts(updated);
@@ -48,7 +48,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
 
     const filteredBarcodes = new Set(filtered.map((f) => f.barcode));
     const updated = products.map((p) =>
-      filteredBarcodes.has(p.barcode) ? { ...p, targetStock: batchTargetStock } : p
+      filteredBarcodes.has(p.barcode) ? { ...p, targetStock: batchTargetStock, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) } : p
     );
 
     setProducts(updated);
@@ -61,7 +61,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
 
     const filteredBarcodes = new Set(filtered.map((f) => f.barcode));
     const updated = products.map((p) =>
-      filteredBarcodes.has(p.barcode) ? { ...p, minOrderQty: batchMinOrderQty } : p
+      filteredBarcodes.has(p.barcode) ? { ...p, minOrderQty: batchMinOrderQty, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) } : p
     );
 
     setProducts(updated);
@@ -181,7 +181,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
                   <td className="py-3 pr-3 max-w-md">
                     <span className="block text-ink leading-snug break-keep">{p.name}</span>
                     <span className="block mt-0.5 text-[13px] text-ink-faint tabular">
-                      {p.barcode} · {p.category}
+                      {p.barcode} · {p.category}{p.updatedAt ? ` · ✏️ 수정: ${p.updatedAt}` : ''}
                     </span>
                   </td>
                   <td className="py-3 px-3 text-center">

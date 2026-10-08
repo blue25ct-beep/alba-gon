@@ -313,7 +313,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       '매가': p.price,
       '원가': p.cost,
       '목표재고': p.targetStock,
-      '최소발주단위': p.minOrderQty
+      '최소발주단위': p.minOrderQty,
+      '마지막수정일': p.updatedAt || '기록없음'
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);

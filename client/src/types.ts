@@ -14,6 +14,7 @@ export interface Product {
   photoUrl?: string;
   photoUrls?: string[];
   isNewProduct?: boolean;
+  updatedAt?: string;
 }
 
 export interface AuditItem {

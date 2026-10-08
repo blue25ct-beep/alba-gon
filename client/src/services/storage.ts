@@ -44,9 +44,9 @@ export const storageService = {
     const list = this.getProducts();
     const index = list.findIndex(p => p.barcode === product.barcode);
     if (index >= 0) {
-      list[index] = { ...list[index], ...product };
+      list[index] = { ...list[index], ...product, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) };
     } else {
-      list.unshift(product);
+      list.unshift({ ...product, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) });
     }
     this.saveProducts(list);
   },
@@ -72,7 +72,7 @@ export const storageService = {
     const list = this.getProducts();
     const idx = list.findIndex(p => p.barcode === barcode);
     if (idx >= 0) {
-      list[idx].targetStock = safeVal;
+      list[idx] = { ...list[idx], targetStock: safeVal, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) };
       this.saveProducts(list);
     }
     const audits = this.getAudits();
@@ -371,7 +371,7 @@ export const storageService = {
             if (!map.has(p.barcode)) {
               addedCount++;
             }
-            map.set(p.barcode, { ...map.get(p.barcode), ...p });
+            map.set(p.barcode, { ...map.get(p.barcode), ...p, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) });
           });
 
           const merged = Array.from(map.values());
