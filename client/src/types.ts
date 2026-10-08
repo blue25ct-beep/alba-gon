@@ -81,3 +81,12 @@ export interface AppSettings {
   workers?: WorkerAuth[];
   autoOrderEnabled: boolean;
 }
+
+
+export interface OrderHistoryEntry {
+  id: string;
+  orderDate: string;
+  vendor: 'YOUNME' | 'SPCHAIN';
+  items: OrderItem[];
+  totalAmount?: number;
+}

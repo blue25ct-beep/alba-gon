@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, X, Check } from 'lucide-react';
 import { Product } from '../types';
 import { storageService } from '../services/storage';
+import { analyzeAndRecommend } from '../services/smartRecommendation';
 
 interface ProductStockSetupModalProps {
   onClose: () => void;
@@ -23,6 +24,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
 
   const categories = ['ALL', ...Array.from(new Set(products.map((p) => p.category)))];
 
+  const recommendations = React.useMemo(() => analyzeAndRecommend(storageService.getOrderHistory(), products), [products]);
   let filtered = products.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.barcode.includes(searchQuery);
@@ -231,6 +233,13 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
                     </span>
                   </td>
                   <td className="py-3 px-3 text-center">
+                    {recommendations.has(p.barcode) && (
+                      <div className="mb-1 flex flex-col items-center">
+                        <button onClick={() => handleItemChange(p.barcode, 'targetStock', recommendations.get(p.barcode)!.recommendedStock)} className="text-[11px] text-white bg-blue-500 hover:bg-blue-600 px-1.5 py-0.5 rounded font-medium shadow-sm transition-colors cursor-pointer whitespace-nowrap">
+                          💡 추천: {recommendations.get(p.barcode)!.recommendedStock}
+                        </button>
+                      </div>
+                    )}
                     <input
                       type="number"
                       min="1"

@@ -169,6 +169,7 @@ class CloudSyncService {
             if (msg.data.products) storageService.saveProducts(msg.data.products);
             if (msg.data.settings) storageService.saveSettings(msg.data.settings);
             if (msg.data.aliases) storageService.saveAliases(msg.data.aliases);
+            if (msg.data.orderHistory) storageService.saveOrderHistory(msg.data.orderHistory);
             this.productsUpdateListeners.forEach((l) => l());
             alert('봇으로부터 백업 데이터를 성공적으로 복원했습니다!');
             /* reload prevented */

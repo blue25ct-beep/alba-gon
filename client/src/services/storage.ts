@@ -1,4 +1,4 @@
-import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings } from '../types';
+import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings, OrderHistoryEntry } from '../types';
 import seedProducts from '../data/seedProducts.json';
 import seedAudits from '../data/seedAudits.json';
 import * as XLSX from 'xlsx';
@@ -8,6 +8,7 @@ const KEYS = {
   AUDITS: 'albagom_audits_v1',
   ALIASES: 'albagom_aliases_v1',
   FAILURES: 'albagom_failures_v1',
+  ORDER_HISTORY: 'albagom_order_history_v1',
   SETTINGS: 'albagom_settings_v1',
 };
 
@@ -21,6 +22,32 @@ const DEFAULT_SETTINGS: AppSettings = {
 
 export const storageService = {
   // --- ?곹뭹 留덉뒪??(Products) ---
+
+getOrderHistory(): OrderHistoryEntry[] {
+    try {
+      const data = localStorage.getItem(KEYS.ORDER_HISTORY);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  },
+
+saveOrderHistory(history: OrderHistoryEntry[]): void {
+    try {
+      // Limit to 100 entries to prevent local storage bloat
+      const trimmed = history.slice(0, 100);
+      localStorage.setItem(KEYS.ORDER_HISTORY, JSON.stringify(trimmed));
+    } catch (e) {
+      console.error('Failed to save order history', e);
+    }
+  },
+
+addOrderHistory(entry: OrderHistoryEntry): void {
+    const history = this.getOrderHistory();
+    history.unshift(entry); // Add to beginning
+    this.saveOrderHistory(history);
+  },
+
   getProducts(): Product[] {
     try {
       const data = localStorage.getItem(KEYS.PRODUCTS);
