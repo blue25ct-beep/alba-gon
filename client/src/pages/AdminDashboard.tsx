@@ -631,7 +631,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           </div>
 
 
-          <div className="relative w-full md:w-72">
+          <div className="flex flex-col gap-2 w-full md:w-72">
+            <div className="relative w-full">
             <Search className="w-4 h-4 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -641,6 +642,16 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               aria-label="상품 검색"
               className="w-full h-10 pl-10 pr-4 rounded-full bg-surface border border-line text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-sage-300 transition-colors"
             />
+            <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer md:self-end mt-1">
+              <input
+                type="checkbox"
+                checked={showUnmodifiedOnly}
+                onChange={(e) => setShowUnmodifiedOnly(e.target.checked)}
+                className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
+              />
+              💡 수정 기록 없는 상품만 모아보기
+            </label>
+          </div>
           </div>
         </div>
 
