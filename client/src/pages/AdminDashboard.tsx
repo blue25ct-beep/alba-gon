@@ -30,7 +30,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [aliases, setAliases] = useState<BarcodeAlias[]>([]);
   const [failures, setFailures] = useState<OrderFailure[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showUnmodifiedOnly, setShowUnmodifiedOnly] = useState(false);
+  const [sortUnmodifiedFirst, setSortUnmodifiedFirst] = useState(false);
+  const [sessionEdited, setSessionEdited] = useState<Set<string>>(new Set());
 
   // 발주 수량 임시 조정 (barcode -> finalQty)
   const [customQuantities, setCustomQuantities] = useState<Record<string, number>>({});
@@ -211,18 +212,21 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   
   const handleMarkReviewed = (barcode: string) => {
     storageService.markProductAsReviewed(barcode);
+    setSessionEdited(prev => new Set(prev).add(barcode));
     cloudSyncService.broadcastProductsUpdate('ADMIN');
     loadData();
   };
 
   const handleTargetStockChange = (barcode: string, val: number) => {
     storageService.updateProductTargetStock(barcode, Math.max(0, val));
+    setSessionEdited(prev => new Set(prev).add(barcode));
     cloudSyncService.broadcastProductsUpdate('ADMIN');
     loadData();
   };
 
   const handleMinOrderQtyChange = (barcode: string, val: number) => {
     storageService.updateProductMinOrderQty(barcode, Math.max(1, val));
+    setSessionEdited(prev => new Set(prev).add(barcode));
     cloudSyncService.broadcastProductsUpdate('ADMIN');
     loadData();
   };
@@ -368,9 +372,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
   const unmappedAudits = audits.filter((a) => a.isUnmapped);
 
-  const filteredItems = orderItems.filter((item) => {
-    const masterProduct = products.find(p => p.barcode === item.barcode);
-    if (showUnmodifiedOnly && masterProduct?.updatedAt) return false;
+  let filteredItems = orderItems.filter((item) => {
     const matchesSearch =
       item.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.barcode.includes(searchQuery);
@@ -388,6 +390,19 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
     return matchesSearch && matchesTemp;
   });
+
+  
+  if (sortUnmodifiedFirst) {
+    filteredItems.sort((a, b) => {
+      const pA = products.find(p => p.barcode === a.barcode);
+      const pB = products.find(p => p.barcode === b.barcode);
+      const isUnmodA = !pA?.updatedAt || sessionEdited.has(a.barcode);
+      const isUnmodB = !pB?.updatedAt || sessionEdited.has(b.barcode);
+      if (isUnmodA && !isUnmodB) return -1;
+      if (!isUnmodA && isUnmodB) return 1;
+      return 0;
+    });
+  }
 
   const isConnected = syncStatus === 'CONNECTED';
 
@@ -652,11 +667,14 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
             <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer md:self-end mt-1">
               <input
                 type="checkbox"
-                checked={showUnmodifiedOnly}
-                onChange={(e) => setShowUnmodifiedOnly(e.target.checked)}
+                checked={sortUnmodifiedFirst}
+                onChange={(e) => {
+                  setSortUnmodifiedFirst(e.target.checked);
+                  if (!e.target.checked) setSessionEdited(new Set()); // reset when turned off
+                }}
                 className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
               />
-              💡 수정 기록 없는 상품만 모아보기
+              💡 수정 안 된 상품 위로 올리기
             </label>
           </div>
           </div>

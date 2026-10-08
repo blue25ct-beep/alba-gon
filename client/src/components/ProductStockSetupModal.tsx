@@ -14,7 +14,8 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
 }) => {
   const [products, setProducts] = useState<Product[]>(storageService.getProducts());
   const [searchQuery, setSearchQuery] = useState('');
-  const [showUnmodifiedOnly, setShowUnmodifiedOnly] = useState(false);
+  const [sortUnmodifiedFirst, setSortUnmodifiedFirst] = useState(false);
+  const [sessionEdited, setSessionEdited] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [batchTargetStock, setBatchTargetStock] = useState<number>(10);
   const [batchMinOrderQty, setBatchMinOrderQty] = useState<number>(10);
@@ -22,11 +23,11 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
 
   const categories = ['ALL', ...Array.from(new Set(products.map((p) => p.category)))];
 
-  const filtered = products.filter((p) => {
+  let filtered = products.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.barcode.includes(searchQuery);
     const matchesCat = selectedCategory === 'ALL' || p.category === selectedCategory;
-    if (showUnmodifiedOnly && p.updatedAt) return false;
+
     return matchesSearch && matchesCat;
   });
 
@@ -37,6 +38,17 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     onUpdated();
   };
 
+  
+  if (sortUnmodifiedFirst) {
+    filtered.sort((a, b) => {
+      const isUnmodA = !a.updatedAt || sessionEdited.has(a.barcode);
+      const isUnmodB = !b.updatedAt || sessionEdited.has(b.barcode);
+      if (isUnmodA && !isUnmodB) return -1;
+      if (!isUnmodA && isUnmodB) return 1;
+      return 0;
+    });
+  }
+
   const handleItemChange = (
     barcode: string,
     field: 'targetStock' | 'minOrderQty',
@@ -46,6 +58,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
       p.barcode === barcode ? { ...p, [field]: Math.max(1, val), updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) } : p
     );
     setProducts(updated);
+    setSessionEdited(prev => new Set(prev).add(barcode));
     storageService.saveProducts(updated);
     setSavedId(barcode);
     setTimeout(() => setSavedId(null), 1000);
@@ -108,11 +121,14 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
               <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer mb-2">
                 <input
                   type="checkbox"
-                  checked={showUnmodifiedOnly}
-                  onChange={(e) => setShowUnmodifiedOnly(e.target.checked)}
+                  checked={sortUnmodifiedFirst}
+                  onChange={(e) => {
+                  setSortUnmodifiedFirst(e.target.checked);
+                  if (!e.target.checked) setSessionEdited(new Set()); // reset when turned off
+                }}
                   className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
                 />
-                💡 수정 기록 없는 상품만 모아보기
+                💡 수정 안 된 상품 위로 올리기
               </label>
               <input
                 type="text"

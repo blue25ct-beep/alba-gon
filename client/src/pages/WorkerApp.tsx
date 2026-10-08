@@ -366,7 +366,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
                     )}
                   </p>
                   <p className="mt-0.5 text-[13px] text-ink-faint tabular">
-                    {item.barcode} · {item.updatedAt}
+                    {item.barcode} · 목표 재고: {item.targetStock ?? 1} · {item.updatedAt}
                   </p>
                 </div>
 
