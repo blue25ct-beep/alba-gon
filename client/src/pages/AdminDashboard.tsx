@@ -30,6 +30,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [aliases, setAliases] = useState<BarcodeAlias[]>([]);
   const [failures, setFailures] = useState<OrderFailure[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showUnmodifiedOnly, setShowUnmodifiedOnly] = useState(false);
 
   // 발주 수량 임시 조정 (barcode -> finalQty)
   const [customQuantities, setCustomQuantities] = useState<Record<string, number>>({});
@@ -361,6 +362,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const unmappedAudits = audits.filter((a) => a.isUnmapped);
 
   const filteredItems = orderItems.filter((item) => {
+    const masterProduct = products.find(p => p.barcode === item.barcode);
+    if (showUnmodifiedOnly && masterProduct?.updatedAt) return false;
     const matchesSearch =
       item.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.barcode.includes(searchQuery);

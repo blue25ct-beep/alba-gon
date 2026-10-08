@@ -14,6 +14,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
 }) => {
   const [products, setProducts] = useState<Product[]>(storageService.getProducts());
   const [searchQuery, setSearchQuery] = useState('');
+  const [showUnmodifiedOnly, setShowUnmodifiedOnly] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [batchTargetStock, setBatchTargetStock] = useState<number>(10);
   const [batchMinOrderQty, setBatchMinOrderQty] = useState<number>(10);
@@ -25,6 +26,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.barcode.includes(searchQuery);
     const matchesCat = selectedCategory === 'ALL' || p.category === selectedCategory;
+    if (showUnmodifiedOnly && p.updatedAt) return false;
     return matchesSearch && matchesCat;
   });
 
@@ -96,6 +98,15 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer mb-2">
+                <input
+                  type="checkbox"
+                  checked={showUnmodifiedOnly}
+                  onChange={(e) => setShowUnmodifiedOnly(e.target.checked)}
+                  className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
+                />
+                💡 수정 기록 없는 상품만 모아보기
+              </label>
               <input
                 type="text"
                 placeholder="상품명 또는 바코드"
