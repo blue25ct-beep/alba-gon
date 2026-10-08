@@ -21,6 +21,8 @@ import { UnmappedGallery } from '../components/UnmappedGallery';
 import { BarcodeAliasModal } from '../components/BarcodeAliasModal';
 import { OrderFailureModal } from '../components/OrderFailureModal';
 import { ProductStockSetupModal } from '../components/ProductStockSetupModal';
+import recoveryAudits from '../data/recoveryAudits.json';
+
 
 export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' | null; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void }> = ({ initialCategory, onThemeChange, onTitleChange }) => {
   const [audits, setAudits] = useState<AuditItem[]>([]);
@@ -321,6 +323,23 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, '마스터_상품목록');
     XLSX.writeFile(wb, `알바곤_상품마스터_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
+  
+  const handleRestoreAudits = () => {
+    if (confirm('유실된 182개의 발주 리스트 데이터를 강제로 복구하시겠습니까?')) {
+      const merged = [...storageService.getAudits()];
+      const existingBarcodes = new Set(merged.map(a => a.barcode));
+      (recoveryAudits as any[]).forEach(a => {
+        if (!existingBarcodes.has(a.barcode)) {
+          merged.push(a);
+        }
+      });
+      storageService.saveAudits(merged);
+      cloudSyncService.broadcastAudits(merged, 'ADMIN');
+      loadData();
+      alert('복구가 완료되었습니다!');
+    }
   };
 
   const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
