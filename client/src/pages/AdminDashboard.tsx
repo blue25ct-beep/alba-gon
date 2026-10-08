@@ -707,10 +707,22 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                     </span>
                                   )}
                                 </span>
-                                <span className="block mt-0.5 text-[13px] text-ink-faint tabular">
-                                  {item.barcode}
-                                  {item.usingAliasBarcode && ` → ${item.usingAliasBarcode}`}
-                                </span>
+                                {(() => {
+                                  const masterProduct = products.find(p => p.barcode === item.barcode);
+                                  return (
+                                    <span className="block mt-0.5 text-[13px] text-ink-faint tabular flex flex-wrap items-center gap-2">
+                                      <span>
+                                        {item.barcode}
+                                        {item.usingAliasBarcode && ` → ${item.usingAliasBarcode}`}
+                                      </span>
+                                      {masterProduct?.updatedAt && (
+                                        <span className="text-[11px] text-sage-600 bg-sage-50 px-1.5 py-0.5 rounded font-medium">
+                                          ✏️ 수정됨: {masterProduct.updatedAt}
+                                        </span>
+                                      )}
+                                    </span>
+                                  );
+                                })()}
                                 {(item.productName.includes('쿠팡]') || item.productName.startsWith('CP]')) && (
                                   <button
                                     onClick={() => {

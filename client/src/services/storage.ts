@@ -56,7 +56,7 @@ export const storageService = {
     const list = this.getProducts();
     const idx = list.findIndex(p => p.barcode === barcode);
     if (idx >= 0) {
-      list[idx].minOrderQty = safeVal;
+      list[idx] = { ...list[idx], minOrderQty: safeVal, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) };
       this.saveProducts(list);
     }
     const audits = this.getAudits();
