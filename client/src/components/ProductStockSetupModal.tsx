@@ -181,7 +181,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
                   <td className="py-3 pr-3 max-w-md">
                     <span className="block text-ink leading-snug break-keep">{p.name}</span>
                     <span className="block mt-0.5 text-[13px] text-ink-faint tabular">
-                      {p.barcode} · {p.category}{p.updatedAt ? ` · ✏️ 수정: ${p.updatedAt}` : ''}
+                      {p.barcode} · {p.category}{p.updatedAt ? ` · ✏️ 수정: ${p.updatedAt}` : ''}{p.lastOrderDate ? ` · 📦 발주: ${p.lastOrderDate}` : ''}
                     </span>
                   </td>
                   <td className="py-3 px-3 text-center">

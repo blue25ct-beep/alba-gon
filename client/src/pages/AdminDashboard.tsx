@@ -289,6 +289,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
         else setSpchainProgress(evt);
       });
 
+      const successBarcodes = sanitizedItems.map(i => i.barcode).filter(b => !result.failures.some(f => f.barcode === b));
+      if (successBarcodes.length > 0) storageService.updateProductLastOrderDate(successBarcodes);
       loadData();
       if (result.failures.length > 0) {
         setShowFailureModal(true);
@@ -316,7 +318,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       '원가': p.cost,
       '목표재고': p.targetStock,
       '최소발주단위': p.minOrderQty,
-      '마지막수정일': p.updatedAt || '기록없음'
+      '마지막수정일': p.updatedAt || '기록없음',
+      '마지막발주일': p.lastOrderDate || '기록없음'
     }));
 
     const ws = XLSX.utils.json_to_sheet(data);
@@ -746,6 +749,11 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                       {masterProduct?.updatedAt && (
                                         <span className="text-[11px] text-sage-600 bg-sage-50 px-1.5 py-0.5 rounded font-medium">
                                           ✏️ 수정됨: {masterProduct.updatedAt}
+                                        </span>
+                                      )}
+                                      {masterProduct?.lastOrderDate && (
+                                        <span className="text-[11px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
+                                          📦 마지막 발주: {masterProduct.lastOrderDate}
                                         </span>
                                       )}
                                     </span>
