@@ -30,6 +30,13 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     return matchesSearch && matchesCat;
   });
 
+  
+  const handleMarkReviewed = (barcode: string) => {
+    storageService.markProductAsReviewed(barcode);
+    setProducts(storageService.getProducts());
+    onUpdated();
+  };
+
   const handleItemChange = (
     barcode: string,
     field: 'targetStock' | 'minOrderQty',
@@ -192,7 +199,19 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
                   <td className="py-3 pr-3 max-w-md">
                     <span className="block text-ink leading-snug break-keep">{p.name}</span>
                     <span className="block mt-0.5 text-[13px] text-ink-faint tabular">
-                      {p.barcode} · {p.category}{p.updatedAt ? ` · ✏️ 수정: ${p.updatedAt}` : ''}{p.lastOrderDate ? ` · 📦 발주: ${p.lastOrderDate}` : ''}
+                      {p.barcode} · {p.category}
+                      {p.updatedAt ? (
+                        ` · ✏️ 수정: ${p.updatedAt}`
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleMarkReviewed(p.barcode)}
+                          className="ml-2 inline-flex text-[11px] text-white bg-sage-500 hover:bg-sage-600 px-1.5 py-0.5 rounded font-medium transition-colors align-middle shadow-sm"
+                        >
+                          ✅ 적절함
+                        </button>
+                      )}
+                      {p.lastOrderDate ? ` · 📦 발주: ${p.lastOrderDate}` : ''}
                     </span>
                   </td>
                   <td className="py-3 px-3 text-center">

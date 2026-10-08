@@ -85,6 +85,22 @@ export const storageService = {
     }
   },
 
+  
+  markProductAsReviewed(barcode: string): void {
+    const list = this.getProducts();
+    const idx = list.findIndex(p => p.barcode === barcode);
+    if (idx >= 0) {
+      list[idx] = { ...list[idx], updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) };
+      this.saveProducts(list);
+    }
+    const audits = this.getAudits();
+    const aIdx = audits.findIndex(a => a.barcode === barcode);
+    if (aIdx >= 0) {
+      if (list[idx]?.updatedAt) audits[aIdx].updatedAt = list[idx].updatedAt;
+      this.saveAudits(audits);
+    }
+  },
+
   updateProductTargetStock(barcode: string, targetStock: number): void {
     const safeVal = Math.max(0, targetStock);
     const list = this.getProducts();

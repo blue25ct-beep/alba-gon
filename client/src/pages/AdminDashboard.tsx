@@ -208,6 +208,13 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     setCustomQuantities((prev) => ({ ...prev, [barcode]: Math.max(0, val) }));
   };
 
+  
+  const handleMarkReviewed = (barcode: string) => {
+    storageService.markProductAsReviewed(barcode);
+    cloudSyncService.broadcastProductsUpdate('ADMIN');
+    loadData();
+  };
+
   const handleTargetStockChange = (barcode: string, val: number) => {
     storageService.updateProductTargetStock(barcode, Math.max(0, val));
     cloudSyncService.broadcastProductsUpdate('ADMIN');
@@ -760,10 +767,18 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                         {item.barcode}
                                         {item.usingAliasBarcode && ` → ${item.usingAliasBarcode}`}
                                       </span>
-                                      {masterProduct?.updatedAt && (
+                                      {masterProduct?.updatedAt ? (
                                         <span className="text-[11px] text-sage-600 bg-sage-50 px-1.5 py-0.5 rounded font-medium">
                                           ✏️ 수정됨: {masterProduct.updatedAt}
                                         </span>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleMarkReviewed(item.barcode)}
+                                          className="text-[11px] text-white bg-sage-500 hover:bg-sage-600 px-1.5 py-0.5 rounded font-medium transition-colors shadow-sm"
+                                        >
+                                          ✅ 현재 값 적절함
+                                        </button>
                                       )}
                                       {masterProduct?.lastOrderDate && (
                                         <span className="text-[11px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
