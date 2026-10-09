@@ -345,7 +345,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
             ← 뒤로가기
           </button>
 
-          {audits.length > 0 && !isCheckFinished && (
+          {!isCheckFinished && (
             <button
               onClick={() => {
                 const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
