@@ -919,7 +919,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                         <button
                                           type="button"
                                           onClick={() => handleMarkReviewed(item.barcode)}
-                                          className="text-[11px] text-white bg-sage-500 hover:bg-sage-600 px-1.5 py-0.5 rounded font-medium transition-colors shadow-sm"
+                                          className="text-[11px] text-white bg-sage hover:bg-sage-deep px-2 py-1 rounded font-medium transition-colors shadow-sm"
                                         >
                                           ✅ 현재 값 적절함
                                         </button>

@@ -224,7 +224,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleMarkReviewed(p.barcode)}
-                          className="ml-2 inline-flex text-[11px] text-white bg-sage-500 hover:bg-sage-600 px-1.5 py-0.5 rounded font-medium transition-colors align-middle shadow-sm"
+                          className="ml-2 inline-flex text-[11px] text-white bg-sage hover:bg-sage-deep px-2 py-0.5 rounded font-medium transition-colors align-middle shadow-sm"
                         >
                           ✅ 적절함
                         </button>

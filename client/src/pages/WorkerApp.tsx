@@ -356,7 +356,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
                 setIsCheckFinished(true);
                 alert('점장님께 완료 알림이 전송되었습니다.');
               }}
-              className="text-sm font-bold text-sage-deep bg-sage-50 hover:bg-sage-100 border border-sage-200 flex items-center justify-center gap-1 py-1.5 px-3 rounded-full transition-colors ml-auto truncate"
+              className="text-sm font-bold text-white bg-sage hover:bg-sage-deep flex items-center justify-center gap-1 py-1.5 px-4 rounded-full shadow-sm transition-colors ml-auto truncate"
             >
               ✅ 완료 알림 보내기
             </button>
