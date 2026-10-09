@@ -80,6 +80,7 @@ export interface AppSettings {
   workerName: string;
   workers?: WorkerAuth[];
   autoOrderEnabled: boolean;
+  discordWebhookUrl?: string;
 }
 
 

@@ -3,7 +3,7 @@ import { AuditItem } from '../types';
 import { storageService } from './storage';
 
 export interface AuditsSyncMessage {
-  type: 'AUDITS_UPDATE' | 'AUDITS_CLEAR' | 'PRODUCTS_UPDATE' | 'PING' | 'BACKUP_DATA' | 'REQUEST_RESTORE' | 'RESTORE_DATA';
+  type: 'AUDITS_UPDATE' | 'AUDITS_CLEAR' | 'PRODUCTS_UPDATE' | 'PING' | 'PONG' | 'BACKUP_DATA' | 'REQUEST_RESTORE' | 'RESTORE_DATA';
   senderId: string;
   senderRole: 'WORKER' | 'ADMIN';
   storeId: string;
@@ -30,6 +30,7 @@ class CloudSyncService {
   private productsUpdateListeners: Set<VoidListener> = new Set();
   private connectionStatus: SyncStatus = 'DISCONNECTED';
   private lastSyncTime: string = '';
+  private pingResolvers: Set<(val: boolean) => void> = new Set();
 
   constructor() {
     let id = '';
@@ -204,6 +205,39 @@ class CloudSyncService {
       console.error('[CloudSync] 연결 시도 오류:', err);
       this.notifyStatus('ERROR');
     }
+  }
+
+  
+  public checkBotAlive(timeoutMs = 3000): Promise<boolean> {
+    return new Promise(resolve => {
+      if (!this.client || !this.client.connected) {
+        resolve(false);
+        return;
+      }
+      
+      const timeout = setTimeout(() => {
+        this.pingResolvers.delete(resolve);
+        resolve(false);
+      }, timeoutMs);
+      
+      this.pingResolvers.add((val) => {
+        clearTimeout(timeout);
+        this.pingResolvers.delete(resolve);
+        resolve(val);
+      });
+      
+      const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
+      const payload = {
+        type: 'PING',
+        senderId: this.mySenderId,
+        senderRole: 'WORKER',
+        storeId: this.currentStoreId,
+        timestamp: Date.now(),
+        audits: [],
+      };
+      
+      this.client.publish(topicSync, JSON.stringify(payload), { qos: 1 });
+    });
   }
 
   public broadcastAudits(audits: AuditItem[], role: 'WORKER' | 'ADMIN' = 'WORKER'): Promise<boolean> {

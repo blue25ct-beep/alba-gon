@@ -24,6 +24,34 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   const [lastSyncTime, setLastSyncTime] = useState<string>('');
   const [isSending, setIsSending] = useState(false);
   const [sendSuccessMsg, setSendSuccessMsg] = useState(false);
+  const [lastScanTime, setLastScanTime] = useState<number | null>(null);
+  const [isCheckFinished, setIsCheckFinished] = useState<boolean>(false);
+  
+  const sendDiscordNotification = (message: string) => {
+    const webhookUrl = storageService.getSettings().discordWebhookUrl;
+    if (webhookUrl) {
+      fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: message })
+      }).catch(err => console.error('Discord webhook error', err));
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lastScanTime && !isCheckFinished && audits.length > 0) {
+        const diff = Date.now() - lastScanTime;
+        if (diff >= 30 * 60 * 1000) { // 30 mins
+          const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
+          sendDiscordNotification(`⏰ **[자동 완료 알림]** 30분 동안 추가 스캔이 없어 발주 체크가 완료된 것으로 보입니다!\n- 근무자: ` + workerName + `\n- 분류: ` + vendorLabel + `\n- 스캔 수량: 총 ` + audits.length + `건\n점장님, PC에서 내역을 확인해 주세요.`);
+          setIsCheckFinished(true);
+        }
+      }
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [lastScanTime, isCheckFinished, audits.length, workerName, selectedCategory]);
+
   useEffect(() => {
     if (selectedCategory === 'SPCHAIN') {
       onThemeChange?.('blue');
@@ -141,11 +169,28 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         vendor: selectedCategory === 'SPCHAIN' ? 'spchain' : 'younme',
       });
 
+      const isFirstScan = audits.length === 0;
+      
       const updated = storageService.getAudits();
       setAudits(updated);
       handleCloseModals();
 
       cloudSyncService.broadcastAudits(updated, 'WORKER');
+      
+      setLastScanTime(Date.now());
+      setIsCheckFinished(false);
+
+      if (isFirstScan) {
+        const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
+        sendDiscordNotification(`✅ **[발주 시작]** 근무자(` + workerName + `)가 ` + vendorLabel + ` 발주 스캔을 시작했습니다.`);
+        
+        // 봇 생존 확인
+        cloudSyncService.checkBotAlive(2000).then(isAlive => {
+          if (!isAlive) {
+            sendDiscordNotification(`🚨 **[긴급 알림]** 발주 봇 서버가 닫혀있습니다! 점장님 PC의 봇 서버를 켜주세요!`);
+          }
+        });
+      }
     } catch (err: unknown) {
       if (err instanceof Error && err.name === 'QuotaExceededError') {
         alert('저장 공간이 꽉 찼습니다! 기존 실사 목록을 먼저 본사로 전송하고 비워주세요.');
@@ -293,12 +338,26 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
       <div className="text-center text-ink-faint text-xs py-1">최종 업데이트: {__BUILD_TIME__}</div>
       {/* 오늘 실사 현황 */}
       <section>
-        <div className="mb-4">
+        <div className="mb-4 flex items-center gap-2">
           <button type="button" onClick={() => onCategoryChange?.(null)}
-            className="text-sm font-medium text-ink-soft hover:text-ink flex items-center gap-1 bg-surface py-2 px-4 rounded-full border border-line"
+            className="text-sm font-medium text-ink-soft hover:text-ink flex items-center gap-1 bg-surface py-2 px-4 rounded-full border border-line shrink-0"
           >
-            ← 카테고리 선택으로 돌아가기
+            ← 뒤로가기
           </button>
+
+          {audits.length > 0 && !isCheckFinished && (
+            <button
+              onClick={() => {
+                const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
+                sendDiscordNotification(`🏁 **[발주 완료]** 근무자(` + workerName + `)가 발주 체크를 모두 마쳤습니다!\n- 분류: ` + vendorLabel + `\n- 총 스캔 수량: ` + audits.length + `건\n최종 발주를 진행해 주세요.`);
+                setIsCheckFinished(true);
+                alert('점장님께 완료 알림이 전송되었습니다.');
+              }}
+              className="text-sm font-semibold text-white bg-sage-600 hover:bg-sage-700 flex items-center justify-center gap-1 py-2 px-3 rounded-full shadow-sm transition-colors ml-auto truncate"
+            >
+              ✅ 완료 알림 보내기
+            </button>
+          )}
         </div>
         <div className="flex items-baseline justify-between">
           <div>
