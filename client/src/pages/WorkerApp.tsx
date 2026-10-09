@@ -44,7 +44,8 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         const diff = Date.now() - lastScanTime;
         if (diff >= 30 * 60 * 1000) { // 30 mins
           const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
-          sendDiscordNotification(`⏰ **[자동 완료 알림]** 30분 동안 추가 스캔이 없어 발주 체크가 완료된 것으로 보입니다!\n- 근무자: ` + workerName + `\n- 분류: ` + vendorLabel + `\n- 스캔 수량: 총 ` + audits.length + `건\n점장님, PC에서 내역을 확인해 주세요.`);
+          sendDiscordNotification(`⏰ **[스캔 종료]** 30분 무반응으로 스캔이 자동 종료되었습니다. (근무자: ` + workerName + `)\n봇 서버가 자동 발주 가능 여부를 판별합니다...`);
+          cloudSyncService.requestAutoOrderEvaluation(audits, workerName, selectedCategory || '');
           setIsCheckFinished(true);
         }
       }
@@ -352,7 +353,8 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
             <button
               onClick={() => {
                 const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
-                sendDiscordNotification(`🏁 **[발주 완료]** 근무자(` + workerName + `)가 발주 체크를 모두 마쳤습니다!\n- 분류: ` + vendorLabel + `\n- 총 스캔 수량: ` + audits.length + `건\n최종 발주를 진행해 주세요.`);
+                sendDiscordNotification(`🏁 **[스캔 종료]** 근무자(` + workerName + `)가 스캔 완료 버튼을 눌렀습니다.\n봇 서버가 자동 발주 가능 여부를 판별합니다...`);
+                cloudSyncService.requestAutoOrderEvaluation(audits, workerName, selectedCategory || '');
                 setIsCheckFinished(true);
                 alert('점장님께 완료 알림이 전송되었습니다.');
               }}

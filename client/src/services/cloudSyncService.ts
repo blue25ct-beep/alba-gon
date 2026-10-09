@@ -378,6 +378,19 @@ class CloudSyncService {
     this.client.publish(topic, JSON.stringify(workers), { retain: true });
   }
 
+
+  public publishSettings(settings: any) {
+    if (!this.client || !this.client.connected) return;
+    const topic = `albagom-v2/sync/store_${this.currentStoreId}/settings`;
+    this.client.publish(topic, JSON.stringify(settings), { retain: true });
+  }
+
+  public requestAutoOrderEvaluation(audits: any[], workerName: string, category: string) {
+    if (!this.client || !this.client.connected) return;
+    const topic = `albagom-v2/sync/store_${this.currentStoreId}/auto_order_eval`;
+    this.client.publish(topic, JSON.stringify({ audits, workerName, category }), { qos: 1 });
+  }
+
   public disconnect() {
     if (this.client) {
       try {

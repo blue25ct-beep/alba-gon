@@ -27,6 +27,9 @@ const TOPIC_SYNC_1060 = `albagom-v2/stores/store_1060/audits_sync`;
 const AUDITS_BACKUP_FILE = path.join(__dirname, '..', 'audits_backup.json');
 const TOPIC_PROD_1060 = `albagom-v2/stores/store_1060/products_sync`;
 const PRODUCTS_BACKUP_FILE = path.join(__dirname, '..', 'products_backup.json');
+const TOPIC_SETTINGS_1060 = `albagom-v2/sync/store_1060/settings`;
+const SETTINGS_BACKUP_FILE = path.join(__dirname, '..', 'settings_backup.json');
+const TOPIC_AUTO_ORDER_1060 = `albagom-v2/sync/store_1060/auto_order_eval`;
 
 console.log('========================================================');
 console.log('  [편의점 알바곤] 통합 클라우드 실시간 자동발주 봇');
@@ -45,7 +48,7 @@ const client = mqtt.connect(BROKER_URL, {
 
 client.on('connect', () => {
   console.log('[2/2] 브로커 연결 성공! 주문 신호 및 데이터 대기 중...\n');
-  client.subscribe([TOPIC_REQ_YOUNME, TOPIC_REQ_SPCHAIN, TOPIC_AUTH_1060, TOPIC_SYNC_1060, TOPIC_PROD_1060]);
+  client.subscribe([TOPIC_REQ_YOUNME, TOPIC_REQ_SPCHAIN, TOPIC_AUTH_1060, TOPIC_SYNC_1060, TOPIC_PROD_1060, TOPIC_SETTINGS_1060, TOPIC_AUTO_ORDER_1060]);
   
   // 봇 재시작 시, 혹은 클라우드 리셋 시 백업된 데이터로 강제 복구
   try {
