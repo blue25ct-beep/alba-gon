@@ -169,7 +169,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         vendor: selectedCategory === 'SPCHAIN' ? 'spchain' : 'younme',
       });
 
-      const isFirstScan = audits.length === 0;
+      const isFirstScan = (audits.length === 0 || lastScanTime === null);
       
       const updated = storageService.getAudits();
       setAudits(updated);
@@ -190,6 +190,9 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
             sendDiscordNotification(`🚨 **[긴급 알림]** 발주 봇 서버가 닫혀있습니다! 점장님 PC의 봇 서버를 켜주세요!`);
           }
         });
+      } else if (isCheckFinished) {
+        const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
+        sendDiscordNotification(`⚠️ **[발주 추가 진행]** 완료 보고가 끝난 후, 근무자(` + workerName + `)가 ` + vendorLabel + ` 상품을 추가로 스캔하기 시작했습니다! 점장님, 발주 넣기 전 추가된 내역을 꼭 확인해 주세요.`);
       }
     } catch (err: unknown) {
       if (err instanceof Error && err.name === 'QuotaExceededError') {
@@ -353,7 +356,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
                 setIsCheckFinished(true);
                 alert('점장님께 완료 알림이 전송되었습니다.');
               }}
-              className="text-sm font-semibold text-white bg-sage-600 hover:bg-sage-700 flex items-center justify-center gap-1 py-2 px-3 rounded-full shadow-sm transition-colors ml-auto truncate"
+              className="text-sm font-bold text-sage-deep bg-sage-50 hover:bg-sage-100 border border-sage-200 flex items-center justify-center gap-1 py-1.5 px-3 rounded-full transition-colors ml-auto truncate"
             >
               ✅ 완료 알림 보내기
             </button>
