@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   younmePw: '',
   workerName: '?쇨컙?뚮컮',
   autoOrderEnabled: true,
+  discordWebhookUrl: 'https://discord.com/api/webhooks/1553037652343783444/te4HYGxp_kSj_NIKKX7yqCHdgidUzLs_wqoqTKyKHQe40x8kN6DBg0z-sKVM33s91_TW',
 };
 
 export const storageService = {
@@ -336,6 +337,9 @@ addOrderHistory(entry: OrderHistoryEntry): void {
           localStorage.setItem(KEYS.SETTINGS, JSON.stringify({ ...DEFAULT_SETTINGS, ...raw }));
         }
 
+        if (!raw.discordWebhookUrl) {
+          raw.discordWebhookUrl = DEFAULT_SETTINGS.discordWebhookUrl;
+        }
         return { ...DEFAULT_SETTINGS, ...raw };
       } catch {
       return DEFAULT_SETTINGS;

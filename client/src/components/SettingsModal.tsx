@@ -12,6 +12,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const [younmePw, setYounmePw] = useState(current.younmePw);
   const [managerPin, setManagerPin] = useState(current.managerPin);
   const [workerName, setWorkerName] = useState(current.workerName);
+  const [discordWebhookUrl, setDiscordWebhookUrl] = useState(current.discordWebhookUrl || '');
   const [saved, setSaved] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
@@ -21,6 +22,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       younmePw: younmePw.trim(),
       managerPin: managerPin.trim() || '1234',
       workerName: workerName.trim() || '야간알바',
+      discordWebhookUrl: discordWebhookUrl.trim(),
     });
     setSaved(true);
     setTimeout(() => {
@@ -85,6 +87,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           <div className="h-px bg-line" />
 
           {/* 매장 */}
+          
+          <div>
+            <label className="block text-[13px] font-medium text-ink-soft mb-1.5 pl-1">디스코드 웹훅 URL (알림용)</label>
+            <input
+              type="url"
+              value={discordWebhookUrl}
+              onChange={(e) => setDiscordWebhookUrl(e.target.value)}
+              className={fieldClass}
+              placeholder="https://discord.com/api/webhooks/..."
+            />
+          </div>
+
+          <div className="h-px bg-line my-4" />
+
           <div className="grid grid-cols-2 gap-3">
             <label className="block">
               <span className="block mb-1.5 text-[13px] text-ink-soft">관리자 비밀번호</span>
