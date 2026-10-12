@@ -6,6 +6,7 @@ import { AuditItem, Product } from '../types';
 import { storageService } from '../services/storage';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
 import { Trash2, Camera, RefreshCw, Check, Lock } from 'lucide-react';
+import { soundManager } from '../services/sound';
 
 export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void; onSwitchMode?: (mode: 'WORKER' | 'ADMIN') => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange, onSwitchMode }) => {
   const [audits, setAudits] = useState<AuditItem[]>([]);
@@ -26,6 +27,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   const [sendSuccessMsg, setSendSuccessMsg] = useState(false);
   const [lastScanTime, setLastScanTime] = useState<number | null>(null);
   const [isCheckFinished, setIsCheckFinished] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<{ text: string; sub?: string } | null>(null);
   
   const sendDiscordNotification = (message: string) => {
     const webhookUrl = storageService.getSettings().discordWebhookUrl;
@@ -192,6 +194,18 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
       setLastScanTime(Date.now());
       setIsCheckFinished(false);
 
+      // 성공 사운드 및 즉각적인 토스트 피드백 제공
+      soundManager.playSaveSuccess();
+      const target = detectedProduct ? detectedProduct.targetStock : 1;
+      const minQty = detectedProduct ? Math.max(1, detectedProduct.minOrderQty) : 1;
+      const shortage = Math.max(0, target - quantity);
+      const orderQty = shortage > 0 ? Math.ceil(shortage / minQty) * minQty : 0;
+      setToastMessage({
+        text: `✅ ${productName} (재고 ${quantity}개 저장 완료)`,
+        sub: orderQty > 0 ? `👉 발주 ${orderQty}개 예정 (목표 ${target}개)` : '👉 재고 충분 (발주 없음)',
+      });
+      setTimeout(() => setToastMessage(null), 3500);
+
       if (isFirstScan) {
         const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
         sendDiscordNotification(`✅ **[발주 시작]** 근무자(` + workerName + `)가 ` + vendorLabel + ` 발주 스캔을 시작했습니다.`);
@@ -349,7 +363,15 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   }
 
   return (
-    <div className="max-w-md mx-auto px-5 py-6 space-y-6 pb-24">
+    <div className="max-w-md mx-auto px-5 py-6 space-y-6 pb-24 relative">
+      {/* 실시간 피드백 토스트 알림 */}
+      {toastMessage && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-ink/95 text-white px-5 py-3 rounded-2xl shadow-2xl flex flex-col items-center gap-0.5 border border-white/10 animate-rise pointer-events-none max-w-[90vw] text-center">
+          <span className="font-bold text-sm text-emerald-400">{toastMessage.text}</span>
+          {toastMessage.sub && <span className="text-xs text-white/90">{toastMessage.sub}</span>}
+        </div>
+      )}
+
       <div className="text-center text-ink-faint text-xs py-1">최종 업데이트: {__BUILD_TIME__}</div>
       {/* 오늘 실사 현황 */}
       <section>
@@ -447,26 +469,34 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         ) : (
           <ul className="divide-y divide-line">
             {filteredAudits.map((item) => (
-              <li key={item.id} className="py-3 flex items-center gap-3">
+              <li
+                key={item.id}
+                onClick={() => handleBarcodeDetected(item.barcode)}
+                className="py-3 flex items-center gap-3 cursor-pointer hover:bg-sunken active:bg-sunken/80 rounded-2xl px-2.5 -mx-2.5 transition-colors group"
+                title="터치하여 수량 수정"
+              >
                 <div className="min-w-0 flex-1">
-                  <p className="text-[15px] text-ink leading-snug break-keep">
+                  <p className="text-[15px] text-ink leading-snug break-keep group-hover:text-sage font-medium transition-colors">
                     {item.productName}
                     {item.isUnmapped && (
                       <span className="ml-1.5 align-middle text-[12px] text-clay">사진</span>
                     )}
                   </p>
                   <p className="mt-0.5 text-[13px] text-ink-faint tabular">
-                    {item.barcode} · 목표 재고: {item.targetStock ?? 1} · {item.updatedAt}
+                    {item.barcode} · 목표: {item.targetStock ?? 1}개 · {item.updatedAt}
                   </p>
                 </div>
 
-                <span className="text-[17px] font-semibold text-ink tabular shrink-0">
-                  {item.stockCount}
+                <span className="px-2.5 py-1 rounded-xl bg-surface border border-line text-[15px] font-bold text-ink tabular shrink-0 group-hover:border-sage group-hover:text-sage transition-colors">
+                  {item.stockCount}개
                 </span>
 
                 <button
                   type="button"
-                  onClick={() => handleDeleteAudit(item.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteAudit(item.id);
+                  }}
                   aria-label={`${item.productName} 삭제`}
                   className="w-9 h-9 rounded-full text-ink-faint hover:text-brick hover:bg-brick-soft flex items-center justify-center shrink-0 transition-colors"
                 >

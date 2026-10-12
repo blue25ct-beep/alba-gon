@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { DecodeHintType, BarcodeFormat } from '@zxing/library';
-import { CameraOff, Keyboard, Search, ChevronRight } from 'lucide-react';
+import { Camera, CameraOff, Keyboard, Search, ChevronRight, Pause, Play } from 'lucide-react';
 import { soundManager } from '../services/sound';
 import { storageService } from '../services/storage';
 import { Product } from '../types';
@@ -15,13 +15,26 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
+  const [isUserPaused, setIsUserPaused] = useState<boolean>(false);
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false);
   const [manualBarcode, setManualBarcode] = useState('');
   const [matchedProducts, setMatchedProducts] = useState<Product[]>([]);
   const codeReaderRef = useRef<BrowserMultiFormatReader | null>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
+  const lastScanTimestampRef = useRef<number>(0);
+
+  const isSearching = isInputFocused || manualBarcode.trim().length > 0 || matchedProducts.length > 0;
+  const isActuallyPaused = isPaused || isUserPaused || isSearching;
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isActuallyPaused) {
+      if (controlsRef.current) {
+        controlsRef.current.stop();
+        controlsRef.current = null;
+      }
+      setIsScanning(false);
+      return;
+    }
 
     let active = true;
     const hints = new Map();
@@ -71,6 +84,11 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
             videoRef.current,
             (result) => {
               if (result && active) {
+                const now = Date.now();
+                // 1.5초 쿨다운: 연타 스캔 및 주변 바코드 오인식 방지
+                if (now - lastScanTimestampRef.current < 1500) return;
+                lastScanTimestampRef.current = now;
+
                 soundManager.playScanSuccess();
                 onDetected(result.getText().trim());
               }
@@ -102,7 +120,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
         videoRef.current.srcObject = null;
       }
     };
-  }, [isPaused, onDetected]);
+  }, [isActuallyPaused, onDetected]);
 
   // 바코드 뒷자리 또는 상품명으로 실시간 검색
   useEffect(() => {
@@ -154,20 +172,72 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
 
   return (
     <div className="space-y-3">
+      {/* 뷰파인더 상단 헤더 & 일시정지 컨트롤 */}
+      <div className="flex items-center justify-between px-1">
+        <span className="text-xs font-medium text-ink-soft flex items-center gap-1.5">
+          <span className={`w-2 h-2 rounded-full ${!isActuallyPaused && isScanning ? 'bg-emerald-500 animate-pulse' : 'bg-ink-faint'}`} />
+          {!isActuallyPaused && isScanning ? '카메라 스캔 중' : isSearching ? '입력 검색 중 (스캔 멈춤)' : '카메라 일시정지됨'}
+        </span>
+        <button
+          type="button"
+          onClick={() => setIsUserPaused(!isUserPaused)}
+          className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm ${
+            isUserPaused
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              : 'bg-surface hover:bg-sunken text-ink-soft border border-line'
+          }`}
+          title={isUserPaused ? '카메라 스캔 시작' : '카메라 스캔 일시정지 (주변 바코드 오인식 방지)'}
+        >
+          {isUserPaused ? (
+            <>
+              <Play className="w-3.5 h-3.5 fill-current" />
+              카메라 켜기
+            </>
+          ) : (
+            <>
+              <Pause className="w-3.5 h-3.5" />
+              카메라 끄기
+            </>
+          )}
+        </button>
+      </div>
+
       {/* 뷰파인더 */}
       <div className="relative aspect-4/3 bg-sunken rounded-2xl overflow-hidden">
         <video
           ref={videoRef}
           className={`w-full h-full object-cover transition-opacity ${
-            isPaused ? 'opacity-40' : 'opacity-100'
+            isActuallyPaused ? 'opacity-30' : 'opacity-100'
           }`}
           playsInline
           muted
         />
 
-        {!isPaused && isScanning && !cameraError && (
+        {!isActuallyPaused && isScanning && !cameraError && (
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
             <div className="w-3/5 h-1/3 rounded-xl ring-2 ring-white/70 shadow-[0_0_0_100vmax_rgba(46,42,37,0.28)]" />
+          </div>
+        )}
+
+        {/* 일시정지 시 오버레이 안내 */}
+        {isActuallyPaused && !cameraError && (
+          <div 
+            onClick={() => { if (isUserPaused) setIsUserPaused(false); }}
+            className="absolute inset-0 bg-ink/40 backdrop-blur-[1px] flex flex-col items-center justify-center gap-2 p-6 text-center text-white cursor-pointer select-none"
+          >
+            {isSearching ? (
+              <>
+                <Keyboard className="w-8 h-8 opacity-90 text-sage-300" />
+                <p className="text-sm font-bold">상품 입력/검색 중</p>
+                <p className="text-xs opacity-80">주변 바코드 오인식을 막기 위해 카메라가 멈췄습니다</p>
+              </>
+            ) : isUserPaused ? (
+              <>
+                <Pause className="w-8 h-8 opacity-90 text-amber-300" />
+                <p className="text-sm font-bold">카메라 일시정지됨</p>
+                <p className="text-xs opacity-80">여기를 터치하거나 [카메라 켜기]를 누르면 재개됩니다</p>
+              </>
+            ) : null}
           </div>
         )}
 
@@ -191,6 +261,8 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
               type="text"
               value={manualBarcode}
               onChange={(e) => setManualBarcode(e.target.value)}
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setTimeout(() => setIsInputFocused(false), 250)}
               placeholder="바코드 뒷자리 또는 상품명"
               aria-label="바코드 또는 상품명 입력"
               className="w-full h-12 pl-10 pr-4 rounded-full bg-surface border border-line text-[15px] text-ink placeholder:text-ink-faint focus:outline-none focus:border-sage-300 transition-colors"
@@ -222,7 +294,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
                         </span>
                         <span className="block mt-0.5 text-[13px]">
                           {renderHighlightedBarcode(p.barcode, manualBarcode)}
-                          <span className="text-ink-faint"> · 최소 {p.minOrderQty}개</span>
+                          <span className="text-ink-faint"> · 최소 {p.minOrderQty}개 · 목표 {p.targetStock}개</span>
                         </span>
                       </span>
                       <ChevronRight className="w-4 h-4 text-ink-faint shrink-0" />

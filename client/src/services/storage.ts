@@ -210,15 +210,14 @@ addOrderHistory(entry: OrderHistoryEntry): void {
     const existingIndex = audits.findIndex(a => a.barcode === item.barcode);
     const updatedItem: AuditItem = {
       ...item,
-      id: existingIndex >= 0 ? audits[existingIndex].id : Date.now().toString(),
+      id: Date.now().toString(),
       updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
     };
 
     if (existingIndex >= 0) {
-      audits[existingIndex] = updatedItem;
-    } else {
-      audits.unshift(updatedItem);
+      audits.splice(existingIndex, 1);
     }
+    audits.unshift(updatedItem);
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
     return updatedItem;
   },

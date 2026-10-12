@@ -19,6 +19,11 @@ export const QuantityModal: React.FC<QuantityModalProps> = ({
 }) => {
   const [quantity, setQuantity] = useState<number>(initialQuantity);
 
+  const targetStock = product?.targetStock ?? 1;
+  const minOrderQty = Math.max(1, product?.minOrderQty ?? 1);
+  const shortage = Math.max(0, targetStock - quantity);
+  const predictedOrderQty = shortage > 0 ? Math.ceil(shortage / minOrderQty) * minOrderQty : 0;
+
   const handleAdjust = (delta: number) => {
     setQuantity((prev) => Math.max(0, prev + delta));
   };
@@ -38,7 +43,7 @@ export const QuantityModal: React.FC<QuantityModalProps> = ({
             </h2>
             {product && (
               <p className="mt-1.5 text-[13px] text-ink-faint">
-                최소 발주 {product.minOrderQty}개 · 매입 {product.cost.toLocaleString()}원
+                목표 재고 {targetStock}개 · 최소 발주 {minOrderQty}개 · 매입 {product.cost.toLocaleString()}원
               </p>
             )}
           </div>
@@ -51,8 +56,36 @@ export const QuantityModal: React.FC<QuantityModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
-          {/* 수량 */}
+        <div className="p-6 space-y-4">
+          {/* 실시간 발주 예측 피드백 배너 */}
+          <div className={`p-3.5 rounded-2xl border text-sm transition-all ${
+            quantity === 0
+              ? 'bg-rose-50 border-rose-200 text-rose-800'
+              : shortage > 0
+              ? 'bg-amber-50 border-amber-200 text-amber-800'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+          }`}>
+            <div className="flex justify-between items-center font-bold mb-1">
+              <span>
+                {quantity === 0
+                  ? '🔴 품절 (재고 0개)'
+                  : shortage > 0
+                  ? `🟡 재고 부족 (${shortage}개 부족)`
+                  : '🟢 재고 충분'}
+              </span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-white/80 border border-current font-semibold">
+                목표 {targetStock}개
+              </span>
+            </div>
+            <div className="text-xs opacity-90 flex justify-between items-center mt-1">
+              <span>예상 발주 수량:</span>
+              <strong className="text-sm font-extrabold">
+                {predictedOrderQty > 0 ? `${predictedOrderQty}개 발주 예정` : '발주 없음 (0개)'}
+              </strong>
+            </div>
+          </div>
+
+          {/* 수량 조정 */}
           <div className="flex items-center justify-between gap-4">
             <button
               type="button"
@@ -88,7 +121,7 @@ export const QuantityModal: React.FC<QuantityModalProps> = ({
           {/* 자주 쓰는 값 */}
           <div className="grid grid-cols-4 gap-2">
             {[
-              { label: '품절', val: 0, setExact: true },
+              { label: '품절(0)', val: 0, setExact: true },
               { label: '+1', val: 1 },
               { label: '+5', val: 5 },
               { label: '+10', val: 10 },
@@ -107,7 +140,7 @@ export const QuantityModal: React.FC<QuantityModalProps> = ({
           <button
             type="button"
             onClick={handleSubmit}
-            className="w-full py-4 rounded-full bg-sage hover:bg-sage-deep text-white font-medium transition-colors"
+            className="w-full py-4 rounded-full bg-sage hover:bg-sage-deep text-white font-bold text-base transition-colors shadow-sm"
           >
             저장하고 다음 스캔
           </button>
