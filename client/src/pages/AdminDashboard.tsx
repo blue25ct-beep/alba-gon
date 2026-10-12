@@ -906,26 +906,29 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                               ))}
 
                               <span className="min-w-0">
+                                {/* 1. 제품명 */}
                                 <span
                                   className={`block leading-snug break-keep ${
                                     isUnregistered ? 'text-clay' : 'text-ink'
                                   }`}
                                 >
                                   {item.productName}
-                                  {item.workerName && (
-                                    <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-700 align-middle whitespace-nowrap">
-                                      👤 {item.workerName} {item.updatedAt ? `(${item.updatedAt.replace(/:d{2}$/, '')})` : ''}
-                                    </span>
-                                  )}
                                 </span>
+                                {/* 2. 바코드 */}
+                                <span className="block mt-0.5 text-[13px] text-ink-faint tabular">
+                                  {item.barcode}
+                                  {item.usingAliasBarcode && ` → ${item.usingAliasBarcode}`}
+                                </span>
+                                {/* 3. 이후 발주자(근무자) 정보 및 검수 상태 등 */}
                                 {(() => {
                                   const masterProduct = products.find(p => p.barcode === item.barcode);
                                   return (
-                                    <span className="block mt-0.5 text-[13px] text-ink-faint tabular flex flex-wrap items-center gap-2">
-                                      <span>
-                                        {item.barcode}
-                                        {item.usingAliasBarcode && ` → ${item.usingAliasBarcode}`}
-                                      </span>
+                                    <span className="flex flex-wrap items-center gap-2 mt-1">
+                                      {item.workerName && (
+                                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-700 align-middle whitespace-nowrap">
+                                          👤 {item.workerName} {item.updatedAt ? `(${item.updatedAt.replace(/:d{2}$/, '')})` : ''}
+                                        </span>
+                                      )}
                                       {masterProduct?.updatedAt ? (
                                         <span className="text-[11px] text-sage-600 bg-sage-50 px-1.5 py-0.5 rounded font-medium">
                                           ✏️ 수정됨: {masterProduct.updatedAt}
@@ -934,7 +937,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                         <button
                                           type="button"
                                           onClick={() => handleMarkReviewed(item.barcode)}
-                                          className="text-[11px] text-white bg-sage hover:bg-sage-deep px-2 py-1 rounded font-medium transition-colors shadow-sm"
+                                          className="text-[11px] text-white bg-sage hover:bg-sage-deep px-2 py-0.5 rounded font-medium transition-colors shadow-sm"
                                         >
                                           ✅ 현재 값 적절함
                                         </button>
