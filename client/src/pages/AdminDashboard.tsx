@@ -12,7 +12,7 @@ import {
   AlertTriangle,
   Users,
 } from 'lucide-react';
-import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias, WorkerAuth } from '../types';
+import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias, WorkerAuth, OrderHistoryEntry } from '../types';
 import * as XLSX from 'xlsx';
 import { storageService } from '../services/storage';
 import { analyzeAndRecommend } from '../services/smartRecommendation';
@@ -39,17 +39,18 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [customQuantities, setCustomQuantities] = useState<Record<string, number>>({});
 
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('DISCONNECTED');
-  const recommendations = React.useMemo(() => analyzeAndRecommend(storageService.getOrderHistory(), products), [products]);
+  const [orderHistory, setOrderHistory] = useState<OrderHistoryEntry[]>(() => storageService.getOrderHistory());
+  const recommendations = React.useMemo(() => analyzeAndRecommend(orderHistory, products), [orderHistory, products]);
 
   const historyStats = React.useMemo(() => {
-    const history = storageService.getOrderHistory();
+    const history = orderHistory;
     const productStats = new Map<string, { name: string; qty: number; cost: number; count: number }>();
     
     let totalCost = 0;
     
     history.forEach(h => {
       totalCost += h.totalAmount || 0;
-      h.items.forEach(item => {
+      h.items.forEach((item: any) => {
         const current = productStats.get(item.barcode) || { name: item.productName, qty: 0, cost: 0, count: 0 };
         current.qty += item.finalOrderQty;
         current.cost += (item.cost || 0) * item.finalOrderQty;
@@ -63,7 +64,21 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     const topByCost = [...allStats].sort((a,b) => b.cost - a.cost).slice(0, 5);
     
     return { history, totalCost, topByQty, topByCost };
-  }, [activeTab]);
+  }, [orderHistory, activeTab]);
+
+  const handleDeleteHistory = (id: string) => {
+    if (!confirm('이 발주 내역을 삭제하시겠습니까? (테스트 기록 삭제 및 통계에서 제외)')) return;
+    storageService.deleteOrderHistory(id);
+    setOrderHistory(storageService.getOrderHistory());
+    cloudSyncService.broadcastBackup();
+  };
+
+  const handleClearAllHistory = () => {
+    if (!confirm('모든 과거 발주 내역을 삭제하시겠습니까? 통계 데이터가 초기화됩니다.')) return;
+    storageService.clearOrderHistory();
+    setOrderHistory([]);
+    cloudSyncService.broadcastBackup();
+  };
 
   const [showWorkerModal, setShowWorkerModal] = useState(false);
   const [workers, setWorkers] = useState<WorkerAuth[]>(storageService.getSettings().workers || []);
@@ -112,6 +127,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     setProducts(storageService.getProducts());
     setAliases(storageService.getAliases());
     setFailures(storageService.getOrderFailures());
+    setOrderHistory(storageService.getOrderHistory());
   };
 
     useEffect(() => {
@@ -521,16 +537,39 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
               {/* 과거 내역 리스트 */}
               <div>
-                <h2 className="text-xl font-bold text-ink mb-4">과거 발주 상세 내역</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-ink">과거 발주 상세 내역</h2>
+                  {historyStats.history.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleClearAllHistory}
+                      className="text-xs font-semibold text-brick hover:underline transition-colors"
+                    >
+                      전체 내역 비우기
+                    </button>
+                  )}
+                </div>
                 <div className="space-y-4">
                   {historyStats.history.map((history) => (
                     <div key={history.id} className="bg-canvas border border-line rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-semibold text-ink">{history.orderDate} - {history.vendor === 'YOUNME' ? '유앤미24' : '생필체인'}</h3>
-                        <span className="text-sm text-sage-600 bg-sage-50 px-2 py-1 rounded font-medium">성공: {history.items.length}품목</span>
-                      </div>
-                      <div className="text-sm text-ink-faint font-medium">
-                        발주 금액: {history.totalAmount ? history.totalAmount.toLocaleString() + '원' : '금액 정보 없음'}
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h3 className="font-semibold text-ink text-base">{history.orderDate} - {history.vendor === 'YOUNME' ? '유앤미24' : '생필체인'}</h3>
+                          <div className="text-sm text-ink-faint font-medium mt-0.5">
+                            발주 금액: {history.totalAmount ? history.totalAmount.toLocaleString() + '원' : '금액 정보 없음'}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-sage-600 bg-sage-50 px-2 py-1 rounded font-medium">성공: {history.items.length}품목</span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteHistory(history.id)}
+                            className="p-1.5 text-ink-faint hover:text-brick rounded-lg hover:bg-brick/10 transition-colors"
+                            title="이 발주 내역 삭제 (테스트 데이터 정리)"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                       <div className="mt-3 text-xs text-ink-faint border-t border-line pt-3 flex flex-wrap gap-2">
                         {history.items.slice(0, 10).map((item: any, idx: number) => (

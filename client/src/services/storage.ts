@@ -49,6 +49,15 @@ addOrderHistory(entry: OrderHistoryEntry): void {
     this.saveOrderHistory(history);
   },
 
+  deleteOrderHistory(id: string): void {
+    const history = this.getOrderHistory().filter(h => h.id !== id);
+    this.saveOrderHistory(history);
+  },
+
+  clearOrderHistory(): void {
+    this.saveOrderHistory([]);
+  },
+
   getProducts(): Product[] {
     try {
       const data = localStorage.getItem(KEYS.PRODUCTS);
