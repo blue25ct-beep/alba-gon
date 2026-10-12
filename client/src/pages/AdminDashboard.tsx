@@ -44,27 +44,59 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
   const historyStats = React.useMemo(() => {
     const history = orderHistory;
-    const productStats = new Map<string, { name: string; qty: number; cost: number; count: number }>();
+    const productStats = new Map<string, { barcode: string; name: string; qty: number; cost: number; sales: number; profit: number; count: number }>();
     
     let totalCost = 0;
+    let totalSales = 0;
     
     history.forEach(h => {
-      totalCost += h.totalAmount || 0;
+      let orderCost = 0;
+      let orderSales = 0;
       h.items.forEach((item: any) => {
-        const current = productStats.get(item.barcode) || { name: item.productName, qty: 0, cost: 0, count: 0 };
-        current.qty += item.finalOrderQty;
-        current.cost += (item.cost || 0) * item.finalOrderQty;
+        const master = products.find(p => p.barcode === item.barcode);
+        const qty = item.finalOrderQty || 0;
+        const cost = (item.cost !== undefined && item.cost !== null && item.cost > 0) ? item.cost : (master?.cost || 0);
+        const price = (item.price !== undefined && item.price !== null && item.price > 0) ? item.price : (master?.price || 0);
+        
+        const lineCost = cost * qty;
+        const lineSales = price * qty;
+        
+        orderCost += lineCost;
+        orderSales += lineSales;
+
+        const current = productStats.get(item.barcode) || { 
+          barcode: item.barcode, 
+          name: item.productName || master?.name || '알 수 없음', 
+          qty: 0, 
+          cost: 0, 
+          sales: 0, 
+          profit: 0, 
+          count: 0 
+        };
+        current.qty += qty;
+        current.cost += lineCost;
+        current.sales += lineSales;
+        current.profit += (lineSales - lineCost);
         current.count += 1;
         productStats.set(item.barcode, current);
       });
+
+      if (orderCost === 0 && h.totalAmount) {
+        orderCost = h.totalAmount;
+      }
+      totalCost += orderCost;
+      totalSales += orderSales;
     });
 
+    const totalProfit = Math.max(0, totalSales - totalCost);
+    const profitMargin = totalSales > 0 ? Math.round((totalProfit / totalSales) * 1000) / 10 : 0;
+
     const allStats = Array.from(productStats.values());
-    const topByQty = [...allStats].sort((a,b) => b.qty - a.qty).slice(0, 5);
+    const topBySales = [...allStats].sort((a,b) => b.sales - a.sales).slice(0, 5);
     const topByCost = [...allStats].sort((a,b) => b.cost - a.cost).slice(0, 5);
     
-    return { history, totalCost, topByQty, topByCost };
-  }, [orderHistory, activeTab]);
+    return { history, totalCost, totalSales, totalProfit, profitMargin, topBySales, topByCost };
+  }, [orderHistory, products, activeTab]);
 
   const handleDeleteHistory = (id: string) => {
     if (!confirm('이 발주 내역을 삭제하시겠습니까? (테스트 기록 삭제 및 통계에서 제외)')) return;
@@ -494,44 +526,89 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
             <p className="text-ink-faint text-center py-10">기록된 발주 내역이 없습니다.</p>
           ) : (
             <>
-              {/* 통계 대시보드 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-canvas border border-line rounded-xl p-5 shadow-sm">
-                  <h3 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
-                    🏆 발주량 기반 예측 베스트셀러 Top 5
-                  </h3>
-                  <div className="space-y-3">
-                    {historyStats.topByQty.map((stat, i) => (
-                      <div key={i} className="flex justify-between items-center text-sm">
-                        <span className="text-ink truncate pr-2"><span className="font-bold text-sage-600 mr-2">{i+1}</span>{stat.name}</span>
-                        <span className="font-semibold text-ink tabular">{stat.qty}개</span>
-                      </div>
-                    ))}
+              {/* 상단 핵심 지표 요약 (예상 매출액 / 매입 원가 / 예상 마진) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 shadow-sm">
+                  <div className="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1">
+                    총 누적 예상 매출액 (판매금액)
                   </div>
+                  <div className="text-2xl font-black text-emerald-700 tabular">
+                    {historyStats.totalSales.toLocaleString()}원
+                  </div>
+                  <div className="text-xs text-emerald-600 mt-1">발주 상품 판매가(소비자가) 기준 합계</div>
                 </div>
 
                 <div className="bg-canvas border border-line rounded-xl p-5 shadow-sm">
-                  <h3 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
-                    💸 매입 금액 랭킹 Top 5
-                  </h3>
-                  <div className="space-y-3">
-                    {historyStats.topByCost.map((stat, i) => (
-                      <div key={i} className="flex justify-between items-center text-sm">
-                        <span className="text-ink truncate pr-2"><span className="font-bold text-red-500 mr-2">{i+1}</span>{stat.name}</span>
-                        <span className="font-semibold text-ink tabular">{stat.cost.toLocaleString()}원</span>
-                      </div>
-                    ))}
+                  <div className="text-xs font-bold text-ink-faint uppercase tracking-wider mb-1">
+                    총 누적 매입 원가
+                  </div>
+                  <div className="text-2xl font-black text-ink tabular">
+                    {historyStats.totalCost.toLocaleString()}원
+                  </div>
+                  <div className="text-xs text-ink-faint mt-1">발주 납품 매입원가 합계</div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 shadow-sm">
+                  <div className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-1">
+                    예상 총 마진 / 마진율
+                  </div>
+                  <div className="text-2xl font-black text-blue-700 tabular">
+                    +{historyStats.totalProfit.toLocaleString()}원
+                  </div>
+                  <div className="text-xs font-bold text-blue-600 mt-1">
+                    평균 마진율: {historyStats.profitMargin}%
                   </div>
                 </div>
               </div>
 
-              <div className="bg-sage-50 border border-sage-200 rounded-xl p-5 flex items-center justify-between shadow-sm">
-                <div>
-                  <h3 className="text-sage-800 font-bold mb-1">총 누적 매입액 (기록된 발주 기준)</h3>
-                  <p className="text-sm text-sage-600 break-keep">매출 데이터가 없어도 발주 금액과 빈도를 통해 상권의 흐름을 파악할 수 있습니다.</p>
+              {/* 통계 랭킹 대시보드: 매출 기여도 Top 5 vs 매입 금액 Top 5 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-canvas border border-line rounded-xl p-5 shadow-sm">
+                  <h3 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
+                    💰 매출 기여도 Top 5 (판매금액 순)
+                  </h3>
+                  <div className="space-y-3">
+                    {historyStats.topBySales.length === 0 ? (
+                      <p className="text-xs text-ink-faint py-3 text-center">집계된 매출 데이터가 없습니다.</p>
+                    ) : (
+                      historyStats.topBySales.map((stat, i) => (
+                        <div key={i} className="flex justify-between items-center text-sm">
+                          <span className="text-ink truncate pr-2">
+                            <span className="font-bold text-emerald-600 mr-2">{i+1}</span>
+                            {stat.name}
+                            <span className="text-xs text-ink-faint ml-1">({stat.qty}개)</span>
+                          </span>
+                          <span className="font-bold text-emerald-700 tabular shrink-0">
+                            {stat.sales.toLocaleString()}원
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
-                <div className="text-2xl font-black text-sage-700 tabular">
-                  {historyStats.totalCost.toLocaleString()}원
+
+                <div className="bg-canvas border border-line rounded-xl p-5 shadow-sm">
+                  <h3 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
+                    💸 매입 금액 랭킹 Top 5 (원가 지출 순)
+                  </h3>
+                  <div className="space-y-3">
+                    {historyStats.topByCost.length === 0 ? (
+                      <p className="text-xs text-ink-faint py-3 text-center">집계된 매입 데이터가 없습니다.</p>
+                    ) : (
+                      historyStats.topByCost.map((stat, i) => (
+                        <div key={i} className="flex justify-between items-center text-sm">
+                          <span className="text-ink truncate pr-2">
+                            <span className="font-bold text-red-500 mr-2">{i+1}</span>
+                            {stat.name}
+                            <span className="text-xs text-ink-faint ml-1">({stat.qty}개)</span>
+                          </span>
+                          <span className="font-semibold text-ink tabular shrink-0">
+                            {stat.cost.toLocaleString()}원
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -550,35 +627,70 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                   )}
                 </div>
                 <div className="space-y-4">
-                  {historyStats.history.map((history) => (
-                    <div key={history.id} className="bg-canvas border border-line rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <h3 className="font-semibold text-ink text-base">{history.orderDate} - {history.vendor === 'YOUNME' ? '유앤미24' : '생필체인'}</h3>
-                          <div className="text-sm text-ink-faint font-medium mt-0.5">
-                            발주 금액: {history.totalAmount ? history.totalAmount.toLocaleString() + '원' : '금액 정보 없음'}
+                  {historyStats.history.map((history) => {
+                    const orderCost = history.items.reduce((sum: number, it: any) => {
+                      const master = products.find(p => p.barcode === it.barcode);
+                      const cost = (it.cost !== undefined && it.cost !== null && it.cost > 0) ? it.cost : (master?.cost || 0);
+                      return sum + cost * (it.finalOrderQty || 0);
+                    }, 0) || history.totalAmount || 0;
+
+                    const orderSales = history.items.reduce((sum: number, it: any) => {
+                      const master = products.find(p => p.barcode === it.barcode);
+                      const price = (it.price !== undefined && it.price !== null && it.price > 0) ? it.price : (master?.price || 0);
+                      return sum + price * (it.finalOrderQty || 0);
+                    }, 0);
+
+                    const orderProfit = Math.max(0, orderSales - orderCost);
+                    const orderMargin = orderSales > 0 ? Math.round((orderProfit / orderSales) * 1000) / 10 : 0;
+
+                    return (
+                      <div key={history.id} className="bg-canvas border border-line rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h3 className="font-semibold text-ink text-base">
+                              {history.orderDate} - {history.vendor === 'YOUNME' ? '유앤미24' : '생필체인'}
+                            </h3>
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-medium mt-1">
+                              <span className="text-emerald-700 font-semibold">
+                                예상 매출: {orderSales.toLocaleString()}원
+                              </span>
+                              <span className="text-ink-faint">
+                                매입 원가: {orderCost.toLocaleString()}원
+                              </span>
+                              {orderSales > 0 && (
+                                <span className="text-blue-600 font-medium">
+                                  마진: +{orderProfit.toLocaleString()}원 ({orderMargin}%)
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-sage-600 bg-sage-50 px-2 py-1 rounded font-medium">성공: {history.items.length}품목</span>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteHistory(history.id)}
+                              className="p-1.5 text-ink-faint hover:text-brick rounded-lg hover:bg-brick/10 transition-colors"
+                              title="이 발주 내역 삭제 (테스트 데이터 정리)"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-sage-600 bg-sage-50 px-2 py-1 rounded font-medium">성공: {history.items.length}품목</span>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteHistory(history.id)}
-                            className="p-1.5 text-ink-faint hover:text-brick rounded-lg hover:bg-brick/10 transition-colors"
-                            title="이 발주 내역 삭제 (테스트 데이터 정리)"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                        <div className="mt-3 text-xs text-ink-faint border-t border-line pt-3 flex flex-wrap gap-2">
+                          {history.items.slice(0, 10).map((item: any, idx: number) => (
+                            <span key={idx} className="bg-surface px-1.5 py-0.5 rounded border border-line">
+                              {item.productName} <strong className="text-ink">({item.finalOrderQty}개)</strong>
+                            </span>
+                          ))}
+                          {history.items.length > 10 && (
+                            <span className="bg-surface px-1.5 py-0.5 rounded border border-line text-ink font-semibold">
+                              외 {history.items.length - 10}건...
+                            </span>
+                          )}
                         </div>
                       </div>
-                      <div className="mt-3 text-xs text-ink-faint border-t border-line pt-3 flex flex-wrap gap-2">
-                        {history.items.slice(0, 10).map((item: any, idx: number) => (
-                          <span key={idx} className="bg-surface px-1.5 py-0.5 rounded border border-line">{item.productName} <strong className="text-ink">({item.finalOrderQty}개)</strong></span>
-                        ))}
-                        {history.items.length > 10 && <span className="bg-surface px-1.5 py-0.5 rounded border border-line text-ink font-semibold">외 {history.items.length - 10}건...</span>}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </>
