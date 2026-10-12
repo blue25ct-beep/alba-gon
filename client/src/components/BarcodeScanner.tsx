@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { DecodeHintType, BarcodeFormat } from '@zxing/library';
-import { Camera, CameraOff, Keyboard, Search, ChevronRight, Pause, Play } from 'lucide-react';
+import { CameraOff, Keyboard, Search, ChevronRight } from 'lucide-react';
 import { soundManager } from '../services/sound';
 import { storageService } from '../services/storage';
 import { Product } from '../types';
@@ -15,7 +15,6 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState<boolean>(false);
-  const [isUserPaused, setIsUserPaused] = useState<boolean>(false);
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false);
   const [manualBarcode, setManualBarcode] = useState('');
   const [matchedProducts, setMatchedProducts] = useState<Product[]>([]);
@@ -24,7 +23,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
   const lastScanTimestampRef = useRef<number>(0);
 
   const isSearching = isInputFocused || manualBarcode.trim().length > 0 || matchedProducts.length > 0;
-  const isActuallyPaused = isPaused || isUserPaused || isSearching;
+  const isActuallyPaused = isPaused || isSearching;
 
   useEffect(() => {
     if (isActuallyPaused) {
@@ -172,36 +171,6 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
 
   return (
     <div className="space-y-3">
-      {/* 뷰파인더 상단 헤더 & 일시정지 컨트롤 */}
-      <div className="flex items-center justify-between px-1">
-        <span className="text-xs font-medium text-ink-soft flex items-center gap-1.5">
-          <span className={`w-2 h-2 rounded-full ${!isActuallyPaused && isScanning ? 'bg-emerald-500 animate-pulse' : 'bg-ink-faint'}`} />
-          {!isActuallyPaused && isScanning ? '카메라 스캔 중' : isSearching ? '입력 검색 중 (스캔 멈춤)' : '카메라 일시정지됨'}
-        </span>
-        <button
-          type="button"
-          onClick={() => setIsUserPaused(!isUserPaused)}
-          className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm ${
-            isUserPaused
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
-              : 'bg-surface hover:bg-sunken text-ink-soft border border-line'
-          }`}
-          title={isUserPaused ? '카메라 스캔 시작' : '카메라 스캔 일시정지 (주변 바코드 오인식 방지)'}
-        >
-          {isUserPaused ? (
-            <>
-              <Play className="w-3.5 h-3.5 fill-current" />
-              카메라 켜기
-            </>
-          ) : (
-            <>
-              <Pause className="w-3.5 h-3.5" />
-              카메라 끄기
-            </>
-          )}
-        </button>
-      </div>
-
       {/* 뷰파인더 */}
       <div className="relative aspect-4/3 bg-sunken rounded-2xl overflow-hidden">
         <video
@@ -219,25 +188,12 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
           </div>
         )}
 
-        {/* 일시정지 시 오버레이 안내 */}
-        {isActuallyPaused && !cameraError && (
-          <div 
-            onClick={() => { if (isUserPaused) setIsUserPaused(false); }}
-            className="absolute inset-0 bg-ink/40 backdrop-blur-[1px] flex flex-col items-center justify-center gap-2 p-6 text-center text-white cursor-pointer select-none"
-          >
-            {isSearching ? (
-              <>
-                <Keyboard className="w-8 h-8 opacity-90 text-sage-300" />
-                <p className="text-sm font-bold">상품 입력/검색 중</p>
-                <p className="text-xs opacity-80">주변 바코드 오인식을 막기 위해 카메라가 멈췄습니다</p>
-              </>
-            ) : isUserPaused ? (
-              <>
-                <Pause className="w-8 h-8 opacity-90 text-amber-300" />
-                <p className="text-sm font-bold">카메라 일시정지됨</p>
-                <p className="text-xs opacity-80">여기를 터치하거나 [카메라 켜기]를 누르면 재개됩니다</p>
-              </>
-            ) : null}
+        {/* 직접 입력/검색 시 오버레이 안내 */}
+        {isSearching && !cameraError && (
+          <div className="absolute inset-0 bg-ink/40 backdrop-blur-[1px] flex flex-col items-center justify-center gap-2 p-6 text-center text-white pointer-events-none select-none">
+            <Keyboard className="w-8 h-8 opacity-90 text-sage-300" />
+            <p className="text-sm font-bold">상품 입력/검색 중</p>
+            <p className="text-xs opacity-80">주변 바코드 오인식을 막기 위해 카메라가 멈췄습니다</p>
           </div>
         )}
 
