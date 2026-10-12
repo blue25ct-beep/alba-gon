@@ -319,6 +319,26 @@ class CloudSyncService {
   public broadcastProductsUpdate(role: 'WORKER' | 'ADMIN' = 'ADMIN'): Promise<boolean> {
     return new Promise((resolve) => {
       const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
+      const prodTopic = `albagom-v2/stores/store_${this.currentStoreId}/products_sync`;
+
+      if (!this.client || !this.client.connected) {
+        resolve(false);
+        return;
+      }
+
+      // 1. Publish actual master products list with retain to products_sync
+      try {
+        const products = storageService.getProducts();
+        this.client.publish(prodTopic, JSON.stringify({
+          senderId: this.mySenderId,
+          data: { products },
+          timestamp: Date.now(),
+        }), { qos: 1, retain: true });
+      } catch (e) {
+        console.error('[CloudSync] products_sync 발행 오류:', e);
+      }
+
+      // 2. Also notify via audits_sync
       const payload: AuditsSyncMessage = {
         type: 'PRODUCTS_UPDATE',
         senderId: this.mySenderId,
@@ -327,11 +347,6 @@ class CloudSyncService {
         timestamp: Date.now(),
         audits: [],
       };
-
-      if (!this.client || !this.client.connected) {
-        resolve(false);
-        return;
-      }
 
       this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
         if (err) {

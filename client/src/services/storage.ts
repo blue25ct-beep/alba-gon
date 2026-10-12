@@ -433,10 +433,20 @@ addOrderHistory(entry: OrderHistoryEntry): void {
           
           let addedCount = 0;
           parsedProducts.forEach(p => {
-            if (!map.has(p.barcode)) {
+            const existing = map.get(p.barcode);
+            if (!existing) {
               addedCount++;
+              // 신상품: 점장님이 리스트 상단에서 확인할 수 있도록 updatedAt 없이 등록
+              map.set(p.barcode, { ...p });
+            } else {
+              // 기존 상품: 점장님이 설정한 목표재고, 발주단위, 검수기록(updatedAt)은 영구 보존!
+              map.set(p.barcode, { 
+                ...existing, 
+                name: p.name, 
+                price: p.price, 
+                cost: p.cost 
+              });
             }
-            map.set(p.barcode, { ...map.get(p.barcode), ...p, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) });
           });
 
           const merged = Array.from(map.values());

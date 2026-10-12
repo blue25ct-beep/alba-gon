@@ -45,7 +45,8 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         if (diff >= 30 * 60 * 1000) { // 30 mins
           const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
           sendDiscordNotification(`⏰ **[스캔 종료]** 30분 무반응으로 스캔이 자동 종료되었습니다. (근무자: ` + workerName + `)\n봇 서버가 자동 발주 가능 여부를 판별합니다...`);
-          cloudSyncService.requestAutoOrderEvaluation(audits, workerName, selectedCategory || '');
+          const targetAudits = audits.filter(a => selectedCategory === 'SPCHAIN' ? (a.vendor === 'spchain') : (a.vendor !== 'spchain'));
+          cloudSyncService.requestAutoOrderEvaluation(targetAudits, workerName, selectedCategory || '');
           setIsCheckFinished(true);
         }
       }
@@ -354,7 +355,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
               onClick={() => {
                 const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
                 sendDiscordNotification(`🏁 **[스캔 종료]** 근무자(` + workerName + `)가 스캔 완료 버튼을 눌렀습니다.\n봇 서버가 자동 발주 가능 여부를 판별합니다...`);
-                cloudSyncService.requestAutoOrderEvaluation(audits, workerName, selectedCategory || '');
+                cloudSyncService.requestAutoOrderEvaluation(filteredAudits, workerName, selectedCategory || '');
                 setIsCheckFinished(true);
                 alert('점장님께 완료 알림이 전송되었습니다.');
               }}

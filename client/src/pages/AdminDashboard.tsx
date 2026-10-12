@@ -135,6 +135,12 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
     cloudSyncService.connect(undefined, 'ADMIN');
 
+    // 봇 및 다른 기기와 마스터 상품(검수 기록 포함) 및 백업 자동 동기화
+    setTimeout(() => {
+      cloudSyncService.broadcastProductsUpdate('ADMIN');
+      cloudSyncService.broadcastBackup();
+    }, 1200);
+
     const unsubSync = cloudSyncService.onSync((newAudits) => {
       setAudits(newAudits);
     });
