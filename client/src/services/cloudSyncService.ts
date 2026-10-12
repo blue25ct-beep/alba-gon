@@ -177,11 +177,25 @@ class CloudSyncService {
           } else if (msg.type === 'PRODUCTS_UPDATE') {
             this.productsUpdateListeners.forEach((l) => l());
           } else if (msg.type === 'AUDITS_UPDATE') {
-            storageService.saveAudits(msg.audits || []);
-            this.notifySync(msg.audits || [], msg);
+            let lastClearedAt = 0;
+            try { lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10); } catch(e){}
+            if (msg.timestamp && msg.timestamp < lastClearedAt) {
+              console.log('[CloudSync] 무시됨: 이전 세션의 오래된 실사 업데이트');
+              return;
+            }
+            // 초기화 시점 이전에 스캔된 과거 항목 필터링
+            const validAudits = (msg.audits || []).filter((a: any) => {
+              const auditTime = parseInt(a.id, 10);
+              if (!isNaN(auditTime) && auditTime < lastClearedAt) return false;
+              return true;
+            });
+            storageService.saveAudits(validAudits);
+            this.notifySync(validAudits, msg);
           } else if (msg.type === 'AUDITS_CLEAR') {
-            this.clearListeners.forEach((l) => l());
+            const clearedAt = (msg as any).clearedAt || msg.timestamp || Date.now();
+            try { localStorage.setItem('albagom_last_cleared_at', clearedAt.toString()); } catch(e){}
             storageService.clearAudits();
+            this.clearListeners.forEach((l) => l());
             this.notifySync([], msg);
           }
         } catch (e) {
@@ -362,12 +376,15 @@ class CloudSyncService {
   public broadcastClear(role: 'WORKER' | 'ADMIN' = 'ADMIN'): Promise<boolean> {
     return new Promise((resolve) => {
       const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
-      const payload: AuditsSyncMessage = {
+      const clearedAt = Date.now();
+      try { localStorage.setItem('albagom_last_cleared_at', clearedAt.toString()); } catch(e){}
+      const payload: any = {
         type: 'AUDITS_CLEAR',
         senderId: this.mySenderId,
         senderRole: role,
         storeId: this.currentStoreId,
-        timestamp: Date.now(),
+        timestamp: clearedAt,
+        clearedAt: clearedAt,
         audits: [],
       };
 

@@ -69,7 +69,17 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
 
   useEffect(() => {
     setWorkerName(storageService.getSettings().workerName);
-    setAudits(storageService.getAudits());
+    let lastClearedAt = 0;
+    try { lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10); } catch(e){}
+    const initialAudits = storageService.getAudits().filter((a: any) => {
+      const auditTime = parseInt(a.id, 10);
+      if (!isNaN(auditTime) && auditTime < lastClearedAt) return false;
+      return true;
+    });
+    if (initialAudits.length !== storageService.getAudits().length) {
+      storageService.saveAudits(initialAudits);
+    }
+    setAudits(initialAudits);
 
     cloudSyncService.connect(undefined, 'WORKER');
 
@@ -399,19 +409,34 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-ink-soft">스캔한 재고</h2>
           {filteredAudits.length > 0 && (
-            <button
-              type="button"
-              onClick={handleManualSendToAdmin}
-              disabled={isSending}
-              className="inline-flex items-center gap-1.5 text-[13px] font-medium text-sage hover:text-sage-deep disabled:text-ink-faint transition-colors"
-            >
-              {isSending ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              ) : sendSuccessMsg ? (
-                <Check className="w-3.5 h-3.5" />
-              ) : null}
-              <span>{sendSuccessMsg ? '보냈습니다' : '지금 보내기'}</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirm('스캔한 목록을 모두 비우시겠습니까?')) {
+                    storageService.clearAudits();
+                    cloudSyncService.broadcastClear('WORKER');
+                    setAudits([]);
+                  }
+                }}
+                className="text-[12px] font-medium text-brick hover:underline"
+              >
+                목록 비우기
+              </button>
+              <button
+                type="button"
+                onClick={handleManualSendToAdmin}
+                disabled={isSending}
+                className="inline-flex items-center gap-1.5 text-[13px] font-medium text-sage hover:text-sage-deep disabled:text-ink-faint transition-colors"
+              >
+                {isSending ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                ) : sendSuccessMsg ? (
+                  <Check className="w-3.5 h-3.5" />
+                ) : null}
+                <span>{sendSuccessMsg ? '보냈습니다' : '지금 보내기'}</span>
+              </button>
+            </div>
           )}
         </div>
 

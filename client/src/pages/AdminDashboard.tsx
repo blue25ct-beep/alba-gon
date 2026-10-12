@@ -349,6 +349,15 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           items: successItems,
           totalAmount
         });
+        // 발주 완료된 품목은 실사 목록에서 자동 제거하여 중복 발주 방지
+        const remainingAudits = storageService.getAudits().filter(a => !successBarcodes.includes(a.barcode));
+        storageService.saveAudits(remainingAudits);
+        setAudits(remainingAudits);
+        if (remainingAudits.length === 0) {
+          cloudSyncService.broadcastClear('ADMIN');
+        } else {
+          cloudSyncService.broadcastAudits(remainingAudits, 'ADMIN');
+        }
         cloudSyncService.broadcastBackup(); // Ensure backup is updated
       }
       loadData();

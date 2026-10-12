@@ -144,6 +144,11 @@ client.on('message', async (topic, message) => {
       }
       if (msg.type === 'AUDITS_UPDATE') {
         fs.writeFileSync(AUDITS_BACKUP_FILE, message.toString(), 'utf8');
+      } else if (msg.type === 'AUDITS_CLEAR') {
+        try {
+          if (fs.existsSync(AUDITS_BACKUP_FILE)) fs.unlinkSync(AUDITS_BACKUP_FILE);
+          console.log('[실사 초기화] 매장 실사 목록 비우기 신호 수신 -> 봇 백업 삭제 완료');
+        } catch(e) {}
       } else if (msg.type === 'BACKUP_DATA' && msg.data) {
         if (msg.data.products && Array.isArray(msg.data.products) && msg.data.products.length > 0) {
           fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(msg.data.products), 'utf8');
