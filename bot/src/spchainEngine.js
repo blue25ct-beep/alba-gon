@@ -73,10 +73,11 @@ async function runSpchainOrder(orderPayload, sendProgress) {
                     const tr = qtyInput.closest('tr');
                     if (tr) {
                         const trText = tr.innerText.replace(/\s+/g, '');
-                        // 이름에서 제조사명(예: 오비], 무학]) 등을 제거하고 핵심 이름 3글자를 추출
-                        const cleanName = name.replace(/^[^\]]+\]/, '').replace(/\s+/g, '');
-                        const safeName = cleanName.substring(0, 3);
-                        if (!trText.includes(barcode) && !trText.includes(safeName)) {
+                        // 이름에서 2글자 이상의 핵심 단어들 추출 (예: '테라', '아사히', '참이슬')
+                        const words = name.replace(/[()[\]\-_]/g, ' ').split(/\s+/).filter(w => w.length >= 2);
+                        const matchesBarcode = trText.includes(barcode);
+                        const matchesName = words.some(w => trText.includes(w));
+                        if (!matchesBarcode && !matchesName) {
                             return false; // 불일치 (검색 실패 후 엉뚱한 리스트 노출됨)
                         }
                     }
