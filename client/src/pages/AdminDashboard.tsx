@@ -102,7 +102,9 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const handleDeleteHistory = (id: string) => {
     if (!confirm('이 발주 내역을 삭제하시겠습니까? (테스트 기록 삭제 및 통계에서 제외)')) return;
     storageService.deleteOrderHistory(id);
-    setOrderHistory(storageService.getOrderHistory());
+    const updated = storageService.getOrderHistory();
+    setOrderHistory(updated);
+    cloudSyncService.broadcastOrderHistory(updated);
     cloudSyncService.broadcastBackup();
   };
 
@@ -110,6 +112,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     if (!confirm('모든 과거 발주 내역을 삭제하시겠습니까? 통계 데이터가 초기화됩니다.')) return;
     storageService.clearOrderHistory();
     setOrderHistory([]);
+    cloudSyncService.broadcastOrderHistory([]);
     cloudSyncService.broadcastBackup();
   };
 
@@ -194,6 +197,21 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       setAudits(newAudits);
     });
 
+    const unsubHistory = cloudSyncService.onHistoryUpdate((newHistory) => {
+      setOrderHistory(newHistory);
+    });
+
+    // PC 로컬 서버(포트 3001)에서 하드디스크 발주 내역을 직접 확인하여 동기화
+    fetch('http://localhost:3001/api/history')
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.history) && data.history.length > 0) {
+          storageService.saveOrderHistory(data.history);
+          setOrderHistory(data.history);
+        }
+      })
+      .catch(() => {});
+
     const unsubAuth = cloudSyncService.onAuthUpdate((newWorkers) => {
       setWorkers(newWorkers);
       storageService.saveSettings({ ...storageService.getSettings(), workers: newWorkers });
@@ -207,6 +225,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     return () => {
       unsubSync();
       unsubStatus();
+      unsubHistory();
     };
   }, []);
 
@@ -399,6 +418,9 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           items: successItems,
           totalAmount
         });
+        const latestHist = storageService.getOrderHistory();
+        setOrderHistory(latestHist);
+        cloudSyncService.broadcastOrderHistory(latestHist);
         // 발주 완료된 품목은 실사 목록에서 자동 제거하여 중복 발주 방지
         const remainingAudits = storageService.getAudits().filter(a => !successBarcodes.includes(a.barcode));
         storageService.saveAudits(remainingAudits);
@@ -610,7 +632,24 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       </div>
       
       {activeTab === 'HISTORY' && (
-        <section className="space-y-8">
+        <section className="space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-sunken/60 p-3.5 rounded-2xl border border-line text-xs">
+            <div className="flex items-center gap-2 text-ink">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="font-bold">💾 점장님 PC 영구 저장소 연동됨</span>
+              <span className="text-ink-faint">| 총 {historyStats.history.length}건 보관 중 (PC 하드디스크 & 클라우드 실시간 동기화)</span>
+            </div>
+            {historyStats.history.length > 0 && (
+              <button
+                type="button"
+                onClick={handleClearAllHistory}
+                className="text-brick hover:underline font-medium ml-auto"
+              >
+                전체 기록 초기화
+              </button>
+            )}
+          </div>
+
           {historyStats.history.length === 0 ? (
             <p className="text-ink-faint text-center py-10">기록된 발주 내역이 없습니다.</p>
           ) : (

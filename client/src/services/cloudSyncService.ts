@@ -1,5 +1,5 @@
 import mqtt, { MqttClient } from 'mqtt';
-import { AuditItem } from '../types';
+import { AuditItem, OrderHistoryEntry } from '../types';
 import { storageService } from './storage';
 
 export interface AuditsSyncMessage {
@@ -18,6 +18,7 @@ type SyncListener = (audits: AuditItem[], message: AuditsSyncMessage) => void;
 type StatusListener = (status: SyncStatus, lastSyncTime?: string) => void;
 type VoidListener = () => void;
 type AuthListener = (workers: any[]) => void;
+type HistoryListener = (history: OrderHistoryEntry[]) => void;
 
 class CloudSyncService {
   private client: MqttClient | null = null;
@@ -28,6 +29,7 @@ class CloudSyncService {
   private statusListeners: Set<StatusListener> = new Set();
   private clearListeners: Set<VoidListener> = new Set();
   private productsUpdateListeners: Set<VoidListener> = new Set();
+  private historyListeners: Set<HistoryListener> = new Set();
   private connectionStatus: SyncStatus = 'DISCONNECTED';
   private lastSyncTime: string = '';
   private pingResolvers: Set<(val: boolean) => void> = new Set();
@@ -78,6 +80,11 @@ class CloudSyncService {
     return () => this.productsUpdateListeners.delete(listener);
   }
 
+  public onHistoryUpdate(listener: HistoryListener): () => void {
+    this.historyListeners.add(listener);
+    return () => this.historyListeners.delete(listener);
+  }
+
   public onStatusChange(listener: StatusListener): () => void {
     this.statusListeners.add(listener);
     listener(this.connectionStatus, this.lastSyncTime);
@@ -126,6 +133,7 @@ class CloudSyncService {
         this.notifyStatus('CONNECTED');
         this.client?.subscribe(topicSync, { qos: 1 });
         this.client?.subscribe(`albagom-v2/stores/store_${this.currentStoreId}/products_sync`, { qos: 1 });
+        this.client?.subscribe(`albagom-v2/sync/store_${this.currentStoreId}/history`, { qos: 1 });
         this.client?.subscribe(`albagom-v2/sync/store_${this.currentStoreId}/auth`, { qos: 1 }, (err) => {
           if (err) {
             console.error('[CloudSync] 토픽 구독 실패:', err);
@@ -159,6 +167,22 @@ class CloudSyncService {
           }
           return;
         }
+
+        const histTopic = `albagom-v2/sync/store_${this.currentStoreId}/history`;
+        if (topic === histTopic) {
+          try {
+            const histData = JSON.parse(payload.toString());
+            const list = Array.isArray(histData) ? histData : (histData.history || []);
+            if (Array.isArray(list)) {
+              storageService.saveOrderHistory(list);
+              this.historyListeners.forEach(l => l(list));
+            }
+          } catch (e) {
+            console.error('History parse error:', e);
+          }
+          return;
+        }
+
         if (topic !== topicSync) return;
         try {
           const msg: AuditsSyncMessage = JSON.parse(payload.toString());
@@ -313,6 +337,7 @@ class CloudSyncService {
         products: storageService.getProducts(),
         settings: storageService.getSettings(),
         aliases: storageService.getAliases(),
+        orderHistory: storageService.getOrderHistory(),
       }
     };
     this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true });
@@ -410,6 +435,12 @@ class CloudSyncService {
     if (!this.client || !this.client.connected) return;
     const topic = `albagom-v2/sync/store_${this.currentStoreId}/auth`;
     this.client.publish(topic, JSON.stringify(workers), { retain: true });
+  }
+
+  public broadcastOrderHistory(history: OrderHistoryEntry[]) {
+    if (!this.client || !this.client.connected) return;
+    const topic = `albagom-v2/sync/store_${this.currentStoreId}/history`;
+    this.client.publish(topic, JSON.stringify(history), { retain: true });
   }
 
 

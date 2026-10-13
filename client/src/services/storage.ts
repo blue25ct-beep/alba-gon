@@ -29,37 +29,172 @@ const DEFAULT_SETTINGS: AppSettings = {
   discordWebhookUrl: 'https://discord.com/api/webhooks/1553037652343783444/te4HYGxp_kSj_NIKKX7yqCHdgidUzLs_wqoqTKyKHQe40x8kN6DBg0z-sKVM33s91_TW',
 };
 
-export const storageService = {
-  // --- ?곹뭹 留덉뒪??(Products) ---
+const DEFAULT_ORDER_HISTORY: OrderHistoryEntry[] = [
+  {
+    id: 'order_1791899340000',
+    orderDate: '2026. 10. 13. 오후 10:49',
+    vendor: 'SPCHAIN',
+    items: [
+      {
+        barcode: '8934822470135',
+        productName: '하이네켄]하이네켄(대캔)500ml',
+        currentStock: 0,
+        targetStock: 24,
+        recommendedQty: 24,
+        finalOrderQty: 24,
+        minOrderQty: 24,
+        isBelowMinQty: false,
+        category: '주류',
+        vendor: 'spchain',
+        cost: 2388,
+        price: 4500,
+        status: 'ORDERED'
+      },
+      {
+        barcode: '4891032840421',
+        productName: '산미구엘페일펠젠캔-500ML',
+        currentStock: 1,
+        targetStock: 25,
+        recommendedQty: 24,
+        finalOrderQty: 24,
+        minOrderQty: 24,
+        isBelowMinQty: false,
+        category: '주류',
+        vendor: 'spchain',
+        cost: 2200,
+        price: 4000,
+        status: 'ORDERED'
+      },
+      {
+        barcode: '8801048951017',
+        productName: '진로]참이슬후레쉬(병)360ml',
+        currentStock: 5,
+        targetStock: 20,
+        recommendedQty: 15,
+        finalOrderQty: 15,
+        minOrderQty: 1,
+        isBelowMinQty: false,
+        category: '주류',
+        vendor: 'spchain',
+        cost: 1309,
+        price: 1800,
+        status: 'ORDERED'
+      },
+      {
+        barcode: '8801119740113',
+        productName: '진로]테라(대캔)500ml',
+        currentStock: 8,
+        targetStock: 32,
+        recommendedQty: 24,
+        finalOrderQty: 24,
+        minOrderQty: 24,
+        isBelowMinQty: false,
+        category: '주류',
+        vendor: 'spchain',
+        cost: 1915,
+        price: 2800,
+        status: 'ORDERED'
+      },
+      {
+        barcode: '8801119740014',
+        productName: '진로]테라(소캔)355ml',
+        currentStock: 6,
+        targetStock: 30,
+        recommendedQty: 24,
+        finalOrderQty: 24,
+        minOrderQty: 24,
+        isBelowMinQty: false,
+        category: '주류',
+        vendor: 'spchain',
+        cost: 1450,
+        price: 2100,
+        status: 'ORDERED'
+      },
+      {
+        barcode: '4901004006714',
+        productName: '아사히]생맥주수퍼드라이(소캔)340ml',
+        currentStock: 6,
+        targetStock: 30,
+        recommendedQty: 24,
+        finalOrderQty: 24,
+        minOrderQty: 24,
+        isBelowMinQty: false,
+        usingAliasBarcode: '4901004006714',
+        category: '주류',
+        vendor: 'spchain',
+        cost: 2388,
+        price: 4500,
+        status: 'ORDERED'
+      },
+      {
+        barcode: '8801048952014',
+        productName: '진로]참이슬오리지널(병)360ml',
+        currentStock: 4,
+        targetStock: 24,
+        recommendedQty: 20,
+        finalOrderQty: 20,
+        minOrderQty: 1,
+        isBelowMinQty: false,
+        category: '주류',
+        vendor: 'spchain',
+        cost: 1309,
+        price: 1800,
+        status: 'ORDERED'
+      }
+    ],
+    totalAmount: 293997
+  }
+];
 
-getOrderHistory(): OrderHistoryEntry[] {
+export const storageService = {
+  // --- 발주 내역 (Order History) ---
+
+  getOrderHistory(): OrderHistoryEntry[] {
     try {
       const data = localStorage.getItem(KEYS.ORDER_HISTORY);
-      return data ? JSON.parse(data) : [];
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      // 로컬 스토리지가 비어있을 경우 초기 보관 기록 로드
+      return DEFAULT_ORDER_HISTORY;
     } catch {
-      return [];
+      return DEFAULT_ORDER_HISTORY;
     }
   },
 
-saveOrderHistory(history: OrderHistoryEntry[]): void {
+  saveOrderHistory(history: OrderHistoryEntry[]): void {
     try {
-      // Limit to 100 entries to prevent local storage bloat
-      const trimmed = history.slice(0, 100);
+      const trimmed = history.slice(0, 300);
       localStorage.setItem(KEYS.ORDER_HISTORY, JSON.stringify(trimmed));
+
+      // PC 로컬 REST API로도 백그라운드 전송하여 PC 하드디스크에 영구 보존
+      fetch('http://localhost:3001/api/history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history: trimmed })
+      }).catch(() => {});
     } catch (e) {
       console.error('Failed to save order history', e);
     }
   },
 
-addOrderHistory(entry: OrderHistoryEntry): void {
+  addOrderHistory(entry: OrderHistoryEntry): void {
     const history = this.getOrderHistory();
-    history.unshift(entry); // Add to beginning
+    // 중복 추가 방지 (동일 ID)
+    const existsIdx = history.findIndex(h => h.id === entry.id);
+    if (existsIdx >= 0) {
+      history[existsIdx] = entry;
+    } else {
+      history.unshift(entry);
+    }
     this.saveOrderHistory(history);
   },
 
   deleteOrderHistory(id: string): void {
     const history = this.getOrderHistory().filter(h => h.id !== id);
     this.saveOrderHistory(history);
+    fetch(`http://localhost:3001/api/history/${id}`, { method: 'DELETE' }).catch(() => {});
   },
 
   clearOrderHistory(): void {

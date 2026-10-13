@@ -3,6 +3,8 @@ const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
+const express = require('express');
+const cors = require('cors');
 const mqtt = require('mqtt');
 
 // 유앤미 주문 처리 엔진
@@ -35,9 +37,53 @@ const PRODUCTS_BACKUP_FILE = path.join(__dirname, '..', 'products_backup.json');
 const TOPIC_SETTINGS_1060 = `albagom-v2/sync/store_1060/settings`;
 const SETTINGS_BACKUP_FILE = path.join(__dirname, '..', 'settings_backup.json');
 
+const TOPIC_HISTORY_1060 = `albagom-v2/sync/store_1060/history`;
+const HISTORY_BACKUP_FILE = path.join(__dirname, '..', 'order_history_backup.json');
+
 const TOPIC_AUTO_ORDER_1060 = `albagom-v2/sync/store_1060/auto_order_eval`;
 
 const DEFAULT_DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1553037652343783444/te4HYGxp_kSj_NIKKX7yqCHdgidUzLs_wqoqTKyKHQe40x8kN6DBg0z-sKVM33s91_TW';
+
+function getOrderHistoryFromDisk() {
+  try {
+    if (fs.existsSync(HISTORY_BACKUP_FILE)) {
+      const data = JSON.parse(fs.readFileSync(HISTORY_BACKUP_FILE, 'utf8'));
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.history)) return data.history;
+    }
+  } catch (e) {
+    console.error('[PC 저장소] 발주 내역 파일 읽기 오류:', e.message);
+  }
+  return [];
+}
+
+function saveOrderHistoryToDisk(history) {
+  try {
+    const list = Array.isArray(history) ? history : [];
+    fs.writeFileSync(HISTORY_BACKUP_FILE, JSON.stringify(list, null, 2), 'utf8');
+    console.log(`[PC 저장소] 발주 내역 총 ${list.length}건 PC 하드디스크에 영구 저장 완료!`);
+    return true;
+  } catch (e) {
+    console.error('[PC 저장소] 발주 내역 파일 쓰기 오류:', e.message);
+    return false;
+  }
+}
+
+function addOrderHistoryEntry(entry) {
+  const current = getOrderHistoryFromDisk();
+  const existingIdx = current.findIndex(h => h.id === entry.id);
+  if (existingIdx >= 0) {
+    current[existingIdx] = entry;
+  } else {
+    current.unshift(entry);
+  }
+  const trimmed = current.slice(0, 500);
+  saveOrderHistoryToDisk(trimmed);
+  if (client && client.connected) {
+    client.publish(TOPIC_HISTORY_1060, JSON.stringify(trimmed), { retain: true });
+  }
+  return trimmed;
+}
 
 function getDiscordWebhookUrl() {
   try {
@@ -104,6 +150,7 @@ client.on('connect', () => {
     TOPIC_PROD_1060,
     TOPIC_SETTINGS_1060,
     TOPIC_AUTO_ORDER_1060,
+    TOPIC_HISTORY_1060,
   ]);
   
   // 봇 재시작 시, 혹은 클라우드 리셋 시 백업된 데이터로 강제 복구
@@ -121,7 +168,11 @@ client.on('connect', () => {
       client.publish(TOPIC_PROD_1060, fs.readFileSync(PRODUCTS_BACKUP_FILE, 'utf8'), { retain: true });
       restored = true;
     }
-    if (restored) console.log('[백업 시스템] 클라우드 데이터 복구 완료 (근무자/실사/상품 내역 유지)');
+    if (fs.existsSync(HISTORY_BACKUP_FILE)) {
+      client.publish(TOPIC_HISTORY_1060, fs.readFileSync(HISTORY_BACKUP_FILE, 'utf8'), { retain: true });
+      restored = true;
+    }
+    if (restored) console.log('[백업 시스템] 클라우드 데이터 복구 완료 (근무자/실사/상품/발주내역 유지)');
   } catch(e) {}
 });
 
@@ -196,6 +247,18 @@ client.on('message', async (topic, message) => {
       fs.writeFileSync(SETTINGS_BACKUP_FILE, message.toString(), 'utf8');
       console.log('[설정 동기화] 점장님 설정(계정/디스코드)이 봇에 저장되었습니다.');
     } catch(e){}
+    return;
+  }
+
+  // 5. 발주 내역 PC 동기화
+  if (topic === TOPIC_HISTORY_1060) {
+    try {
+      const msg = JSON.parse(message.toString());
+      const historyList = Array.isArray(msg) ? msg : (msg.history || []);
+      if (Array.isArray(historyList)) {
+        saveOrderHistoryToDisk(historyList);
+      }
+    } catch (e) {}
     return;
   }
 
@@ -305,6 +368,18 @@ client.on('message', async (topic, message) => {
         const result = await runDirectOrderAdd(orderItems, sendProgress);
         console.log(`\n🎉 [자동발주 완료] 성공: ${result.successCount}건, 실패: ${result.failures.length}건`);
         
+        if (result.successCount > 0) {
+          const successItems = orderItems.filter(item => !result.failures.some(f => f.barcode === item.barcode));
+          const totalAmount = successItems.reduce((sum, item) => sum + ((item.cost || 0) * (item.finalOrderQty || 1)), 0);
+          addOrderHistoryEntry({
+            id: Date.now().toString(),
+            orderDate: new Date().toLocaleString('ko-KR'),
+            vendor: category === 'SPCHAIN' ? 'SPCHAIN' : 'YOUNME',
+            items: successItems,
+            totalAmount,
+          });
+        }
+        
         let discordMsg = `🎉 **[자동발주 완료]** 유앤미24 장바구니 담기가 성공적으로 완료되었습니다!\n- 성공: **${result.successCount}건**`;
         if (result.failures.length > 0) {
           discordMsg += `\n- 실패/품절: ${result.failures.length}건 (${result.failures.map(f => f.productName).slice(0, 3).join(', ')})`;
@@ -375,6 +450,18 @@ client.on('message', async (topic, message) => {
 
     console.log(`\n✅ [${vendorName}] 처리 완료! (성공: ${result.successCount}건)`);
     
+    if (result.successCount > 0) {
+      const successItems = items.filter(item => !result.failures.some(f => f.barcode === item.barcode));
+      const totalAmount = successItems.reduce((sum, item) => sum + ((item.cost || 0) * (item.finalOrderQty || 1)), 0);
+      addOrderHistoryEntry({
+        id: orderId || Date.now().toString(),
+        orderDate: new Date().toLocaleString('ko-KR'),
+        vendor: isYounme ? 'YOUNME' : 'SPCHAIN',
+        items: successItems,
+        totalAmount,
+      });
+    }
+
     client.publish(resTopic, JSON.stringify({
       orderId,
       status: 'DONE',
@@ -400,3 +487,58 @@ client.on('error', (err) => {
 client.on('reconnect', () => {
   console.log('재연결 시도 중...');
 });
+
+// ========================================================
+// PC 로컬 REST API 서버 (포트 3001) - 발주 내역 영구 보존 및 실시간 조회용
+// ========================================================
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+
+app.get('/api/history', (req, res) => {
+  const history = getOrderHistoryFromDisk();
+  res.json({ success: true, count: history.length, history });
+});
+
+app.post('/api/history', (req, res) => {
+  const { history, entry } = req.body || {};
+  if (entry) {
+    const updated = addOrderHistoryEntry(entry);
+    return res.json({ success: true, count: updated.length, history: updated });
+  }
+  if (Array.isArray(history)) {
+    saveOrderHistoryToDisk(history);
+    if (client && client.connected) {
+      client.publish(TOPIC_HISTORY_1060, JSON.stringify(history), { retain: true });
+    }
+    return res.json({ success: true, count: history.length, history });
+  }
+  res.status(400).json({ error: 'Invalid payload' });
+});
+
+app.delete('/api/history/:id', (req, res) => {
+  const { id } = req.params;
+  const current = getOrderHistoryFromDisk();
+  const filtered = current.filter(h => h.id !== id);
+  saveOrderHistoryToDisk(filtered);
+  if (client && client.connected) {
+    client.publish(TOPIC_HISTORY_1060, JSON.stringify(filtered), { retain: true });
+  }
+  res.json({ success: true, count: filtered.length, history: filtered });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', server: 'unifiedBot', historyCount: getOrderHistoryFromDisk().length });
+});
+
+const BOT_PORT = process.env.BOT_PORT || 3001;
+app.listen(BOT_PORT, () => {
+  console.log(`[PC 저장소 서버] http://localhost:${BOT_PORT} 가동 완료 (발주 내역 영구 보존 API)`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`[PC 저장소 서버] 포트 ${BOT_PORT}이 이미 활성화되어 있습니다.`);
+  } else {
+    console.error('[PC 저장소 서버 오류]:', err.message);
+  }
+});
+
