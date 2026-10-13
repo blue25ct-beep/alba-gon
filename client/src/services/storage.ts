@@ -13,10 +13,18 @@ const KEYS = {
 };
 
 const DEFAULT_SETTINGS: AppSettings = {
-  managerPin: '1234',
-  younmeId: '',
+  managerPin: '1180',
+  younmeId: '1060',
   younmePw: '',
-  workerName: '?쇨컙?뚮컮',
+  spchainId: '047458',
+  spchainPw: '0474581227',
+  workerName: '주간알바',
+  workers: [
+    { id: '6850', name: '하진현' },
+    { id: '0280', name: '정금희' },
+    { id: '4041', name: '손명원' },
+    { id: '1311', name: '김승곤' },
+  ],
   autoOrderEnabled: true,
   discordWebhookUrl: 'https://discord.com/api/webhooks/1553037652343783444/te4HYGxp_kSj_NIKKX7yqCHdgidUzLs_wqoqTKyKHQe40x8kN6DBg0z-sKVM33s91_TW',
 };
@@ -332,24 +340,60 @@ addOrderHistory(entry: OrderHistoryEntry): void {
       const data = localStorage.getItem(KEYS.SETTINGS);
       if (!data) return DEFAULT_SETTINGS;
       const raw = JSON.parse(data);
-      // 鍮꾨?踰덊샇 蹂듯샇??(?뷀샇臾?prefix 'enc:' ?뺤씤)
-        if (raw.younmePw && raw.younmePw.startsWith('enc:')) {
+      let needsSave = false;
+
+      // 비밀번호 복호화(암호문 prefix 'enc:' 확인)
+      if (raw.younmePw && raw.younmePw.startsWith('enc:')) {
+        try {
+          const decoded = atob(raw.younmePw.replace('enc:', ''));
+          raw.younmePw = decodeURIComponent(escape(decoded));
+        } catch {}
+      }
+
+      if (raw.spchainPw && raw.spchainPw.startsWith('enc:')) {
+        try {
+          const decoded = atob(raw.spchainPw.replace('enc:', ''));
+          raw.spchainPw = decodeURIComponent(escape(decoded));
+        } catch {}
+      }
+
+      // 이전 기본 PIN(1234)이거나 미설정 시 점장님 요청에 따라 1180으로 마이그레이션
+      if (!raw.managerPin || raw.managerPin === '1234') {
+        raw.managerPin = '1180';
+        needsSave = true;
+      }
+
+      if (raw.workerName && (raw.workerName.includes('?') || raw.workerName.includes('켑') || raw.workerName.includes('뚮'))) {
+        raw.workerName = '주간알바';
+        needsSave = true;
+      }
+
+      if (!raw.workers || !Array.isArray(raw.workers) || raw.workers.length === 0) {
+        raw.workers = DEFAULT_SETTINGS.workers;
+        needsSave = true;
+      }
+
+      if (!raw.discordWebhookUrl) {
+        raw.discordWebhookUrl = DEFAULT_SETTINGS.discordWebhookUrl;
+      }
+
+      if (needsSave) {
+        const toStore = { ...DEFAULT_SETTINGS, ...raw };
+        if (toStore.younmePw && !toStore.younmePw.startsWith('enc:')) {
           try {
-            const decoded = atob(raw.younmePw.replace('enc:', ''));
-            raw.younmePw = decodeURIComponent(escape(decoded));
+            toStore.younmePw = `enc:${btoa(unescape(encodeURIComponent(toStore.younmePw)))}`;
           } catch {}
         }
-
-        if (raw.workerName && (raw.workerName.includes('?') || raw.workerName.includes('켑') || raw.workerName.includes('뚮'))) {
-          raw.workerName = '주간알바';
-          localStorage.setItem(KEYS.SETTINGS, JSON.stringify({ ...DEFAULT_SETTINGS, ...raw }));
+        if (toStore.spchainPw && !toStore.spchainPw.startsWith('enc:')) {
+          try {
+            toStore.spchainPw = `enc:${btoa(unescape(encodeURIComponent(toStore.spchainPw)))}`;
+          } catch {}
         }
+        localStorage.setItem(KEYS.SETTINGS, JSON.stringify(toStore));
+      }
 
-        if (!raw.discordWebhookUrl) {
-          raw.discordWebhookUrl = DEFAULT_SETTINGS.discordWebhookUrl;
-        }
-        return { ...DEFAULT_SETTINGS, ...raw };
-      } catch {
+      return { ...DEFAULT_SETTINGS, ...raw };
+    } catch {
       return DEFAULT_SETTINGS;
     }
   },
@@ -358,12 +402,18 @@ addOrderHistory(entry: OrderHistoryEntry): void {
     const current = this.getSettings();
     const updated = { ...current, ...settings };
     
-    // 濡쒖뺄?ㅽ넗由ъ??먮뒗 ?뷀샇?붾맂 ?뺥깭濡쒕쭔 蹂닿? (?뚮컮??F12 媛쒕컻?먮룄援щ줈 ?됰Ц ?몄텧 諛⑹?)
+    // 로컬스토리지에는 암호화된 상태로만 보관 (알바생 F12 개발자도구로 평문 노출 방지)
     const toStore = { ...updated };
     if (toStore.younmePw) {
       try {
         const encoded = btoa(unescape(encodeURIComponent(toStore.younmePw)));
         toStore.younmePw = `enc:${encoded}`;
+      } catch {}
+    }
+    if (toStore.spchainPw) {
+      try {
+        const encoded = btoa(unescape(encodeURIComponent(toStore.spchainPw)));
+        toStore.spchainPw = `enc:${encoded}`;
       } catch {}
     }
 

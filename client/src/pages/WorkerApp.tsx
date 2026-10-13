@@ -321,7 +321,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   if (requireAuth && !isLoggedIn) {
     const handleLogin = (e: React.FormEvent) => {
       e.preventDefault();
-      const managerPin = storageService.getSettings().managerPin || '1234';
+      const managerPin = storageService.getSettings().managerPin || '1180';
       if (pinInput === managerPin) {
         if (onSwitchMode) {
           onSwitchMode('ADMIN');

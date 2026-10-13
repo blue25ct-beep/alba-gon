@@ -77,6 +77,8 @@ export interface AppSettings {
   managerPin: string;
   younmeId: string;
   younmePw: string;
+  spchainId?: string;
+  spchainPw?: string;
   workerName: string;
   workers?: WorkerAuth[];
   autoOrderEnabled: boolean;
