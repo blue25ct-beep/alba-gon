@@ -363,6 +363,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       const step = Math.max(1, item.minOrderQty);
       return {
         ...item,
+        barcode: item.usingAliasBarcode || item.barcode,
         finalOrderQty: item.finalOrderQty > 0 ? Math.ceil(item.finalOrderQty / step) * step : 0,
       };
     });
