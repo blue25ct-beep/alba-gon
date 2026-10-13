@@ -183,11 +183,13 @@ class CloudSyncService {
               console.log('[CloudSync] 무시됨: 이전 세션의 오래된 실사 업데이트');
               return;
             }
-            // 초기화 시점 이전에 스캔된 과거 항목 필터링
-            const validAudits = (msg.audits || []).filter((a: any) => {
+            // 최신 전송된 메시지(msg.timestamp >= lastClearedAt)의 실사는 과거 ID를 현재로 갱신하여 안전하게 유지
+            const validAudits = (msg.audits || []).map((a: any, idx: number) => {
               const auditTime = parseInt(a.id, 10);
-              if (!isNaN(auditTime) && auditTime < lastClearedAt) return false;
-              return true;
+              if (!isNaN(auditTime) && auditTime < lastClearedAt) {
+                return { ...a, id: ((msg.timestamp || Date.now()) + idx).toString() };
+              }
+              return a;
             });
             storageService.saveAudits(validAudits);
             this.notifySync(validAudits, msg);

@@ -11,6 +11,7 @@ import {
   X,
   AlertTriangle,
   Users,
+  Share2,
 } from 'lucide-react';
 import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias, WorkerAuth, OrderHistoryEntry } from '../types';
 import * as XLSX from 'xlsx';
@@ -460,6 +461,68 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       loadData();
       alert('복구가 완료되었습니다!');
     }
+  };
+
+  const handleShareOrdersToDiscord = async () => {
+    const targetItems = tempFilter === 'ALL'
+      ? allItemsToOrder
+      : tempFilter === 'YOUNME'
+        ? younmeItems
+        : tempFilter === 'SPCHAIN'
+          ? spchainItems
+          : coupangItems;
+
+    if (targetItems.length === 0) {
+      alert('현재 발주 예정인 상품이 없습니다.');
+      return;
+    }
+
+    const filterName = tempFilter === 'ALL' ? '전체' : tempFilter === 'YOUNME' ? '유앤미24(상온/냉장)' : tempFilter === 'SPCHAIN' ? '생필체인(주류/저온)' : '쿠팡(수동)';
+    const dateStr = new Date().toLocaleString('ko-KR');
+
+    const header = `📢 **[발주 리스트 공유 - ${filterName} (${targetItems.length}건)]**\n발주서 작성일시: ${dateStr}\n────────────────────────\n`;
+    
+    // 제품명 -> 바코드 -> 발주 정보/수량 -> 발주자/구분 정보 순서
+    const itemLines = targetItems.map((item, idx) => {
+      const vendorText = item.vendor === 'spchain' ? '생필체인' : item.vendor === 'younme' ? '유앤미24' : item.category || '기타';
+      const workerText = item.workerName ? ` | 발주자: ${item.workerName}` : '';
+      return `${idx + 1}. **${item.productName}**\n` +
+        `• 바코드: \`${item.barcode}\`\n` +
+        `• 수량: 재고 ${item.currentStock}개 / 목표 ${item.targetStock}개 ➔ **발주 ${item.finalOrderQty}개**\n` +
+        `• 구분: ${vendorText}${workerText}`;
+    });
+
+    const fullMessage = header + itemLines.join('\n\n');
+
+    const webhookUrl = storageService.getSettings().discordWebhookUrl;
+    if (webhookUrl) {
+      let currentChunk = header;
+      for (const line of itemLines) {
+        if ((currentChunk + '\n\n' + line).length > 1850) {
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: currentChunk })
+          }).catch(console.error);
+          currentChunk = line;
+        } else {
+          currentChunk += (currentChunk === header ? '' : '\n\n') + line;
+        }
+      }
+      if (currentChunk) {
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: currentChunk })
+        }).catch(console.error);
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(fullMessage);
+    } catch(e) {}
+
+    alert(`✅ 디스코드로 발주 리스트(${targetItems.length}건)를 전송했습니다!\n(클립보드에도 복사되어 카카오톡/문자로 바로 붙여넣기 하실 수 있습니다)`);
   };
 
   const handleExcelUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -942,6 +1005,18 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               <Users className="w-4 h-4" />
               👥 근무자 관리
             </button>
+
+            {/* 디스코드로 발주 리스트 공유 버튼 */}
+            {allItemsToOrder.length > 0 && (
+              <button
+                onClick={handleShareOrdersToDiscord}
+                className="h-9 px-4 rounded-full font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors flex items-center gap-1.5 shadow-sm"
+                title="발주 대상 리스트를 디스코드로 전송하고 클립보드에 복사"
+              >
+                <Share2 className="w-4 h-4" />
+                📢 디스코드로 발주 리스트 공유
+              </button>
+            )}
           </div>
 
 

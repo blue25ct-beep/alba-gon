@@ -144,10 +144,19 @@ client.on('message', async (topic, message) => {
       }
       if (msg.type === 'AUDITS_UPDATE') {
         fs.writeFileSync(AUDITS_BACKUP_FILE, message.toString(), 'utf8');
+        try {
+          const dateStr = new Date().toISOString().slice(0, 10);
+          const archiveFile = path.join(__dirname, '..', `audits_archive_${dateStr}.json`);
+          fs.writeFileSync(archiveFile, message.toString(), 'utf8');
+        } catch(e) {}
       } else if (msg.type === 'AUDITS_CLEAR') {
         try {
-          if (fs.existsSync(AUDITS_BACKUP_FILE)) fs.unlinkSync(AUDITS_BACKUP_FILE);
-          console.log('[실사 초기화] 매장 실사 목록 비우기 신호 수신 -> 봇 백업 삭제 완료');
+          if (fs.existsSync(AUDITS_BACKUP_FILE)) {
+            const emergencyFile = path.join(__dirname, '..', 'audits_last_cleared_backup.json');
+            fs.copyFileSync(AUDITS_BACKUP_FILE, emergencyFile);
+            fs.unlinkSync(AUDITS_BACKUP_FILE);
+          }
+          console.log('[실사 초기화] 매장 실사 목록 비우기 신호 수신 -> 봇 백업 삭제 완료 (비상 아카이브 보존)');
         } catch(e) {}
       } else if (msg.type === 'BACKUP_DATA' && msg.data) {
         if (msg.data.products && Array.isArray(msg.data.products) && msg.data.products.length > 0) {
