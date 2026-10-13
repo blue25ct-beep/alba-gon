@@ -439,15 +439,43 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
           {!isCheckFinished && (
             <button
               onClick={() => {
-                const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
-                sendDiscordNotification(`🏁 **[스캔 종료]** 근무자(` + workerName + `)가 스캔 완료 버튼을 눌렀습니다.\n봇 서버가 자동 발주 가능 여부를 판별합니다...`);
+                const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(주류/저온)' : '유앤미24(상온/냉장)';
+                const orderItems = filteredAudits.map(a => {
+                  const p = storageService.findProduct(a.barcode).product;
+                  const target = a.targetStock ?? p?.targetStock ?? 1;
+                  const minQty = a.minOrderQty ?? p?.minOrderQty ?? 1;
+                  const shortage = Math.max(0, target - a.stockCount);
+                  const orderQty = shortage > 0 ? Math.ceil(shortage / minQty) * minQty : 0;
+                  return { ...a, target, minQty, orderQty };
+                });
+
+                const itemsToOrder = orderItems.filter(it => it.orderQty > 0);
+                const dateStr = new Date().toLocaleString('ko-KR');
+
+                let discordText = `🏁 **[발주 완료 알림 - ${vendorLabel}]**\n` +
+                  `• **근무자**: ${workerName || '근무자'} (${dateStr})\n` +
+                  `• **실사 현황**: 총 ${filteredAudits.length}개 확인 (발주 대상: **${itemsToOrder.length}건**)\n` +
+                  `────────────────────────\n`;
+
+                if (itemsToOrder.length === 0) {
+                  discordText += `✨ 모든 품목의 재고가 충분하여 발주 대상 품목이 없습니다.`;
+                } else {
+                  itemsToOrder.forEach((it, idx) => {
+                    discordText += `${idx + 1}. **${it.productName}**\n` +
+                      `• 바코드: \`${it.barcode}\`\n` +
+                      `• 수량: 재고 ${it.stockCount}개 / 목표 ${it.target}개 ➔ **발주 ${it.orderQty}개**\n` +
+                      `• 구분: ${vendorLabel} | 발주자: ${workerName || '근무자'}\n\n`;
+                  });
+                }
+
+                sendDiscordNotification(discordText);
                 cloudSyncService.requestAutoOrderEvaluation(filteredAudits, workerName, selectedCategory || '');
                 setIsCheckFinished(true);
-                alert('점장님께 완료 알림이 전송되었습니다.');
+                alert(`점장님께 발주 완료 알림과 리스트(${itemsToOrder.length}건)가 디스코드로 전송되었습니다!`);
               }}
               className="text-sm font-bold text-white bg-sage hover:bg-sage-deep flex items-center justify-center gap-1 py-1.5 px-4 rounded-full shadow-sm transition-colors ml-auto truncate"
             >
-              ✅ 완료 알림 보내기
+              ✅ 발주 완료 알림 보내기
             </button>
           )}
         </div>
@@ -498,14 +526,6 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
                 className="text-[12px] font-medium text-brick hover:underline"
               >
                 목록 비우기
-              </button>
-              <button
-                type="button"
-                onClick={handleShareListToDiscord}
-                className="inline-flex items-center gap-1 text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors bg-blue-50 px-2.5 py-1 rounded-full"
-                title="현재 발주 리스트를 디스코드로 즉시 공유"
-              >
-                <span>📢 디스코드로 공유</span>
               </button>
               <button
                 type="button"

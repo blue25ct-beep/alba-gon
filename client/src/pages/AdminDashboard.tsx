@@ -409,6 +409,36 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           cloudSyncService.broadcastAudits(remainingAudits, 'ADMIN');
         }
         cloudSyncService.broadcastBackup(); // Ensure backup is updated
+
+        // 발주 완료 결과를 디스코드로 자동 전송
+        const dateStr = new Date().toLocaleString('ko-KR');
+        let orderReport = `🎉 **[발주 완료 보고 - ${vendorName}]**\n` +
+          `• **처리일시**: ${dateStr}\n` +
+          `• **결과**: 총 ${sanitizedItems.length}건 중 성공 **${successBarcodes.length}건**` +
+          (result.failures.length > 0 ? ` (실패 ${result.failures.length}건)` : '') +
+          `\n────────────────────────\n`;
+
+        successItems.forEach((item, idx) => {
+          const vendorText = item.vendor === 'spchain' ? '생필체인' : item.vendor === 'younme' ? '유앤미24' : item.category || '기타';
+          const workerText = item.workerName ? ` | 발주자: ${item.workerName}` : '';
+          orderReport += `${idx + 1}. **${item.productName}**\n` +
+            `• 바코드: \`${item.barcode}\`\n` +
+            `• 수량: 재고 ${item.currentStock}개 / 목표 ${item.targetStock}개 ➔ **발주 ${item.finalOrderQty}개**\n` +
+            `• 구분: ${vendorText}${workerText}\n\n`;
+        });
+
+        if (result.failures.length > 0) {
+          orderReport += `⚠️ **[발주 실패 품목]**\n` + result.failures.map(f => `• ${f.productName || f.barcode}: ${f.failDetail || f.failReason || '실패'}`).join('\n');
+        }
+
+        const webhookUrl = storageService.getSettings().discordWebhookUrl;
+        if (webhookUrl) {
+          fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: orderReport })
+          }).catch(console.error);
+        }
       }
       loadData();
       if (result.failures.length > 0) {
@@ -1006,18 +1036,6 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               <Users className="w-4 h-4" />
               👥 근무자 관리
             </button>
-
-            {/* 디스코드로 발주 리스트 공유 버튼 */}
-            {allItemsToOrder.length > 0 && (
-              <button
-                onClick={handleShareOrdersToDiscord}
-                className="h-9 px-4 rounded-full font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors flex items-center gap-1.5 shadow-sm"
-                title="발주 대상 리스트를 디스코드로 전송하고 클립보드에 복사"
-              >
-                <Share2 className="w-4 h-4" />
-                📢 디스코드로 발주 리스트 공유
-              </button>
-            )}
           </div>
 
 
