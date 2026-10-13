@@ -60,6 +60,14 @@ function getOrderHistoryFromDisk() {
 function saveOrderHistoryToDisk(history) {
   try {
     const list = Array.isArray(history) ? history : [];
+    if (fs.existsSync(HISTORY_BACKUP_FILE)) {
+      try {
+        const existing = JSON.parse(fs.readFileSync(HISTORY_BACKUP_FILE, 'utf8'));
+        if (JSON.stringify(existing) === JSON.stringify(list)) {
+          return true;
+        }
+      } catch (e) {}
+    }
     fs.writeFileSync(HISTORY_BACKUP_FILE, JSON.stringify(list, null, 2), 'utf8');
     console.log(`[PC 저장소] 발주 내역 총 ${list.length}건 PC 하드디스크에 영구 저장 완료!`);
     return true;
@@ -507,13 +515,47 @@ app.post('/api/history', (req, res) => {
     return res.json({ success: true, count: updated.length, history: updated });
   }
   if (Array.isArray(history)) {
-    saveOrderHistoryToDisk(history);
-    if (client && client.connected) {
-      client.publish(TOPIC_HISTORY_1060, JSON.stringify(history), { retain: true });
+    const current = getOrderHistoryFromDisk();
+    if (JSON.stringify(current) !== JSON.stringify(history)) {
+      saveOrderHistoryToDisk(history);
+      if (client && client.connected) {
+        client.publish(TOPIC_HISTORY_1060, JSON.stringify(history), { retain: true });
+      }
     }
     return res.json({ success: true, count: history.length, history });
   }
   res.status(400).json({ error: 'Invalid payload' });
+});
+
+app.post('/api/order', async (req, res) => {
+  try {
+    const { items, credentials } = req.body || {};
+    console.log(`\n📦 [로컬 REST 발주 요청 수신] 품목 수: ${items?.length || 0}건`);
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: '주문할 품목이 없습니다.', successCount: 0, failures: [] });
+    }
+
+    const sendProgress = (arg1, arg2, arg3) => {
+      let percent, msg;
+      if (typeof arg1 === 'object') {
+        percent = arg1.percent;
+        msg = arg1.message;
+      } else {
+        percent = arg2;
+        msg = arg3;
+      }
+      console.log(`   [진행] ${percent}% - ${msg}`);
+    };
+
+    const result = await runDirectOrderAdd(items, sendProgress);
+    console.log(`\n🎉 [로컬 REST 발주 완료] 성공: ${result.successCount}건, 실패: ${result.failures.length}건`);
+
+    res.json(result);
+  } catch (err) {
+    console.error('❌ [로컬 REST 발주 실패]:', err.message);
+    res.status(500).json({ error: err.message, successCount: 0, failures: [] });
+  }
 });
 
 app.delete('/api/history/:id', (req, res) => {

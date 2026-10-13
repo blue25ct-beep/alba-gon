@@ -163,17 +163,24 @@ export const storageService = {
     }
   },
 
-  saveOrderHistory(history: OrderHistoryEntry[]): void {
+  saveOrderHistory(history: OrderHistoryEntry[], syncToApi = true): void {
     try {
       const trimmed = history.slice(0, 300);
-      localStorage.setItem(KEYS.ORDER_HISTORY, JSON.stringify(trimmed));
+      const currentRaw = localStorage.getItem(KEYS.ORDER_HISTORY);
+      const newRaw = JSON.stringify(trimmed);
+      if (currentRaw === newRaw) {
+        return;
+      }
+      localStorage.setItem(KEYS.ORDER_HISTORY, newRaw);
 
-      // PC 로컬 REST API로도 백그라운드 전송하여 PC 하드디스크에 영구 보존
-      fetch('http://localhost:3001/api/history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history: trimmed })
-      }).catch(() => {});
+      if (syncToApi) {
+        // PC 로컬 REST API로도 백그라운드 전송하여 PC 하드디스크에 영구 보존
+        fetch('http://localhost:3001/api/history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: newRaw.startsWith('{') ? newRaw : JSON.stringify({ history: trimmed })
+        }).catch(() => {});
+      }
     } catch (e) {
       console.error('Failed to save order history', e);
     }

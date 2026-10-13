@@ -174,7 +174,7 @@ class CloudSyncService {
             const histData = JSON.parse(payload.toString());
             const list = Array.isArray(histData) ? histData : (histData.history || []);
             if (Array.isArray(list)) {
-              storageService.saveOrderHistory(list);
+              storageService.saveOrderHistory(list, false);
               this.historyListeners.forEach(l => l(list));
             }
           } catch (e) {
@@ -332,7 +332,7 @@ class CloudSyncService {
       senderRole: 'ADMIN',
       storeId: this.currentStoreId,
       timestamp: Date.now(),
-      audits: [],
+      audits: storageService.getAudits(),
       data: {
         products: storageService.getProducts(),
         settings: storageService.getSettings(),
@@ -340,7 +340,7 @@ class CloudSyncService {
         orderHistory: storageService.getOrderHistory(),
       }
     };
-    this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true });
+    this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: false });
   }
 
   public requestRestore(): void {
@@ -379,17 +379,17 @@ class CloudSyncService {
         console.error('[CloudSync] products_sync 발행 오류:', e);
       }
 
-      // 2. Also notify via audits_sync
+      // 2. Also notify via audits_sync without retain so real audits are not wiped
       const payload: AuditsSyncMessage = {
         type: 'PRODUCTS_UPDATE',
         senderId: this.mySenderId,
         senderRole: role,
         storeId: this.currentStoreId,
         timestamp: Date.now(),
-        audits: [],
+        audits: storageService.getAudits(),
       };
 
-      this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
+      this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: false }, (err) => {
         if (err) {
           console.error('[CloudSync] 상품 업데이트 발행 실패:', err);
           resolve(false);
