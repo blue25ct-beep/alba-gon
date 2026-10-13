@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Bell, Users, ShoppingBag, Zap, Plus, Trash2, Send, Check } from 'lucide-react';
+import { X, Lock, Bell, Users, ShoppingBag, Zap, Plus, Trash2, Send, Check, Eye, EyeOff } from 'lucide-react';
 import { storageService } from '../services/storage';
 import { cloudSyncService } from '../services/cloudSyncService';
 import { WorkerAuth } from '../types';
@@ -13,6 +13,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
 
   // 1. 관리자 보안
   const [managerPin, setManagerPin] = useState(current.managerPin || '1180');
+  const [showManagerPin, setShowManagerPin] = useState(false);
 
   // 2. 디스코드 알림
   const [discordWebhookUrl, setDiscordWebhookUrl] = useState(current.discordWebhookUrl || '');
@@ -37,8 +38,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   // 4. 발주처 계정
   const [younmeId, setYounmeId] = useState(current.younmeId || '1060');
   const [younmePw, setYounmePw] = useState(current.younmePw || '');
+  const [showYounmePw, setShowYounmePw] = useState(false);
   const [spchainId, setSpchainId] = useState(current.spchainId || '047458');
   const [spchainPw, setSpchainPw] = useState(current.spchainPw || '0474581227');
+  const [showSpchainPw, setShowSpchainPw] = useState(false);
 
   // 5. 자동발주 토글
   const [autoOrderEnabled, setAutoOrderEnabled] = useState(
@@ -177,16 +180,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 <p className="text-[13px] text-ink-soft">관리자 접속 PIN (4자리)</p>
                 <p className="text-[11px] text-ink-faint">관리자 화면 및 설정에 진입할 때 입력합니다.</p>
               </div>
-              <div className="w-32">
+              <div className="w-36 relative">
                 <input
-                  type="password"
+                  type={showManagerPin ? 'text' : 'password'}
                   maxLength={4}
                   inputMode="numeric"
                   value={managerPin}
                   onChange={(e) => setManagerPin(e.target.value.replace(/[^0-9]/g, ''))}
-                  className={`${inputClass} text-center font-bold text-lg tracking-[0.3em]`}
+                  className={`${inputClass} text-center font-bold text-lg tracking-[0.3em] pr-9 font-mono`}
                   placeholder="1180"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowManagerPin(!showManagerPin)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink p-1 transition-colors"
+                  tabIndex={-1}
+                  title={showManagerPin ? '비밀번호 숨기기' : '비밀번호 보기'}
+                >
+                  {showManagerPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
           </div>
@@ -264,15 +276,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 placeholder="이름 (예: 홍길동)"
                 value={newWorkerName}
                 onChange={(e) => setNewWorkerName(e.target.value)}
-                className={`${inputClass} flex-1`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddWorker();
+                  }
+                }}
+                className="flex-1 min-w-0 h-10 px-3 rounded-xl bg-canvas border border-line text-[14px] text-ink placeholder:text-ink-faint focus:outline-none focus:border-sage transition-colors"
               />
               <input
                 type="text"
+                inputMode="numeric"
                 maxLength={4}
                 placeholder="번호 4자리"
                 value={newWorkerId}
-                onChange={(e) => setNewWorkerId(e.target.value.replace(/[^0-9]/g, ''))}
-                className={`${inputClass} w-28 text-center font-mono`}
+                onChange={(e) => {
+                  const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                  setNewWorkerId(cleaned.length > 4 ? cleaned.slice(-4) : cleaned);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddWorker();
+                  }
+                }}
+                className="w-28 shrink-0 h-10 px-3 rounded-xl bg-canvas border border-line text-[14px] text-ink text-center font-mono placeholder:text-ink-faint focus:outline-none focus:border-sage transition-colors"
               />
               <button
                 type="button"
@@ -323,13 +351,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 </div>
                 <div>
                   <span className="block text-[11px] text-ink-faint mb-1">비밀번호</span>
-                  <input
-                    type="password"
-                    value={younmePw}
-                    onChange={(e) => setYounmePw(e.target.value)}
-                    placeholder="유앤미 비밀번호"
-                    className={inputClass}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showYounmePw ? 'text' : 'password'}
+                      value={younmePw}
+                      onChange={(e) => setYounmePw(e.target.value)}
+                      placeholder="유앤미 비밀번호"
+                      className={`${inputClass} pr-9`}
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowYounmePw(!showYounmePw)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink p-1 transition-colors"
+                      tabIndex={-1}
+                      title={showYounmePw ? '비밀번호 숨기기' : '비밀번호 보기'}
+                    >
+                      {showYounmePw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -350,13 +390,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 </div>
                 <div>
                   <span className="block text-[11px] text-ink-faint mb-1">비밀번호</span>
-                  <input
-                    type="password"
-                    value={spchainPw}
-                    onChange={(e) => setSpchainPw(e.target.value)}
-                    placeholder="0474581227"
-                    className={inputClass}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showSpchainPw ? 'text' : 'password'}
+                      value={spchainPw}
+                      onChange={(e) => setSpchainPw(e.target.value)}
+                      placeholder="0474581227"
+                      className={`${inputClass} pr-9`}
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSpchainPw(!showSpchainPw)}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink p-1 transition-colors"
+                      tabIndex={-1}
+                      title={showSpchainPw ? '비밀번호 숨기기' : '비밀번호 보기'}
+                    >
+                      {showSpchainPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -10,6 +10,7 @@ interface PinModalProps {
 export const PinModal: React.FC<PinModalProps> = ({ onSuccess, onClose }) => {
   const [pin, setPin] = useState('');
   const [error, setError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const settings = storageService.getSettings();
 
   const handleKeyPress = useCallback((digit: string) => {
@@ -20,6 +21,7 @@ export const PinModal: React.FC<PinModalProps> = ({ onSuccess, onClose }) => {
       if (newPin.length === 4) {
         const targetPin = settings.managerPin || '1180';
         if (newPin === targetPin) {
+          setIsSuccess(true);
           setTimeout(() => onSuccess(), 80);
         } else {
           setError(true);
@@ -40,8 +42,22 @@ export const PinModal: React.FC<PinModalProps> = ({ onSuccess, onClose }) => {
   }, []);
 
   useEffect(() => {
+    if (isSuccess) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      // 숫자 키패드 및 상단 숫자키 지원
+      // 1. 텍스트 입력창이나 textarea, 모달 내 입력창에 포커스가 있을 때는 절대 키를 가로채지 않음
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable ||
+          target.closest('input, textarea, select'))
+      ) {
+        return;
+      }
+
+      // 2. 숫자 키패드 및 상단 숫자키 지원
       if (e.key >= '0' && e.key <= '9') {
         e.preventDefault();
         handleKeyPress(e.key);
@@ -56,7 +72,7 @@ export const PinModal: React.FC<PinModalProps> = ({ onSuccess, onClose }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyPress, handleDelete, onClose]);
+  }, [handleKeyPress, handleDelete, onClose, isSuccess]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/30 backdrop-blur-[2px] p-5">

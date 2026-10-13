@@ -1486,22 +1486,38 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               <input
                 type="text"
                 placeholder="이름 (예: 김알바)"
-                className="flex-1 h-12 px-4 rounded-xl border border-line bg-sunken focus:bg-white transition-colors"
+                className="flex-1 min-w-0 h-12 px-4 rounded-xl border border-line bg-sunken focus:bg-white transition-colors"
                 value={newWorkerName}
                 onChange={e => setNewWorkerName(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && newWorkerName && newWorkerId.length === 4) {
+                    e.preventDefault();
+                    addWorker();
+                  }
+                }}
               />
               <input
-                type="password"
-                placeholder="전화번호 뒷자리"
+                type="text"
+                inputMode="numeric"
+                placeholder="번호 4자리"
                 maxLength={4}
-                className="w-28 h-12 px-4 rounded-xl border border-line bg-sunken focus:bg-white transition-colors"
+                className="w-28 shrink-0 h-12 px-4 rounded-xl border border-line bg-sunken focus:bg-white text-center font-mono transition-colors"
                 value={newWorkerId}
-                onChange={e => setNewWorkerId(e.target.value.replace(/[^0-9]/g, ''))}
+                onChange={e => {
+                  const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                  setNewWorkerId(cleaned.length > 4 ? cleaned.slice(-4) : cleaned);
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && newWorkerName && newWorkerId.length === 4) {
+                    e.preventDefault();
+                    addWorker();
+                  }
+                }}
               />
               <button
                 onClick={addWorker}
                 disabled={!newWorkerName || newWorkerId.length < 4}
-                className="px-4 h-12 bg-blue-500 text-white rounded-xl font-bold disabled:opacity-50"
+                className="px-4 h-12 bg-blue-500 text-white rounded-xl font-bold disabled:opacity-50 shrink-0"
               >
                 추가
               </button>
