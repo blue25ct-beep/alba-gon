@@ -26,7 +26,7 @@ const DEFAULT_SETTINGS: AppSettings = {
     { id: '1311', name: '김승곤' },
   ],
   autoOrderEnabled: true,
-  discordWebhookUrl: 'https://discord.com/api/webhooks/1553037652343783444/te4HYGxp_kSj_NIKKX7yqCHdgidUzLs_wqoqTKyKHQe40x8kN6DBg0z-sKVM33s91_TW',
+  discordWebhookUrl: 'https://discord.com/api/webhooks/1559680394444673076/xC_ZlBnDBYpOTd2PGDcywLA4LdFEgGzQ3Hothe7wiEsPmNPkb7uoLbSb67f3wv-5PeNL',
 };
 
 const DEFAULT_ORDER_HISTORY: OrderHistoryEntry[] = [
