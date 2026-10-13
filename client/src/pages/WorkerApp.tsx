@@ -208,12 +208,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
 
       // 발주 필요 상품 디스코드 실시간 공유 (누락 및 유실 방지)
       if (orderQty > 0) {
-        sendDiscordNotification(
-          `📦 **[발주 대상 스캔]**\n` +
-          `• **상품명**: ${productName}\n` +
-          `• **바코드**: \`${activeBarcode}\`\n` +
-          `• **재고**: ${quantity}개`
-        );
+        sendDiscordNotification(`📦 ${productName}, ${activeBarcode}, 재고: ${quantity}개`);
       }
 
       if (isFirstScan) {
@@ -459,9 +454,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
                   discordText += `✨ 모든 품목의 재고가 충분하여 발주 대상 품목이 없습니다.`;
                 } else {
                   itemsToOrder.forEach((it, idx) => {
-                    discordText += `${idx + 1}. **${it.productName}**\n` +
-                      `• 바코드: \`${it.barcode}\`\n` +
-                      `• 재고: ${it.stockCount}개\n\n`;
+                    discordText += `${idx + 1}. ${it.productName}, ${it.barcode}, 재고: ${it.stockCount}개\n`;
                   });
                 }
 

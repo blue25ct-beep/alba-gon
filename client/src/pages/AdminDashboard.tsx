@@ -419,9 +419,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           `\n────────────────────────\n`;
 
         successItems.forEach((item, idx) => {
-          orderReport += `${idx + 1}. **${item.productName}**\n` +
-            `• 바코드: \`${item.barcode}\`\n` +
-            `• 재고: ${item.currentStock}개\n\n`;
+          orderReport += `${idx + 1}. ${item.productName}, ${item.barcode}, 재고: ${item.currentStock}개\n`;
         });
 
         if (result.failures.length > 0) {
