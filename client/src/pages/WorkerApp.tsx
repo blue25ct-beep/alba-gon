@@ -208,13 +208,11 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
 
       // 발주 필요 상품 디스코드 실시간 공유 (누락 및 유실 방지)
       if (orderQty > 0) {
-        const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(주류/저온)' : '유앤미24(상온/냉장)';
         sendDiscordNotification(
-          `📦 **[발주 리스트 등록]**\n` +
+          `📦 **[발주 대상 스캔]**\n` +
           `• **상품명**: ${productName}\n` +
           `• **바코드**: \`${activeBarcode}\`\n` +
-          `• **수량**: 재고 ${quantity}개 / 목표 ${target}개 ➔ **발주 ${orderQty}개**\n` +
-          `• **구분**: ${vendorLabel} | **근무자**: ${workerName || '근무자'}`
+          `• **재고**: ${quantity}개`
         );
       }
 
@@ -463,8 +461,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
                   itemsToOrder.forEach((it, idx) => {
                     discordText += `${idx + 1}. **${it.productName}**\n` +
                       `• 바코드: \`${it.barcode}\`\n` +
-                      `• 수량: 재고 ${it.stockCount}개 / 목표 ${it.target}개 ➔ **발주 ${it.orderQty}개**\n` +
-                      `• 구분: ${vendorLabel} | 발주자: ${workerName || '근무자'}\n\n`;
+                      `• 재고: ${it.stockCount}개\n\n`;
                   });
                 }
 

@@ -419,12 +419,9 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           `\n────────────────────────\n`;
 
         successItems.forEach((item, idx) => {
-          const vendorText = item.vendor === 'spchain' ? '생필체인' : item.vendor === 'younme' ? '유앤미24' : item.category || '기타';
-          const workerText = item.workerName ? ` | 발주자: ${item.workerName}` : '';
           orderReport += `${idx + 1}. **${item.productName}**\n` +
             `• 바코드: \`${item.barcode}\`\n` +
-            `• 수량: 재고 ${item.currentStock}개 / 목표 ${item.targetStock}개 ➔ **발주 ${item.finalOrderQty}개**\n` +
-            `• 구분: ${vendorText}${workerText}\n\n`;
+            `• 재고: ${item.currentStock}개\n\n`;
         });
 
         if (result.failures.length > 0) {
