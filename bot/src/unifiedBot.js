@@ -569,6 +569,36 @@ app.delete('/api/history/:id', (req, res) => {
   res.json({ success: true, count: filtered.length, history: filtered });
 });
 
+app.get('/api/restore-backup', (req, res) => {
+  try {
+    const emergencyFile = path.join(__dirname, '..', 'audits_last_cleared_backup.json');
+    if (fs.existsSync(emergencyFile)) {
+      const data = JSON.parse(fs.readFileSync(emergencyFile, 'utf8'));
+      const audits = data.audits || (Array.isArray(data) ? data : []);
+      return res.json({
+        success: true,
+        count: audits.length,
+        timestamp: data.timestamp,
+        reason: data.reason || '직전 실사/발주 백업',
+        audits
+      });
+    }
+  } catch (e) {
+    console.error('[PC 저장소] restore-backup 읽기 오류:', e.message);
+  }
+  res.json({ success: false, count: 0, audits: [] });
+});
+
+app.get('/api/latest-order', (req, res) => {
+  try {
+    const history = getOrderHistoryFromDisk();
+    if (history.length > 0) {
+      return res.json({ success: true, order: history[0] });
+    }
+  } catch (e) {}
+  res.json({ success: false, order: null });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', server: 'unifiedBot', historyCount: getOrderHistoryFromDisk().length });
 });

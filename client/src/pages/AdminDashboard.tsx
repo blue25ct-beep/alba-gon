@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   Users,
   Share2,
+  RotateCcw,
 } from 'lucide-react';
 import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias, WorkerAuth, OrderHistoryEntry } from '../types';
 import * as XLSX from 'xlsx';
@@ -23,7 +24,7 @@ import { UnmappedGallery } from '../components/UnmappedGallery';
 import { BarcodeAliasModal } from '../components/BarcodeAliasModal';
 import { OrderFailureModal } from '../components/OrderFailureModal';
 import { ProductStockSetupModal } from '../components/ProductStockSetupModal';
-import recoveryAudits from '../data/recoveryAudits.json';
+import { RestoreAuditModal } from '../components/RestoreAuditModal';
 
 
 export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' | null; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void }> = ({ initialCategory, onThemeChange, onTitleChange }) => {
@@ -147,6 +148,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [aliasTargetBarcode, setAliasTargetBarcode] = useState('');
   const [showFailureModal, setShowFailureModal] = useState(false);
   const [showStockSetupModal, setShowStockSetupModal] = useState(false);
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
 
   const [editingBarcode, setEditingBarcode] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
@@ -336,7 +338,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
   const handleClearAllAudits = () => {
     if (!confirm('실사 목록을 모두 비웁니다. 매장 폰의 목록도 함께 지워집니다.')) return;
-    storageService.clearAudits();
+    storageService.clearAudits('관리자 목록 비우기');
     setCustomQuantities({});
     loadData();
     cloudSyncService.broadcastClear('ADMIN');
@@ -415,6 +417,21 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
         const latestHist = storageService.getOrderHistory();
         setOrderHistory(latestHist);
         cloudSyncService.broadcastOrderHistory(latestHist);
+        // 발주 완료된 품목은 언제든 복구할 수 있도록 직전 백업에 보존
+        const orderedAuditsToBackup: AuditItem[] = successItems.map((it, idx) => ({
+          id: (Date.now() + idx).toString(),
+          barcode: it.barcode,
+          productName: it.productName,
+          vendor: it.vendor || (vendor === 'SPCHAIN' ? 'spchain' : 'younme'),
+          stockCount: it.currentStock ?? 0,
+          targetStock: it.targetStock ?? (it.minOrderQty || 1),
+          minOrderQty: it.minOrderQty ?? 1,
+          workerName: (it as any).workerName || '발주복구',
+          updatedAt: (it as any).updatedAt || new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          isUnmapped: false,
+        }));
+        storageService.saveLastClearedAudits(orderedAuditsToBackup, `${vendorName} 발주 완료`);
+
         // 발주 완료된 품목은 실사 목록에서 자동 제거하여 중복 발주 방지
         const remainingAudits = storageService.getAudits().filter(a => !successBarcodes.includes(a.barcode));
         storageService.saveAudits(remainingAudits);
@@ -490,19 +507,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
   
   const handleRestoreAudits = () => {
-    if (confirm('유실된 182개의 발주 리스트 데이터를 강제로 복구하시겠습니까?')) {
-      const merged = [...storageService.getAudits()];
-      const existingBarcodes = new Set(merged.map(a => a.barcode));
-      (recoveryAudits as any[]).forEach(a => {
-        if (!existingBarcodes.has(a.barcode)) {
-          merged.push(a);
-        }
-      });
-      storageService.saveAudits(merged);
-      cloudSyncService.broadcastAudits(merged, 'ADMIN');
-      loadData();
-      alert('복구가 완료되었습니다!');
-    }
+    setShowRestoreModal(true);
   };
 
   const handleShareOrdersToDiscord = async () => {
@@ -1043,19 +1048,30 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           {audits.length === 0 && (
             <button
               onClick={handleRestoreAudits}
-              className="h-9 px-4 rounded-full font-medium text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
+              className="h-9 px-4 rounded-full font-medium text-red-600 bg-red-100 hover:bg-red-200 transition-colors flex items-center gap-1.5 shadow-sm"
             >
-              🚨 삭제된 데이터 복구하기
+              <RotateCcw className="w-4 h-4" />
+              🚨 삭제/발주 데이터 복구하기
             </button>
           )}
           {audits.length > 0 && (
+            <>
+              <button
+                onClick={handleRestoreAudits}
+                className="h-9 px-4 rounded-full font-medium text-amber-700 bg-amber-100/70 hover:bg-amber-200/80 transition-colors flex items-center gap-1.5"
+                title="직전 발주 품목 또는 실수로 지운 실사 목록 복구"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                데이터 복구
+              </button>
               <button
                 onClick={handleClearAllAudits}
                 className="h-9 px-4 rounded-full font-medium text-ink-faint hover:text-brick hover:bg-brick-soft transition-colors"
               >
                 목록 비우기
               </button>
-            )}
+            </>
+          )}
             {/* Worker Management Button */}
             <button
               onClick={() => setShowWorkerModal(true)}
@@ -1544,6 +1560,18 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           </div>
         </div>
       )}
+
+      <RestoreAuditModal
+        isOpen={showRestoreModal}
+        onClose={() => setShowRestoreModal(false)}
+        onRestored={(count, sourceName) => {
+          const updated = storageService.getAudits();
+          setAudits(updated);
+          cloudSyncService.broadcastAudits(updated, 'ADMIN');
+          loadData();
+          alert(`🎉 총 ${count}건 (${sourceName})이 실사 목록으로 성공적으로 복구되었습니다!`);
+        }}
+      />
         </>
       )}
 </div>

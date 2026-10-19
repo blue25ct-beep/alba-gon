@@ -10,6 +10,8 @@ const KEYS = {
   FAILURES: 'albagom_failures_v1',
   ORDER_HISTORY: 'albagom_order_history_v1',
   SETTINGS: 'albagom_settings_v1',
+  LAST_CLEARED_AUDITS: 'albagom_last_cleared_audits_v1',
+  RECENT_DELETED_AUDITS: 'albagom_recent_deleted_audits_v1',
 };
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -409,13 +411,104 @@ export const storageService = {
     this.saveProducts(products);
   },
 
+  getLastClearedAudits(): { timestamp: number; dateStr: string; reason: string; audits: AuditItem[] } | null {
+    try {
+      const data = localStorage.getItem(KEYS.LAST_CLEARED_AUDITS);
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  },
+
+  saveLastClearedAudits(audits: AuditItem[], reason = '목록 비우기'): void {
+    if (!audits || audits.length === 0) return;
+    try {
+      const backup = {
+        timestamp: Date.now(),
+        dateStr: new Date().toLocaleString('ko-KR', {
+          month: 'numeric',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+        reason,
+        audits,
+      };
+      localStorage.setItem(KEYS.LAST_CLEARED_AUDITS, JSON.stringify(backup));
+    } catch (e) {
+      console.error('Failed to save last cleared audits', e);
+    }
+  },
+
+  getRecentlyDeletedAudits(): AuditItem[] {
+    try {
+      const data = localStorage.getItem(KEYS.RECENT_DELETED_AUDITS);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  addRecentlyDeletedAudit(item: AuditItem): void {
+    try {
+      const list = this.getRecentlyDeletedAudits().filter(a => a.barcode !== item.barcode);
+      list.unshift(item);
+      localStorage.setItem(KEYS.RECENT_DELETED_AUDITS, JSON.stringify(list.slice(0, 50)));
+    } catch (e) {
+      console.error('Failed to save recently deleted audit', e);
+    }
+  },
+
+  clearRecentlyDeletedAudits(): void {
+    localStorage.removeItem(KEYS.RECENT_DELETED_AUDITS);
+  },
+
   deleteAudit(identifier: string): void {
-    const audits = this.getAudits().filter(a => a.id !== identifier && a.barcode !== identifier);
+    const current = this.getAudits();
+    const itemToDelete = current.find(a => a.id === identifier || a.barcode === identifier);
+    if (itemToDelete) {
+      this.addRecentlyDeletedAudit(itemToDelete);
+    }
+    const audits = current.filter(a => a.id !== identifier && a.barcode !== identifier);
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
   },
 
-  clearAudits(): void {
+  clearAudits(reason = '목록 비우기'): void {
+    const current = this.getAudits();
+    if (current.length > 0) {
+      this.saveLastClearedAudits(current, reason);
+    }
     localStorage.setItem(KEYS.AUDITS, JSON.stringify([]));
+  },
+
+  getLatestOrderForRecovery(): OrderHistoryEntry | null {
+    const history = this.getOrderHistory();
+    if (history && history.length > 0) {
+      const latest = history[0];
+      if (latest && latest.items && latest.items.length > 0) {
+        return latest;
+      }
+    }
+    return null;
+  },
+
+  restoreItemsToAudits(newAudits: AuditItem[]): { addedCount: number; totalCount: number } {
+    if (!newAudits || newAudits.length === 0) return { addedCount: 0, totalCount: this.getAudits().length };
+    const current = this.getAudits();
+    const existingBarcodes = new Set(current.map(a => a.barcode));
+    let addedCount = 0;
+
+    newAudits.forEach(item => {
+      if (!existingBarcodes.has(item.barcode)) {
+        current.push(item);
+        existingBarcodes.add(item.barcode);
+        addedCount++;
+      }
+    });
+
+    this.saveAudits(current);
+    return { addedCount, totalCount: current.length };
   },
 
   // --- ?泥?諛붿퐫??留ㅽ븨 (Aliases: 援ы삎 諛붿퐫???∽툘 ?좉퇋 諛쒖＜??諛붿퐫?? ---
