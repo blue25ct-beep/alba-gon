@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Trash2, RefreshCw, ArrowRightLeft, X } from 'lucide-react';
 import { OrderFailure, OrderItem } from '../types';
 import { storageService } from '../services/storage';
-import { younmeOrderService } from '../services/younmeOrderService';
+import { unifiedOrderService, Vendor } from '../services/unifiedOrderService';
 
 interface OrderFailureModalProps {
   failures: OrderFailure[];
@@ -42,6 +42,9 @@ export const OrderFailureModal: React.FC<OrderFailureModalProps> = ({
     const qtyToOrder = customQty || failure.minOrderQty;
     setRetryingId(failure.id);
 
+    const { product } = storageService.findProduct(failure.barcode);
+    const vendor: Vendor = (product?.category === '주류' || product?.category === '냉동/아이스') ? 'SPCHAIN' : 'YOUNME';
+
     const item: OrderItem = {
       barcode: failure.barcode,
       productName: failure.productName,
@@ -52,13 +55,15 @@ export const OrderFailureModal: React.FC<OrderFailureModalProps> = ({
       minOrderQty: failure.minOrderQty,
       isBelowMinQty: false,
       status: 'PENDING',
+      vendor: vendor === 'SPCHAIN' ? 'spchain' : 'younme',
+      category: product?.category,
     };
 
     try {
-      const res = await younmeOrderService.executeOrder([item], () => {});
+      const res = await unifiedOrderService.executeOrder(vendor, [item], () => {});
       if (res.successCount > 0) {
         storageService.deleteOrderFailure(failure.id);
-        alert(`${failure.productName} ${qtyToOrder}개를 발주했습니다.`);
+        alert(`${failure.productName} ${qtyToOrder}개를 재발주했습니다.`);
       } else {
         alert('다시 시도했지만 주문이 접수되지 않았습니다.');
       }

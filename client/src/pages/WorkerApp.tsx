@@ -46,9 +46,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         const diff = Date.now() - lastScanTime;
         if (diff >= 30 * 60 * 1000) { // 30 mins
           const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
-          sendDiscordNotification(`⏰ **[스캔 종료]** 30분 무반응으로 스캔이 자동 종료되었습니다. (근무자: ` + workerName + `)\n봇 서버가 자동 발주 가능 여부를 판별합니다...`);
-          const targetAudits = audits.filter(a => selectedCategory === 'SPCHAIN' ? (a.vendor === 'spchain') : (a.vendor !== 'spchain'));
-          cloudSyncService.requestAutoOrderEvaluation(targetAudits, workerName, selectedCategory || '');
+          sendDiscordNotification(`⏰ **[스캔 일시 중단 안내]** 30분 동안 추가 스캔이 없습니다. (근무자: ${workerName}, 구분: ${vendorLabel})\n관리자 페이지에서 실사 내역을 확인해 주세요.`);
           setIsCheckFinished(true);
         }
       }
@@ -205,11 +203,6 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         sub: orderQty > 0 ? `👉 발주 ${orderQty}개 예정 (목표 ${target}개)` : '👉 재고 충분 (발주 없음)',
       });
       setTimeout(() => setToastMessage(null), 3500);
-
-      // 발주 필요 상품 디스코드 실시간 공유 (누락 및 유실 방지)
-      if (orderQty > 0) {
-        sendDiscordNotification(`📦 ${productName}, ${activeBarcode}, 재고: ${quantity}개`);
-      }
 
       if (isFirstScan) {
         const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';

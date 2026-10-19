@@ -1,6 +1,5 @@
 import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings, OrderHistoryEntry } from '../types';
 import seedProducts from '../data/seedProducts.json';
-import seedAudits from '../data/seedAudits.json';
 import * as XLSX from 'xlsx';
 
 const KEYS = {

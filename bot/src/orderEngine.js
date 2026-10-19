@@ -12,7 +12,7 @@ const USER_PW = process.env.YOUNME_PASSWORD;
 // 1. 기본 마스터 데이터 로드 (460여 개 품목 유앤미 공식 공급단가 캐시)
 let seedMap = {};
 try {
-  const seedList = require('./seedProducts.json');
+  const seedList = require('../../client/src/data/seedProducts.json');
   for (const p of seedList) {
     seedMap[p.barcode] = p;
   }

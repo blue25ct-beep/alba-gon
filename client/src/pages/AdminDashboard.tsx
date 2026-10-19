@@ -17,7 +17,6 @@ import {
 import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias, WorkerAuth, OrderHistoryEntry } from '../types';
 import * as XLSX from 'xlsx';
 import { storageService } from '../services/storage';
-import { analyzeAndRecommend } from '../services/smartRecommendation';
 import { unifiedOrderService, OrderProgressEvent } from '../services/unifiedOrderService';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
 import { UnmappedGallery } from '../components/UnmappedGallery';
@@ -42,7 +41,6 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('DISCONNECTED');
   const [orderHistory, setOrderHistory] = useState<OrderHistoryEntry[]>(() => storageService.getOrderHistory());
-  const recommendations = React.useMemo(() => analyzeAndRecommend(orderHistory, products), [orderHistory, products]);
 
   const historyStats = React.useMemo(() => {
     const history = orderHistory;

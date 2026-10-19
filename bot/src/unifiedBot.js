@@ -123,13 +123,9 @@ function getMasterProducts() {
   } catch (e) {}
 
   try {
-    return require('./seedProducts.json');
+    return require('../../client/src/data/seedProducts.json');
   } catch (e) {
-    try {
-      return require('../../client/src/data/seedProducts.json');
-    } catch (e2) {
-      return [];
-    }
+    return [];
   }
 }
 

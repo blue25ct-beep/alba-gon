@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Package, Trash2, Clock, AlertTriangle, Check, X, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { RotateCcw, Package, Trash2, Clock, AlertTriangle, Check, X, ArrowRight } from 'lucide-react';
 import { AuditItem, OrderHistoryEntry, OrderItem } from '../types';
 import { storageService } from '../services/storage';
-import recoveryAudits from '../data/recoveryAudits.json';
 
 interface RestoreAuditModalProps {
   isOpen: boolean;
@@ -19,7 +18,6 @@ export const RestoreAuditModal: React.FC<RestoreAuditModalProps> = ({
   const [lastCleared, setLastCleared] = useState<{ timestamp: number; dateStr: string; reason: string; audits: AuditItem[] } | null>(null);
   const [serverBackup, setServerBackup] = useState<{ timestamp?: number; reason?: string; audits: AuditItem[] } | null>(null);
   const [recentDeleted, setRecentDeleted] = useState<AuditItem[]>([]);
-  const [showLegacy, setShowLegacy] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -98,13 +96,6 @@ export const RestoreAuditModal: React.FC<RestoreAuditModalProps> = ({
     onClose();
   };
 
-  // 4. 레거시 10월 8일 과거 데이터 비상 복구
-  const handleRestoreLegacy = () => {
-    if (!confirm('⚠️ 주의: 10월 8일 과거 데이터(182건)입니다. 현재 매장 재고와 다를 수 있습니다. 그래도 복구하시겠습니까?')) return;
-    const result = storageService.restoreItemsToAudits(recoveryAudits as AuditItem[]);
-    onRestored(result.addedCount, '10월 8일 과거 데이터 (비상용)');
-    onClose();
-  };
 
   const hasAnyRecentData = Boolean(
     (latestOrder && latestOrder.items?.length > 0) ||
@@ -258,31 +249,6 @@ export const RestoreAuditModal: React.FC<RestoreAuditModalProps> = ({
               </p>
             </div>
           )}
-
-          {/* Legacy 10월 8일 비상 복구 (접힘) */}
-          <div className="pt-2 border-t border-gray-100">
-            <button
-              onClick={() => setShowLegacy(!showLegacy)}
-              className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1 transition-colors"
-            >
-              {showLegacy ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-              <span>과거 초기 데이터(10월 8일자 182건) 비상 복구가 필요한 경우</span>
-            </button>
-            {showLegacy && (
-              <div className="mt-2 p-3 bg-red-50/60 rounded-xl border border-red-100 text-xs text-red-700 flex items-center justify-between">
-                <div>
-                  <p className="font-bold">⚠️ 주의: 10월 8일 과거 실사 데이터 (182건)</p>
-                  <p className="text-[11px] text-red-500 mt-0.5">현재 매장 재고와 다를 수 있는 예전 데이터입니다.</p>
-                </div>
-                <button
-                  onClick={handleRestoreLegacy}
-                  className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold text-xs shrink-0 transition-colors"
-                >
-                  과거 182건 복구
-                </button>
-              </div>
-            )}
-          </div>
 
         </div>
 
