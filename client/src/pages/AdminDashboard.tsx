@@ -301,9 +301,14 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     const isBelowMinQty = finalOrderQty > 0 && finalOrderQty < minOrderQty;
     const isNotMultiple = finalOrderQty > 0 && finalOrderQty % minOrderQty !== 0;
 
+    const effectiveProductName =
+      (product && product.name && product.name !== '미등록 상품')
+        ? product.name
+        : audit.productName;
+
     return {
       barcode: audit.barcode,
-      productName: audit.productName,
+      productName: effectiveProductName,
       currentStock: audit.stockCount,
       targetStock,
       recommendedQty,
@@ -410,6 +415,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     if (trimmed) {
       storageService.registerProductName(barcode, trimmed);
       cloudSyncService.broadcastProductsUpdate('ADMIN');
+      cloudSyncService.broadcastAudits(storageService.getAudits(), 'ADMIN');
       loadData();
     }
     setEditingBarcode(null);
@@ -1273,8 +1279,10 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                 <tbody className="divide-y divide-line">
                   {filteredItems.map((item) => {
                     const audit = audits.find((a) => a.barcode === item.barcode);
+                    const { product: matchedProd } = storageService.findProduct(item.barcode);
                     const isUnregistered =
-                      item.productName === '미등록 상품' || !item.productName;
+                      (!matchedProd || !matchedProd.name || matchedProd.name === '미등록 상품') &&
+                      (item.productName === '미등록 상품' || !item.productName);
 
                     return (
                       <tr key={item.barcode} className="hover:bg-canvas/60 transition-colors">

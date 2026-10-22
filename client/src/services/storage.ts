@@ -417,23 +417,28 @@ export const storageService = {
     });
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
 
-    // 2. 留덉뒪???곹뭹(Products) 紐⑸줉??異붽? ?먮뒗 ?대쫫 ?섏젙 (?곴뎄 蹂닿?)
+    // 2. 마스터 상품(Products) 목록에 추가 또는 이름 수정 (영구 보관)
     const products = this.getProducts();
     const existingIdx = products.findIndex(p => p.barcode === barcode);
+    const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     if (existingIdx >= 0) {
       products[existingIdx].name = trimmed;
+      products[existingIdx].reviewStatus = 'MODIFIED';
+      products[existingIdx].updatedAt = nowStr;
     } else {
       products.unshift({
         barcode,
         name: trimmed,
-        category: '誘몃벑濡앹떊?곹뭹',
+        category: '미등록신상품',
         price: 0,
         cost: 0,
-        targetStock: 10,
+        targetStock: 1,
         minOrderQty: 1,
+        reviewStatus: 'MODIFIED',
+        updatedAt: nowStr,
       });
     }
-    this.saveProducts(products);
+    this.saveProducts(products, true);
   },
 
   getLastClearedAudits(): { timestamp: number; dateStr: string; reason: string; audits: AuditItem[] } | null {

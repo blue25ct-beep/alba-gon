@@ -613,6 +613,10 @@ app.post('/api/products', (req, res) => {
 
       const merged = Array.from(currentMap.values());
       fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(merged, null, 2), 'utf8');
+      const seedFile = path.join(__dirname, '..', '..', 'client', 'src', 'data', 'seedProducts.json');
+      if (fs.existsSync(seedFile)) {
+        try { fs.writeFileSync(seedFile, JSON.stringify(merged, null, 2), 'utf8'); } catch(e){}
+      }
 
       if (client && client.connected) {
         client.publish(TOPIC_PROD_1060, JSON.stringify({

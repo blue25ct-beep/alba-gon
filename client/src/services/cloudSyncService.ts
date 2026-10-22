@@ -260,10 +260,22 @@ class CloudSyncService {
             // 최신 전송된 메시지(msg.timestamp >= lastClearedAt)의 실사는 과거 ID를 현재로 갱신하여 안전하게 유지
             const validAudits = (msg.audits || []).map((a: any, idx: number) => {
               const auditTime = parseInt(a.id, 10);
+              let itemObj = a;
               if (!isNaN(auditTime) && auditTime < lastClearedAt) {
-                return { ...a, id: ((msg.timestamp || Date.now()) + idx).toString() };
+                itemObj = { ...a, id: ((msg.timestamp || Date.now()) + idx).toString() };
               }
-              return a;
+              // 미등록 상품 자동 마스터 복원
+              const { product } = storageService.findProduct(itemObj.barcode);
+              if (product && product.name && product.name !== '미등록 상품') {
+                return {
+                  ...itemObj,
+                  productName: product.name,
+                  isUnmapped: false,
+                  targetStock: itemObj.targetStock || product.targetStock || 1,
+                  minOrderQty: itemObj.minOrderQty || product.minOrderQty || 1,
+                };
+              }
+              return itemObj;
             });
             storageService.saveAudits(validAudits);
             this.notifySync(validAudits, msg);
