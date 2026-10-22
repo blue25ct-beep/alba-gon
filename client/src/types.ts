@@ -9,6 +9,7 @@ export interface Product {
   price: number;
   cost: number;
   category: string;
+  vendor?: 'younme' | 'spchain';
   targetStock: number;
   minOrderQty: number;
   photoUrl?: string;
@@ -25,6 +26,7 @@ export interface AuditItem {
   barcode: string;
   productName: string;
   vendor?: 'younme' | 'spchain';
+  category?: string;
   stockCount: number;
   targetStock: number;
   minOrderQty: number;

@@ -178,6 +178,29 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [onlyOrdersFilter, setOnlyOrdersFilter] = useState(false);
 
   const loadData = () => {
+    // 부채표/왕뚜껑 발주처 캐시 강제 정상화 (younme)
+    const cachedAudits = storageService.getAudits();
+    let auditsChanged = false;
+    const fixedAudits = cachedAudits.map(a => {
+      if ((a.barcode === '8806016310018' || a.barcode === '8801128503211') && (a.vendor !== 'younme' || a.category === '주류')) {
+        auditsChanged = true;
+        return { ...a, vendor: 'younme' as const, category: '상온' };
+      }
+      return a;
+    });
+    if (auditsChanged) storageService.saveAudits(fixedAudits);
+
+    const cachedProds = storageService.getProducts();
+    let prodsChanged = false;
+    const fixedProds = cachedProds.map(p => {
+      if ((p.barcode === '8806016310018' || p.barcode === '8801128503211') && (p.vendor !== 'younme' || p.category === '주류')) {
+        prodsChanged = true;
+        return { ...p, vendor: 'younme' as const, category: '상온' };
+      }
+      return p;
+    });
+    if (prodsChanged) storageService.saveProducts(fixedProds, false);
+
     setAudits(storageService.getAudits());
     setProducts(storageService.getProducts());
     setAliases(storageService.getAliases());
@@ -307,6 +330,10 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
         ? product.name
         : audit.productName;
 
+    const isYounmeTarget = audit.barcode === '8806016310018' || audit.barcode === '8801128503211';
+    const effectiveCategory = isYounmeTarget ? '상온' : (product ? product.category : '기타');
+    const effectiveVendor = isYounmeTarget ? 'younme' : (product?.vendor === 'spchain' || effectiveCategory === '주류' ? 'spchain' : (audit.vendor || 'younme'));
+
     return {
       barcode: audit.barcode,
       productName: effectiveProductName,
@@ -317,8 +344,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       minOrderQty,
       isBelowMinQty: isBelowMinQty || isNotMultiple,
       usingAliasBarcode: alias?.newBarcode,
-      category: product ? product.category : '기타',
-          vendor: audit.vendor,
+      category: effectiveCategory,
+      vendor: effectiveVendor,
       cost: product ? product.cost : 0,
       price: product ? product.price : 0,
       status: 'PENDING',
@@ -330,9 +357,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const allItemsToOrder = orderItems.filter((item) => item.finalOrderQty > 0);
   const coupangItems = allItemsToOrder.filter((item) => item.productName.includes('쿠팡]') || item.productName.startsWith('CP]'));
   const itemsToOrder = allItemsToOrder.filter((item) => !item.productName.includes('쿠팡]') && !item.productName.startsWith('CP]'));
-  const younmeItems = itemsToOrder.filter(item => item.vendor === 'younme' || (!item.vendor && (item.category === '상온' || item.category === '냉장' || !item.category)));
-  const spchainItems = itemsToOrder.filter(item => item.vendor === 'spchain' || (!item.vendor && item.category === '주류'));
-
+  const younmeItems = itemsToOrder.filter(item => item.vendor === 'younme');
+  const spchainItems = itemsToOrder.filter(item => item.vendor === 'spchain');
 
   const handleSnapToMultiple = (barcode: string, val: number, minQty: number) => {
     const step = Math.max(1, minQty);

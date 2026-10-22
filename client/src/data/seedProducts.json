@@ -9509,9 +9509,9 @@
     "cost": 4752,
     "category": "상온",
     "targetStock": 2,
-    "minOrderQty": 1,
+    "minOrderQty": 3,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 10:35"
+    "updatedAt": "10. 22. 오후 11:09"
   },
   {
     "barcode": "8809821802235",
