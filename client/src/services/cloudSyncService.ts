@@ -33,6 +33,7 @@ class CloudSyncService {
   private connectionStatus: SyncStatus = 'DISCONNECTED';
   private lastSyncTime: string = '';
   private pingResolvers: Set<(val: boolean) => void> = new Set();
+  private pendingAuditsPayload: AuditsSyncMessage | null = null;
 
   constructor() {
     let id = '';
@@ -140,6 +141,16 @@ class CloudSyncService {
             this.notifyStatus('ERROR');
           }
         });
+
+        if (this.pendingAuditsPayload) {
+          const payloadToSend = JSON.stringify(this.pendingAuditsPayload);
+          this.client?.publish(topicSync, payloadToSend, { qos: 1, retain: true }, (err) => {
+            if (!err) {
+              console.log('[CloudSync] 대기 중이던 실사 데이터 자동 전송 완료!');
+              this.pendingAuditsPayload = null;
+            }
+          });
+        }
       });
 
       this.client.on('message', (topic, payload) => {
@@ -190,6 +201,12 @@ class CloudSyncService {
             return;
           }
 
+          if (msg.type === 'PONG') {
+            this.pingResolvers.forEach((res) => res(true));
+            this.pingResolvers.clear();
+            return;
+          }
+
           if (msg.type === 'RESTORE_DATA' && msg.data) {
             if (msg.data.products) storageService.saveProducts(msg.data.products);
             if (msg.data.settings) storageService.saveSettings(msg.data.settings);
@@ -203,8 +220,8 @@ class CloudSyncService {
           } else if (msg.type === 'AUDITS_UPDATE') {
             let lastClearedAt = 0;
             try { lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10); } catch(e){}
-            if (msg.timestamp && msg.timestamp < lastClearedAt) {
-              console.log('[CloudSync] 무시됨: 이전 세션의 오래된 실사 업데이트');
+            if (msg.timestamp && lastClearedAt > 0 && (lastClearedAt - msg.timestamp > 60 * 60 * 1000)) {
+              console.log('[CloudSync] 무시됨: 1시간 이상 과거의 이전 세션 실사 업데이트');
               return;
             }
             // 최신 전송된 메시지(msg.timestamp >= lastClearedAt)의 실사는 과거 ID를 현재로 갱신하여 안전하게 유지
@@ -300,15 +317,36 @@ class CloudSyncService {
       });
       this.notifyStatus('CONNECTED');
 
+      this.pendingAuditsPayload = payload;
+
+      // PC 로컬 봇 서버(localhost:3001)에도 직접 보존 (PC 브라우저인 경우)
+      try {
+        if (typeof window !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+          fetch('http://localhost:3001/api/audits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audits, senderId: this.mySenderId, senderRole: role }),
+          }).catch(() => {});
+        }
+      } catch(e) {}
+
       if (!this.client || !this.client.connected) {
         this.connect(this.currentStoreId, role);
-        setTimeout(() => {
+        let attempts = 0;
+        const timer = setInterval(() => {
+          attempts++;
           if (this.client && this.client.connected) {
-            this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, () => resolve(true));
-          } else {
+            clearInterval(timer);
+            this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
+              if (!err) this.pendingAuditsPayload = null;
+              resolve(!err);
+            });
+          } else if (attempts >= 25) { // 5초 대기
+            clearInterval(timer);
+            console.warn('[CloudSync] 연결 지연 - 연결 완료 시 자동 전송 대기열에 보관됨');
             resolve(false);
           }
-        }, 1000);
+        }, 200);
         return;
       }
 
@@ -317,6 +355,7 @@ class CloudSyncService {
           console.error('[CloudSync] 발행 실패:', err);
           resolve(false);
         } else {
+          this.pendingAuditsPayload = null;
           resolve(true);
         }
       });

@@ -82,6 +82,9 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
     setAudits(initialAudits);
 
     cloudSyncService.connect(undefined, 'WORKER');
+    if (initialAudits.length > 0) {
+      cloudSyncService.broadcastAudits(initialAudits, 'WORKER');
+    }
 
     const unsubSync = cloudSyncService.onSync((newAudits) => {
       setAudits(newAudits);
@@ -452,6 +455,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
                 }
 
                 sendDiscordNotification(discordText);
+                cloudSyncService.broadcastAudits(storageService.getAudits(), 'WORKER');
                 cloudSyncService.requestAutoOrderEvaluation(filteredAudits, workerName, selectedCategory || '');
                 setIsCheckFinished(true);
                 alert(`점장님께 발주 완료 알림과 리스트(${itemsToOrder.length}건)가 디스코드로 전송되었습니다!`);

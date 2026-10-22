@@ -195,13 +195,23 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       setOrderHistory(newHistory);
     });
 
-    // PC 로컬 서버(포트 3001)에서 하드디스크 발주 내역을 직접 확인하여 동기화
+    // PC 로컬 서버(포트 3001)에서 하드디스크 발주 내역 및 실사 목록 직접 확인하여 동기화
     fetch('http://localhost:3001/api/history')
       .then(res => res.json())
       .then(data => {
         if (data && Array.isArray(data.history) && data.history.length > 0) {
           storageService.saveOrderHistory(data.history, false);
           setOrderHistory(data.history);
+        }
+      })
+      .catch(() => {});
+
+    fetch('http://localhost:3001/api/audits')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && Array.isArray(data.audits) && data.audits.length > 0) {
+          storageService.saveAudits(data.audits);
+          setAudits(data.audits);
         }
       })
       .catch(() => {});

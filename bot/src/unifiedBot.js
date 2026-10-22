@@ -565,6 +565,49 @@ app.delete('/api/history/:id', (req, res) => {
   res.json({ success: true, count: filtered.length, history: filtered });
 });
 
+// PC 로컬 실사 데이터 조회/저장 API
+app.get('/api/audits', (req, res) => {
+  try {
+    if (fs.existsSync(AUDITS_BACKUP_FILE)) {
+      const data = JSON.parse(fs.readFileSync(AUDITS_BACKUP_FILE, 'utf8'));
+      const audits = data.audits || (Array.isArray(data) ? data : []);
+      return res.json({
+        success: true,
+        count: audits.length,
+        timestamp: data.timestamp,
+        audits
+      });
+    }
+  } catch (e) {
+    console.error('[PC 저장소] audits 읽기 오류:', e.message);
+  }
+  res.json({ success: true, count: 0, audits: [] });
+});
+
+app.post('/api/audits', (req, res) => {
+  try {
+    const { audits, senderId, senderRole } = req.body || {};
+    if (Array.isArray(audits)) {
+      const payload = {
+        type: 'AUDITS_UPDATE',
+        senderId: senderId || 'REST_API',
+        senderRole: senderRole || 'ADMIN',
+        storeId: '1060',
+        timestamp: Date.now(),
+        audits,
+      };
+      fs.writeFileSync(AUDITS_BACKUP_FILE, JSON.stringify(payload), 'utf8');
+      if (client && client.connected) {
+        client.publish(TOPIC_SYNC_1060, JSON.stringify(payload), { qos: 1, retain: true });
+      }
+      return res.json({ success: true, count: audits.length, audits });
+    }
+  } catch (e) {
+    console.error('[PC 저장소] audits 저장 오류:', e.message);
+  }
+  res.status(400).json({ success: false, error: 'Invalid payload' });
+});
+
 app.get('/api/restore-backup', (req, res) => {
   try {
     const emergencyFile = path.join(__dirname, '..', 'audits_last_cleared_backup.json');
