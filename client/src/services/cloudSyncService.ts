@@ -47,6 +47,30 @@ class CloudSyncService {
       id = `dev_${Math.random().toString(36).substring(2, 9)}`;
     }
     this.mySenderId = id;
+
+    // iOS Safari / 모바일 브라우저 백그라운드 복귀 및 화면 켜짐 시 자동 소켓 복구
+    if (typeof window !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          console.log('[CloudSync] 화면 복귀 감지 (iOS/모바일) - 연결 상태 점검');
+          if (!this.client || !this.client.connected) {
+            this.connect(this.currentStoreId);
+          }
+        }
+      });
+
+      window.addEventListener('pageshow', (e: any) => {
+        if (e.persisted) {
+          console.log('[CloudSync] pageshow(bfcache) 감지 - 재연결');
+          this.connect(this.currentStoreId);
+        }
+      });
+    }
+  }
+
+  public reconnect() {
+    this.disconnect();
+    this.connect(this.currentStoreId);
   }
 
   public getSenderId(): string {

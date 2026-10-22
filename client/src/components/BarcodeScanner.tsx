@@ -55,31 +55,43 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
         setCameraError(null);
         setIsScanning(true);
 
-        const videoInputDevices = await BrowserMultiFormatReader.listVideoInputDevices();
-        if (videoInputDevices.length === 0) {
-          setCameraError('카메라를 찾을 수 없습니다.');
-          return;
-        }
+        // iOS(아이폰 16 등) 및 모바일 환경 최적화 후면 카메라 제약 조건
+        const isIOS = typeof navigator !== 'undefined' && (
+          /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        );
 
-        // 후면 카메라 우선
-        const selectedDevice =
-          videoInputDevices.find(
-            (device) =>
-              device.label.toLowerCase().includes('back') ||
-              device.label.toLowerCase().includes('후면') ||
-              device.label.toLowerCase().includes('rear')
-          ) || videoInputDevices[0];
+        let constraints: MediaStreamConstraints = {
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280, max: 1920 },
+            height: { ideal: 720, max: 1080 }
+          }
+        };
+
+        if (!isIOS) {
+          try {
+            const devices = await BrowserMultiFormatReader.listVideoInputDevices();
+            const backDevice = devices.find(d =>
+              d.label.toLowerCase().includes('back') ||
+              d.label.toLowerCase().includes('후면') ||
+              d.label.toLowerCase().includes('rear')
+            );
+            if (backDevice && backDevice.deviceId) {
+              constraints = {
+                video: {
+                  deviceId: { exact: backDevice.deviceId },
+                  width: { ideal: 1280, max: 1920 },
+                  height: { ideal: 720, max: 1080 }
+                }
+              };
+            }
+          } catch (e) {}
+        }
 
         if (videoRef.current && active) {
           const controls = await codeReader.decodeFromConstraints(
-            {
-              video: {
-                deviceId: selectedDevice.deviceId,
-                width: { ideal: 1920 },
-                height: { ideal: 1080 },
-                advanced: [{ focusMode: "continuous" } as any]
-              }
-            },
+            constraints,
             videoRef.current,
             (result) => {
               if (result && active) {
@@ -175,11 +187,12 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onDetected, isPa
       <div className="relative aspect-4/3 bg-sunken rounded-2xl overflow-hidden">
         <video
           ref={videoRef}
+          autoPlay
+          playsInline
+          muted
           className={`w-full h-full object-cover transition-opacity ${
             isActuallyPaused ? 'opacity-30' : 'opacity-100'
           }`}
-          playsInline
-          muted
         />
 
         {!isActuallyPaused && isScanning && !cameraError && (
