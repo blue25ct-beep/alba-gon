@@ -30,7 +30,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   const [toastMessage, setToastMessage] = useState<{ text: string; sub?: string } | null>(null);
   
   const sendDiscordNotification = (message: string) => {
-    const webhookUrl = storageService.getSettings().discordWebhookUrl;
+    const webhookUrl = storageService.getSettings().discordWebhookUrl || 'https://discord.com/api/webhooks/1559680394444673076/xC_ZlBnDBYpOTd2PGDcywLA4LdFEgGzQ3Hothe7wiEsPmNPkb7uoLbSb67f3wv-5PeNL';
     if (webhookUrl) {
       fetch(webhookUrl, {
         method: 'POST',
@@ -207,12 +207,17 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
       });
       setTimeout(() => setToastMessage(null), 3500);
 
+      // 점장님 실시간 확인 및 데이터 유실 방지를 위한 디스코드 실시간 전송
+      if (orderQty > 0) {
+        sendDiscordNotification(`📦 ${productName}, ${activeBarcode}, 재고: ${quantity}개`);
+      }
+
       if (isFirstScan) {
         const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(저온)' : '유앤미24(상온)';
         sendDiscordNotification(`✅ **[발주 시작]** 근무자(` + workerName + `)가 ` + vendorLabel + ` 발주 스캔을 시작했습니다.`);
         
         // 봇 생존 확인
-        cloudSyncService.checkBotAlive(2000).then(isAlive => {
+        cloudSyncService.checkBotAlive(4500).then(isAlive => {
           if (!isAlive) {
             sendDiscordNotification(`🚨 **[긴급 알림]** 발주 봇 서버가 닫혀있습니다! 점장님 PC의 봇 서버를 켜주세요!`);
           }
