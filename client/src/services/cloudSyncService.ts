@@ -264,6 +264,10 @@ class CloudSyncService {
               if (!isNaN(auditTime) && auditTime < lastClearedAt) {
                 itemObj = { ...a, id: ((msg.timestamp || Date.now()) + idx).toString() };
               }
+              if (itemObj.barcode === '8806016310018' || itemObj.barcode === '8801128503211') {
+                itemObj.vendor = 'younme';
+                itemObj.category = '상온';
+              }
               // 미등록 상품 자동 마스터 복원
               const { product } = storageService.findProduct(itemObj.barcode);
               if (product && product.name && product.name !== '미등록 상품') {
