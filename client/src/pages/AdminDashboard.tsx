@@ -175,6 +175,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [younmeProgress, setYounmeProgress] = useState<OrderProgressEvent | null>(null);
   const [spchainProgress, setSpchainProgress] = useState<OrderProgressEvent | null>(null);
   const [tempFilter, setTempFilter] = useState<'ALL' | 'YOUNME' | 'SPCHAIN' | 'COUPANG'>(initialCategory || 'ALL');
+  const [onlyOrdersFilter, setOnlyOrdersFilter] = useState(false);
 
   const loadData = () => {
     setAudits(storageService.getAudits());
@@ -455,12 +456,21 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
         else setSpchainProgress(evt);
       });
 
-      const successBarcodes = sanitizedItems.map(i => i.barcode).filter(b => !result.failures.some(f => f.barcode === b));
-      if (successBarcodes.length > 0) {
-        storageService.updateProductLastOrderDate(successBarcodes);
+      const successOriginalBarcodes = new Set<string>();
+      targetItems.forEach((item) => {
+        const sentBarcode = item.usingAliasBarcode || item.barcode;
+        const isFailed = result.failures.some((f) => f.barcode === sentBarcode || f.barcode === item.barcode);
+        if (!isFailed) {
+          successOriginalBarcodes.add(item.barcode);
+          if (item.usingAliasBarcode) successOriginalBarcodes.add(item.usingAliasBarcode);
+        }
+      });
+
+      if (successOriginalBarcodes.size > 0) {
+        storageService.updateProductLastOrderDate(Array.from(successOriginalBarcodes));
         
         // Add to history
-        const successItems = sanitizedItems.filter(i => successBarcodes.includes(i.barcode));
+        const successItems = targetItems.filter((i) => successOriginalBarcodes.has(i.barcode));
         const totalAmount = successItems.reduce((sum, item) => sum + ((item.cost || 0) * item.finalOrderQty), 0);
         storageService.addOrderHistory({
           id: Date.now().toString(),
@@ -481,14 +491,14 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           stockCount: it.currentStock ?? 0,
           targetStock: it.targetStock ?? (it.minOrderQty || 1),
           minOrderQty: it.minOrderQty ?? 1,
-          workerName: (it as any).workerName || '발주복구',
+          workerName: (it as any).workerName || '발주완료',
           updatedAt: (it as any).updatedAt || new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
           isUnmapped: false,
         }));
         storageService.saveLastClearedAudits(orderedAuditsToBackup, `${vendorName} 발주 완료`);
 
-        // 발주 완료된 품목은 실사 목록에서 자동 제거하여 중복 발주 방지
-        const remainingAudits = storageService.getAudits().filter(a => !successBarcodes.includes(a.barcode));
+        // 발주 완료된 품목은 실사 목록에서 자동 제거하여 중복 발주 방지 (로컬 및 원격 즉시 반영)
+        const remainingAudits = storageService.getAudits().filter((a) => !successOriginalBarcodes.has(a.barcode));
         storageService.saveAudits(remainingAudits);
         setAudits(remainingAudits);
         if (remainingAudits.length === 0) {
@@ -502,7 +512,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
         const dateStr = new Date().toLocaleString('ko-KR');
         let orderReport = `🎉 **[발주 완료 보고 - ${vendorName}]**\n` +
           `• **처리일시**: ${dateStr}\n` +
-          `• **결과**: 총 ${sanitizedItems.length}건 중 성공 **${successBarcodes.length}건**` +
+          `• **결과**: 총 ${sanitizedItems.length}건 중 성공 **${successItems.length}건**` +
           (result.failures.length > 0 ? ` (실패 ${result.failures.length}건)` : '') +
           `\n────────────────────────\n`;
 
@@ -658,7 +668,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     if (tempFilter === 'SPCHAIN') matchesTemp = !isYounmeItem && !isCoupangItem;
     if (tempFilter === 'COUPANG') matchesTemp = isCoupangItem;
 
-    return matchesSearch && matchesTemp;
+    const matchesOnlyOrders = !onlyOrdersFilter || item.finalOrderQty > 0;
+    return matchesSearch && matchesTemp && matchesOnlyOrders;
   });
 
   
@@ -901,12 +912,26 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
             </p>
           </div>
 
-          <div>
-            <p className="text-sm text-ink-faint">발주 예정</p>
+          <button
+            type="button"
+            onClick={() => setOnlyOrdersFilter(prev => !prev)}
+            className={`text-left group transition-all p-2 -m-2 rounded-2xl ${
+              onlyOrdersFilter ? 'bg-sage-100 ring-2 ring-sage shadow-sm' : 'hover:bg-sunken'
+            }`}
+            title="클릭 시 발주 예정 품목만 바로 필터링합니다"
+          >
+            <p className="text-sm text-ink-faint group-hover:text-ink-soft transition-colors flex items-center gap-1.5">
+              <span>발주 예정</span>
+              {onlyOrdersFilter && (
+                <span className="text-[10px] bg-sage text-white px-1.5 py-0.2 rounded-full font-bold">
+                  필터 ON
+                </span>
+              )}
+            </p>
             <p className="mt-1 text-[32px] leading-none font-semibold text-sage tabular">
               {itemsToOrder.length}
             </p>
-          </div>
+          </button>
 
           {coupangItems.length > 0 && (
             <div>
@@ -1108,7 +1133,18 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               </button>
             ))}
             
-          {audits.length === 0 && (
+          {onlyOrdersFilter && (
+              <button
+                type="button"
+                onClick={() => setOnlyOrdersFilter(false)}
+                className="h-9 px-3.5 rounded-full font-medium text-xs text-sage-800 bg-sage-100 hover:bg-sage-200 transition-colors flex items-center gap-1.5 shadow-sm"
+                title="전체 실사 목록으로 돌아가기"
+              >
+                <span>🛒 발주 예정만 보는 중</span>
+                <span className="font-bold ml-1">✕</span>
+              </button>
+            )}
+            {audits.length === 0 && (
             <button
               onClick={handleRestoreAudits}
               className="h-9 px-4 rounded-full font-medium text-red-600 bg-red-100 hover:bg-red-200 transition-colors flex items-center gap-1.5 shadow-sm"

@@ -4137,7 +4137,10 @@
     "cost": 3220,
     "category": "라면/면류",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801046886687",
@@ -4209,7 +4212,11 @@
     "cost": 2520,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:33",
+    "updatedAt": "10. 22. 오후 10:33",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809175192747",
@@ -4218,7 +4225,10 @@
     "cost": 7200,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:35",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "8806002022185",
@@ -4244,8 +4254,11 @@
     "price": 1600,
     "cost": 912,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:15",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801043070034",
@@ -4371,7 +4384,10 @@
     "cost": 2340,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:36",
+    "updatedAt": "10. 22. 오후 10:36"
   },
   {
     "barcode": "8801149101663",
@@ -4388,8 +4404,11 @@
     "price": 4300,
     "cost": 2580,
     "category": "생활/잡화",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 4,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:33",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801045560052",
@@ -4406,8 +4425,11 @@
     "price": 1450,
     "cost": 1088,
     "category": "라면/면류",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:27",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801117780203",
@@ -4424,8 +4446,11 @@
     "price": 1500,
     "cost": 1035,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:40",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801117760205",
@@ -4442,8 +4467,10 @@
     "price": 1800,
     "cost": 1026,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "8809422042986",
@@ -4451,8 +4478,11 @@
     "price": 5000,
     "cost": 3000,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 10
+    "targetStock": 3,
+    "minOrderQty": 10,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:12",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801235320022",
@@ -4460,8 +4490,11 @@
     "price": 600,
     "cost": 360,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 3,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:31",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8800244340007",
@@ -4479,7 +4512,10 @@
     "cost": 2640,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801056049904",
@@ -4515,7 +4551,10 @@
     "cost": 1495,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:18",
+    "updatedAt": "10. 22. 오후 10:18"
   },
   {
     "barcode": "8801094017606",
@@ -4523,8 +4562,9 @@
     "price": 2600,
     "cost": 1872,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "updatedAt": "10. 22. 오후 09:19"
   },
   {
     "barcode": "8801111610636",
@@ -4559,8 +4599,10 @@
     "price": 2100,
     "cost": 1365,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:28"
   },
   {
     "barcode": "8803622001071",
@@ -4578,7 +4620,8 @@
     "cost": 1360,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "updatedAt": "10. 22. 오후 09:19"
   },
   {
     "barcode": "8801019606540",
@@ -4587,7 +4630,8 @@
     "cost": 1156,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 4
+    "minOrderQty": 4,
+    "updatedAt": "10. 14. 오전 06:15"
   },
   {
     "barcode": "8801105908787",
@@ -4604,8 +4648,11 @@
     "price": 4900,
     "cost": 3185,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 6,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:36",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801166234399",
@@ -4614,7 +4661,11 @@
     "cost": 670,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801166230469",
@@ -4623,7 +4674,10 @@
     "cost": 3451,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8809422043815",
@@ -4650,7 +4704,10 @@
     "cost": 945,
     "category": "생활/잡화",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801056044534",
@@ -4658,8 +4715,10 @@
     "price": 2000,
     "cost": 695,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:15"
   },
   {
     "barcode": "8801045570716",
@@ -4668,7 +4727,8 @@
     "cost": 1047,
     "category": "라면/면류",
     "targetStock": 12,
-    "minOrderQty": 12
+    "minOrderQty": 12,
+    "updatedAt": "10. 15. 오후 07:12"
   },
   {
     "barcode": "8801045570082",
@@ -4712,8 +4772,10 @@
     "price": 2300,
     "cost": 1282,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 09:40"
   },
   {
     "barcode": "8801007403267",
@@ -4722,7 +4784,11 @@
     "cost": 2520,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801007403205",
@@ -4748,8 +4814,10 @@
     "price": 2400,
     "cost": 1632,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:16"
   },
   {
     "barcode": "8808244101109",
@@ -4793,8 +4861,11 @@
     "price": 2000,
     "cost": 1440,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:20",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801043036436",
@@ -4820,8 +4891,10 @@
     "price": 600,
     "cost": 420,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8806329332783",
@@ -4874,8 +4947,10 @@
     "price": 2100,
     "cost": 1050,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "8803060018549",
@@ -4883,8 +4958,10 @@
     "price": 1850,
     "cost": 1221,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 5
+    "targetStock": 2,
+    "minOrderQty": 5,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:30"
   },
   {
     "barcode": "8801073211520",
@@ -4974,7 +5051,11 @@
     "cost": 2277,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:40",
+    "updatedAt": "10. 22. 오후 10:40",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801117282301",
@@ -4982,8 +5063,11 @@
     "price": 1500,
     "cost": 1035,
     "category": "유제품/음료",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:40",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809169792427",
@@ -4992,7 +5076,10 @@
     "cost": 3829,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:28",
+    "updatedAt": "10. 22. 오후 10:28"
   },
   {
     "barcode": "8801056755010",
@@ -5000,8 +5087,10 @@
     "price": 2300,
     "cost": 1260,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 09:40"
   },
   {
     "barcode": "8801056049881",
@@ -5027,8 +5116,10 @@
     "price": 2600,
     "cost": 1872,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 09:40"
   },
   {
     "barcode": "8801094362706",
@@ -5045,8 +5136,11 @@
     "price": 2400,
     "cost": 1632,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:19",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801111954877",
@@ -5063,8 +5157,11 @@
     "price": 4000,
     "cost": 2800,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:27",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801019607912",
@@ -5117,8 +5214,10 @@
     "price": 5900,
     "cost": 1918,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:44"
   },
   {
     "barcode": "8809821802495",
@@ -5172,7 +5271,8 @@
     "cost": 1156,
     "category": "유제품/음료",
     "targetStock": 1,
-    "minOrderQty": 4
+    "minOrderQty": 4,
+    "updatedAt": "10. 14. 오전 06:15"
   },
   {
     "barcode": "8801062012756",
@@ -5207,8 +5307,10 @@
     "price": 4900,
     "cost": 3185,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:44"
   },
   {
     "barcode": "8801489844077",
@@ -5252,8 +5354,11 @@
     "price": 1200,
     "cost": 828,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:40",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801117536411",
@@ -5270,8 +5375,10 @@
     "price": 1600,
     "cost": 912,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:40"
   },
   {
     "barcode": "8809105032020",
@@ -5288,8 +5395,11 @@
     "price": 3500,
     "cost": 2100,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 3,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:44",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809027556796",
@@ -5333,8 +5443,11 @@
     "price": 1900,
     "cost": 1292,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 4
+    "targetStock": 2,
+    "minOrderQty": 4,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:42",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801007512259",
@@ -5379,7 +5492,10 @@
     "cost": 2282,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:36",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801046433089",
@@ -5396,8 +5512,11 @@
     "price": 1400,
     "cost": 630,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 09:44",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801056055189",
@@ -5405,8 +5524,10 @@
     "price": 1600,
     "cost": 864,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:15"
   },
   {
     "barcode": "8809693974177",
@@ -5415,7 +5536,10 @@
     "cost": 3025,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:35",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "0902018100058",
@@ -5486,8 +5610,11 @@
     "price": 2200,
     "cost": 1320,
     "category": "라면/면류",
-    "targetStock": 1,
-    "minOrderQty": 8
+    "targetStock": 8,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:36",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8806011616153",
@@ -5523,7 +5650,9 @@
     "cost": 1632,
     "category": "과자/간식",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "updatedAt": "10. 22. 오후 09:19",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801062013388",
@@ -5532,7 +5661,10 @@
     "cost": 2040,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:24",
+    "updatedAt": "10. 22. 오후 10:24"
   },
   {
     "barcode": "8801062870585",
@@ -5585,8 +5717,10 @@
     "price": 1500,
     "cost": 1050,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:23"
   },
   {
     "barcode": "8801489804200",
@@ -5604,7 +5738,9 @@
     "cost": 2205,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:37"
   },
   {
     "barcode": "8801489804088",
@@ -5613,7 +5749,10 @@
     "cost": 2160,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:36",
+    "updatedAt": "10. 22. 오후 10:36"
   },
   {
     "barcode": "8801045880112",
@@ -5621,8 +5760,10 @@
     "price": 4900,
     "cost": 3185,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:37"
   },
   {
     "barcode": "8801117777609",
@@ -5631,7 +5772,8 @@
     "cost": 1380,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 4
+    "minOrderQty": 4,
+    "updatedAt": "10. 14. 오전 06:17"
   },
   {
     "barcode": "8801117798505",
@@ -5640,7 +5782,8 @@
     "cost": 1173,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "updatedAt": "10. 14. 오전 06:15"
   },
   {
     "barcode": "8801117282202",
@@ -5685,7 +5828,10 @@
     "cost": 1800,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8802599000544",
@@ -5693,8 +5839,11 @@
     "price": 2000,
     "cost": 1300,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 3,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:33",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809076020286",
@@ -5711,8 +5860,10 @@
     "price": 950,
     "cost": 532,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 5
+    "targetStock": 2,
+    "minOrderQty": 5,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:33"
   },
   {
     "barcode": "8801056230111",
@@ -5739,7 +5890,10 @@
     "cost": 1495,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:25",
+    "updatedAt": "10. 22. 오후 10:25"
   },
   {
     "barcode": "8801094202606",
@@ -5802,7 +5956,8 @@
     "cost": 886,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 5
+    "minOrderQty": 5,
+    "updatedAt": "10. 15. 오후 07:11"
   },
   {
     "barcode": "8801043016049",
@@ -5810,8 +5965,11 @@
     "price": 1600,
     "cost": 1232,
     "category": "상온",
-    "targetStock": 16,
-    "minOrderQty": 16
+    "targetStock": 3,
+    "minOrderQty": 16,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:31",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801037012309",
@@ -5865,7 +6023,10 @@
     "cost": 2484,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:40",
+    "updatedAt": "10. 22. 오후 10:40"
   },
   {
     "barcode": "8801021213217",
@@ -5874,7 +6035,9 @@
     "cost": 2299,
     "category": "주류",
     "targetStock": 24,
-    "minOrderQty": 24
+    "minOrderQty": 24,
+    "updatedAt": "10. 20. 오후 07:25",
+    "lastOrderDate": "10. 20. 오후 07:26"
   },
   {
     "barcode": "8801021214320",
@@ -5891,8 +6054,11 @@
     "price": 1900,
     "cost": 1100,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:40",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801235241716",
@@ -5919,7 +6085,10 @@
     "cost": 1495,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:18",
+    "updatedAt": "10. 22. 오후 10:18"
   },
   {
     "barcode": "8886467105333",
@@ -5927,8 +6096,10 @@
     "price": 2100,
     "cost": 1365,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:32"
   },
   {
     "barcode": "8809304881016",
@@ -5954,8 +6125,10 @@
     "price": 9900,
     "cost": 2970,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:44"
   },
   {
     "barcode": "8801166234412",
@@ -5964,7 +6137,11 @@
     "cost": 1374,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:43",
+    "updatedAt": "10. 22. 오후 10:43",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801007171210",
@@ -6009,7 +6186,10 @@
     "cost": 1206,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:35",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "8801045570419",
@@ -6018,7 +6198,8 @@
     "cost": 1350,
     "category": "라면/면류",
     "targetStock": 12,
-    "minOrderQty": 12
+    "minOrderQty": 12,
+    "updatedAt": "10. 14. 오전 06:16"
   },
   {
     "barcode": "8809713911373",
@@ -6026,8 +6207,11 @@
     "price": 1500,
     "cost": 731,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:16",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809041427065",
@@ -6035,8 +6219,11 @@
     "price": 2200,
     "cost": 1073,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:15",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801166234023",
@@ -6045,7 +6232,10 @@
     "cost": 4975,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801056154011",
@@ -6062,8 +6252,11 @@
     "price": 1600,
     "cost": 864,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:15",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809103875209",
@@ -6071,8 +6264,11 @@
     "price": 4000,
     "cost": 2520,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 3,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:44",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801007611679",
@@ -6081,7 +6277,10 @@
     "cost": 2520,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8804340980785",
@@ -6135,7 +6334,8 @@
     "cost": 693,
     "category": "라면/면류",
     "targetStock": 1,
-    "minOrderQty": 5
+    "minOrderQty": 5,
+    "updatedAt": "10. 15. 오후 07:11"
   },
   {
     "barcode": "8801043015745",
@@ -6152,8 +6352,11 @@
     "price": 2000,
     "cost": 1440,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:21",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8802260004451",
@@ -6189,7 +6392,10 @@
     "cost": 5135,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801062381937",
@@ -6206,8 +6412,11 @@
     "price": 3000,
     "cost": 1950,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:23",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801062865680",
@@ -6234,7 +6443,10 @@
     "cost": 1020,
     "category": "과자/간식",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "80177616",
@@ -6260,8 +6472,11 @@
     "price": 1700,
     "cost": 1156,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:38",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801073113770",
@@ -6279,7 +6494,8 @@
     "cost": 1425,
     "category": "라면/면류",
     "targetStock": 16,
-    "minOrderQty": 16
+    "minOrderQty": 16,
+    "updatedAt": "10. 14. 오전 06:17"
   },
   {
     "barcode": "8801073210776",
@@ -6287,8 +6503,11 @@
     "price": 1400,
     "cost": 1050,
     "category": "라면/면류",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:25",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801489831374",
@@ -6297,7 +6516,10 @@
     "cost": 756,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:36",
+    "updatedAt": "10. 22. 오후 10:36"
   },
   {
     "barcode": "8801117280512",
@@ -6333,7 +6555,8 @@
     "cost": 2622,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "updatedAt": "10. 15. 오후 07:11"
   },
   {
     "barcode": "8801117282806",
@@ -6359,8 +6582,11 @@
     "price": 2100,
     "cost": 1365,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:15",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8802599001527",
@@ -6405,7 +6631,10 @@
     "cost": 1495,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:12",
+    "updatedAt": "10. 22. 오후 10:12"
   },
   {
     "barcode": "8801094063283",
@@ -6413,8 +6642,10 @@
     "price": 2200,
     "cost": 1362,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:21"
   },
   {
     "barcode": "8801111922722",
@@ -6431,8 +6662,11 @@
     "price": 4000,
     "cost": 2800,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:27",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8886467100017",
@@ -6440,8 +6674,10 @@
     "price": 4000,
     "cost": 2800,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:27"
   },
   {
     "barcode": "8886467100031",
@@ -6449,8 +6685,10 @@
     "price": 4000,
     "cost": 2800,
     "category": "유제품/음료",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:27"
   },
   {
     "barcode": "8801019309168",
@@ -6468,7 +6706,8 @@
     "cost": 3298,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 3
+    "minOrderQty": 3,
+    "updatedAt": "10. 14. 오전 06:17"
   },
   {
     "barcode": "8801105941227",
@@ -6503,8 +6742,11 @@
     "price": 1300,
     "cost": -884,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 4
+    "targetStock": 2,
+    "minOrderQty": 10,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801045611228",
@@ -6549,7 +6791,10 @@
     "cost": 3149,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:43"
   },
   {
     "barcode": "8801007054186",
@@ -6557,8 +6802,11 @@
     "price": 3700,
     "cost": 1727,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 3,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:33",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809175304058",
@@ -6567,7 +6815,10 @@
     "cost": 4679,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:34",
+    "updatedAt": "10. 22. 오후 10:34"
   },
   {
     "barcode": "8801007867045",
@@ -6576,7 +6827,10 @@
     "cost": 2520,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:33",
+    "updatedAt": "10. 22. 오후 10:33"
   },
   {
     "barcode": "8801260611324",
@@ -6584,8 +6838,10 @@
     "price": 1200,
     "cost": 624,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 10
+    "targetStock": 2,
+    "minOrderQty": 10,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:43"
   },
   {
     "barcode": "8801097250048",
@@ -6611,8 +6867,11 @@
     "price": 2800,
     "cost": 1904,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801149405822",
@@ -6621,7 +6880,10 @@
     "cost": 3300,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801117497804",
@@ -6666,7 +6928,10 @@
     "cost": 4270,
     "category": "라면/면류",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8809821802136",
@@ -6711,7 +6976,10 @@
     "cost": 4975,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8800244340014",
@@ -6774,7 +7042,10 @@
     "cost": 1496,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:36",
+    "updatedAt": "10. 22. 오후 10:36"
   },
   {
     "barcode": "8806002002392",
@@ -6827,8 +7098,11 @@
     "price": 1350,
     "cost": 1040,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:25",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801043015714",
@@ -6836,8 +7110,11 @@
     "price": 1350,
     "cost": 1040,
     "category": "라면/면류",
-    "targetStock": 15,
-    "minOrderQty": 15
+    "targetStock": 4,
+    "minOrderQty": 15,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:19",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801043036337",
@@ -6891,7 +7168,10 @@
     "cost": 5135,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8806016310018",
@@ -6899,8 +7179,10 @@
     "price": 1300,
     "cost": 900,
     "category": "주류",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 4,
+    "minOrderQty": 10,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:10"
   },
   {
     "barcode": "8801062870462",
@@ -6909,7 +7191,10 @@
     "cost": 1156,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 3
+    "minOrderQty": 3,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:40",
+    "updatedAt": "10. 22. 오후 10:40"
   },
   {
     "barcode": "8801062865666",
@@ -6918,7 +7203,8 @@
     "cost": 4760,
     "category": "과자/간식",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "updatedAt": "10. 22. 오후 09:19"
   },
   {
     "barcode": "8801062289936",
@@ -6944,8 +7230,10 @@
     "price": 2300,
     "cost": 1370,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "8809047801111",
@@ -6954,7 +7242,10 @@
     "cost": 2800,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:32",
+    "updatedAt": "10. 22. 오후 10:32"
   },
   {
     "barcode": "8801006273854",
@@ -6963,7 +7254,11 @@
     "cost": 1625,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:35",
+    "updatedAt": "10. 22. 오후 10:35",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809617945146",
@@ -6981,7 +7276,8 @@
     "cost": 1221,
     "category": "주류",
     "targetStock": 30,
-    "minOrderQty": 30
+    "minOrderQty": 30,
+    "updatedAt": "10. 15. 오후 07:12"
   },
   {
     "barcode": "5996379377360",
@@ -6990,7 +7286,8 @@
     "cost": 1890,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "updatedAt": "10. 15. 오후 07:09"
   },
   {
     "barcode": "8801005484824",
@@ -7007,8 +7304,10 @@
     "price": 4900,
     "cost": 3185,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:38"
   },
   {
     "barcode": "4973484034600",
@@ -7035,7 +7334,10 @@
     "cost": 2400,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:37",
+    "updatedAt": "10. 22. 오후 10:37"
   },
   {
     "barcode": "8801489839141",
@@ -7053,7 +7355,8 @@
     "cost": 910,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 4
+    "minOrderQty": 4,
+    "updatedAt": "10. 14. 오전 06:15"
   },
   {
     "barcode": "8801045440002",
@@ -7106,8 +7409,11 @@
     "price": 650,
     "cost": 358,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 5
+    "targetStock": 2,
+    "minOrderQty": 5,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:44",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809004774038",
@@ -7133,8 +7439,10 @@
     "price": 2000,
     "cost": 1080,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:06"
   },
   {
     "barcode": "8850389109229",
@@ -7142,8 +7450,10 @@
     "price": 2000,
     "cost": 1080,
     "category": "유제품/음료",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:06"
   },
   {
     "barcode": "8801052435596",
@@ -7160,8 +7470,10 @@
     "price": 1700,
     "cost": 1105,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:19"
   },
   {
     "barcode": "8801094132705",
@@ -7169,8 +7481,11 @@
     "price": 2400,
     "cost": 1632,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:19",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801128503211",
@@ -7178,8 +7493,10 @@
     "price": 1500,
     "cost": 1125,
     "category": "주류",
-    "targetStock": 18,
-    "minOrderQty": 18
+    "targetStock": 4,
+    "minOrderQty": 18,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:30"
   },
   {
     "barcode": "8801074702423",
@@ -7206,7 +7523,8 @@
     "cost": 1360,
     "category": "유제품/음료",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "updatedAt": "10. 14. 오전 06:17"
   },
   {
     "barcode": "8801105915006",
@@ -7214,8 +7532,10 @@
     "price": 1800,
     "cost": 1024,
     "category": "유제품/음료",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:22"
   },
   {
     "barcode": "8801105901009",
@@ -7242,7 +7562,8 @@
     "cost": 1155,
     "category": "상온",
     "targetStock": 16,
-    "minOrderQty": 16
+    "minOrderQty": 16,
+    "updatedAt": "10. 15. 오후 07:12"
   },
   {
     "barcode": "8801043036719",
@@ -7268,8 +7589,11 @@
     "price": 1200,
     "cost": 570,
     "category": "유제품/음료",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801489845548",
@@ -7278,7 +7602,10 @@
     "cost": 1800,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:36",
+    "updatedAt": "10. 22. 오후 10:36"
   },
   {
     "barcode": "8801149405501",
@@ -7286,8 +7613,10 @@
     "price": 4800,
     "cost": 2640,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "8801117761806",
@@ -7359,7 +7688,10 @@
     "cost": 2040,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:41",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "8801019315459",
@@ -7377,7 +7709,10 @@
     "cost": 2992,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:04",
+    "updatedAt": "10. 22. 오후 10:04"
   },
   {
     "barcode": "8809821802099",
@@ -7413,7 +7748,8 @@
     "cost": 1001,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 5
+    "minOrderQty": 5,
+    "updatedAt": "10. 15. 오후 07:11"
   },
   {
     "barcode": "8802259020431",
@@ -7431,7 +7767,10 @@
     "cost": 2380,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8809617945092",
@@ -7467,7 +7806,10 @@
     "cost": 3465,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:37",
+    "updatedAt": "10. 22. 오후 10:37"
   },
   {
     "barcode": "8801166399814",
@@ -7503,7 +7845,9 @@
     "cost": 1902,
     "category": "주류",
     "targetStock": 24,
-    "minOrderQty": 24
+    "minOrderQty": 24,
+    "updatedAt": "10. 20. 오후 07:25",
+    "lastOrderDate": "10. 20. 오후 07:26"
   },
   {
     "barcode": "8801048101023",
@@ -7520,8 +7864,10 @@
     "price": 2400,
     "cost": 960,
     "category": "상온",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 3,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:15"
   },
   {
     "barcode": "8806004000587",
@@ -7539,7 +7885,10 @@
     "cost": 5386,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:35",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "8809368801074",
@@ -7584,7 +7933,8 @@
     "cost": 1425,
     "category": "라면/면류",
     "targetStock": 16,
-    "minOrderQty": 16
+    "minOrderQty": 16,
+    "updatedAt": "10. 14. 오전 06:17"
   },
   {
     "barcode": "8801073211032",
@@ -7601,8 +7951,11 @@
     "price": 1400,
     "cost": 910,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:23",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "9300647000328",
@@ -7700,8 +8053,10 @@
     "price": 2300,
     "cost": 1495,
     "category": "유제품/음료",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:15"
   },
   {
     "barcode": "8801051110098",
@@ -7764,7 +8119,10 @@
     "cost": 600,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:37",
+    "updatedAt": "10. 22. 오후 10:37"
   },
   {
     "barcode": "8801045875538",
@@ -7773,7 +8131,11 @@
     "cost": 3400,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:33",
+    "updatedAt": "10. 22. 오후 10:33",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801117377205",
@@ -7799,8 +8161,11 @@
     "price": 1200,
     "cost": 828,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:40",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801008021200",
@@ -7827,7 +8192,10 @@
     "cost": 7350,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:43",
+    "updatedAt": "10. 22. 오후 10:43"
   },
   {
     "barcode": "8809617946457",
@@ -7845,7 +8213,10 @@
     "cost": 373,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 5
+    "minOrderQty": 5,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:43",
+    "updatedAt": "10. 22. 오후 10:43"
   },
   {
     "barcode": "8801037006391",
@@ -7863,7 +8234,10 @@
     "cost": 2520,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8801260605477",
@@ -7880,8 +8254,11 @@
     "price": 1200,
     "cost": 600,
     "category": "라면/면류",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 3,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:44",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809368801715",
@@ -7997,8 +8374,10 @@
     "price": 1300,
     "cost": 780,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:21"
   },
   {
     "barcode": "8801094203009",
@@ -8006,8 +8385,10 @@
     "price": 1700,
     "cost": 960,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:19"
   },
   {
     "barcode": "8801094362409",
@@ -8015,8 +8396,10 @@
     "price": 3800,
     "cost": 2450,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 2,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:16"
   },
   {
     "barcode": "8801128945288",
@@ -8079,7 +8462,10 @@
     "cost": 2520,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8801043036559",
@@ -8106,7 +8492,8 @@
     "cost": 1890,
     "category": "과자/간식",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "updatedAt": "10. 15. 오후 07:09"
   },
   {
     "barcode": "7622210262202",
@@ -8168,8 +8555,11 @@
     "price": 2500,
     "cost": 1283,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 09:40",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801006813210",
@@ -8195,8 +8585,10 @@
     "price": 1600,
     "cost": 900,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:22"
   },
   {
     "barcode": "8801037055726",
@@ -8214,7 +8606,10 @@
     "cost": 2312,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:39",
+    "updatedAt": "10. 22. 오후 10:39"
   },
   {
     "barcode": "8801062883646",
@@ -8231,8 +8626,10 @@
     "price": 1600,
     "cost": 880,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "8803060082441",
@@ -8240,8 +8637,11 @@
     "price": 1850,
     "cost": 1221,
     "category": "라면/면류",
-    "targetStock": 1,
-    "minOrderQty": 5
+    "targetStock": 2,
+    "minOrderQty": 5,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:30",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801221505167",
@@ -8286,7 +8686,10 @@
     "cost": 3264,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801019606311",
@@ -8303,8 +8706,10 @@
     "price": 3800,
     "cost": 1976,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "8809407992138",
@@ -8339,8 +8744,11 @@
     "price": 1200,
     "cost": 847,
     "category": "라면/면류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 4,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:30",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809030361431",
@@ -8358,7 +8766,8 @@
     "cost": 1300,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 7
+    "minOrderQty": 7,
+    "updatedAt": "10. 15. 오후 07:10"
   },
   {
     "barcode": "8436556395932",
@@ -8367,7 +8776,8 @@
     "cost": 1750,
     "category": "과자/간식",
     "targetStock": 1,
-    "minOrderQty": 3
+    "minOrderQty": 3,
+    "updatedAt": "10. 15. 오후 07:09"
   },
   {
     "barcode": "8801489701417",
@@ -8403,7 +8813,10 @@
     "cost": 1360,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:18",
+    "updatedAt": "10. 22. 오후 10:18"
   },
   {
     "barcode": "8801166238762",
@@ -8412,7 +8825,10 @@
     "cost": 3149,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:43"
   },
   {
     "barcode": "8803284611151",
@@ -8429,8 +8845,10 @@
     "price": 1800,
     "cost": 780,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:23"
   },
   {
     "barcode": "8801043017022",
@@ -8474,8 +8892,10 @@
     "price": 6500,
     "cost": 4420,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:44"
   },
   {
     "barcode": "8801037070545",
@@ -8483,8 +8903,10 @@
     "price": 3500,
     "cost": 2380,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:16"
   },
   {
     "barcode": "8801108000297",
@@ -8511,7 +8933,10 @@
     "cost": 1495,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:18",
+    "updatedAt": "10. 22. 오후 10:18"
   },
   {
     "barcode": "4897036692424",
@@ -8520,7 +8945,10 @@
     "cost": 1495,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:18",
+    "updatedAt": "10. 22. 오후 10:18"
   },
   {
     "barcode": "8801019207655",
@@ -8537,8 +8965,10 @@
     "price": 2200,
     "cost": 1496,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801105910124",
@@ -8546,8 +8976,10 @@
     "price": 1600,
     "cost": 960,
     "category": "유제품/음료",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:22"
   },
   {
     "barcode": "8801051304459",
@@ -8555,8 +8987,11 @@
     "price": 9000,
     "cost": 6300,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 4,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:43",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809256674636",
@@ -8574,7 +9009,9 @@
     "cost": 720,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 10
+    "minOrderQty": 10,
+    "updatedAt": "10. 15. 오후 07:09",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809401606994",
@@ -8609,8 +9046,10 @@
     "price": 1900,
     "cost": 1283,
     "category": "라면/면류",
-    "targetStock": 12,
-    "minOrderQty": 12
+    "targetStock": 3,
+    "minOrderQty": 12,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:30"
   },
   {
     "barcode": "8809368801098",
@@ -8754,7 +9193,8 @@
     "cost": 1700,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "updatedAt": "10. 15. 오후 07:11"
   },
   {
     "barcode": "8801062382811",
@@ -8790,7 +9230,8 @@
     "cost": 1890,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "updatedAt": "10. 15. 오후 07:09"
   },
   {
     "barcode": "7622202273452",
@@ -8799,7 +9240,8 @@
     "cost": 3015,
     "category": "상온",
     "targetStock": 12,
-    "minOrderQty": 12
+    "minOrderQty": 12,
+    "updatedAt": "10. 15. 오후 07:09"
   },
   {
     "barcode": "8801489845845",
@@ -8817,7 +9259,8 @@
     "cost": 788,
     "category": "라면/면류",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "updatedAt": "10. 15. 오후 07:11"
   },
   {
     "barcode": "8801117123901",
@@ -8879,8 +9322,10 @@
     "price": 2500,
     "cost": 1283,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 09:40"
   },
   {
     "barcode": "8809695254864",
@@ -8934,7 +9379,10 @@
     "cost": 3900,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:44",
+    "updatedAt": "10. 22. 오후 10:44"
   },
   {
     "barcode": "8801052435336",
@@ -8960,8 +9408,10 @@
     "price": 2500,
     "cost": 1625,
     "category": "상온",
-    "targetStock": 12,
-    "minOrderQty": 12
+    "targetStock": 2,
+    "minOrderQty": 12,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:13"
   },
   {
     "barcode": "8809086622203",
@@ -8970,7 +9420,10 @@
     "cost": 1540,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:34",
+    "updatedAt": "10. 22. 오후 10:34"
   },
   {
     "barcode": "8801206003862",
@@ -9015,7 +9468,10 @@
     "cost": 1470,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:43",
+    "updatedAt": "10. 22. 오후 10:43"
   },
   {
     "barcode": "8809821802549",
@@ -9050,8 +9506,10 @@
     "price": 9900,
     "cost": 4752,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "8809821802235",
@@ -9132,7 +9590,10 @@
     "cost": 1800,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8809116740617",
@@ -9140,8 +9601,10 @@
     "price": 1500,
     "cost": 975,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 3
+    "targetStock": 2,
+    "minOrderQty": 3,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:23"
   },
   {
     "barcode": "8801056234065",
@@ -9276,7 +9739,10 @@
     "cost": 2520,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8802255808019",
@@ -9293,8 +9759,11 @@
     "price": 1800,
     "cost": 1370,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:12",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801062637669",
@@ -9347,8 +9816,11 @@
     "price": 4700,
     "cost": 2820,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:28",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801045890715",
@@ -9401,8 +9873,10 @@
     "price": 2400,
     "cost": 1120,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:18"
   },
   {
     "barcode": "8801382127789",
@@ -9428,8 +9902,11 @@
     "price": 2200,
     "cost": 1073,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:25",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801007310572",
@@ -9447,7 +9924,10 @@
     "cost": 2520,
     "category": "냉동/즉석",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8809359461102",
@@ -9510,7 +9990,10 @@
     "cost": 4500,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:35",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "8801056201012",
@@ -9537,7 +10020,10 @@
     "cost": 1495,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:18",
+    "updatedAt": "10. 22. 오후 10:18"
   },
   {
     "barcode": "8801105914382",
@@ -9590,8 +10076,10 @@
     "price": 2500,
     "cost": 1375,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 2,
+    "minOrderQty": 10,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:28"
   },
   {
     "barcode": "8809440350759",
@@ -9716,8 +10204,10 @@
     "price": 4900,
     "cost": 2730,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:37"
   },
   {
     "barcode": "8801382126515",
@@ -9861,7 +10351,10 @@
     "cost": 3660,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8807252101217",
@@ -9906,7 +10399,10 @@
     "cost": 3264,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:40",
+    "updatedAt": "10. 22. 오후 10:40"
   },
   {
     "barcode": "8801117581510",
@@ -9969,7 +10465,10 @@
     "cost": 3094,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:32",
+    "updatedAt": "10. 22. 오후 10:32"
   },
   {
     "barcode": "8806002000893",
@@ -10013,8 +10512,10 @@
     "price": 1200,
     "cost": 816,
     "category": "상온",
-    "targetStock": 12,
-    "minOrderQty": 12
+    "targetStock": 2,
+    "minOrderQty": 12,
+    "updatedAt": "10. 22. 오후 10:24",
+    "reviewStatus": "MODIFIED"
   },
   {
     "barcode": "8809256674162",
@@ -10032,7 +10533,10 @@
     "cost": 1800,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:29",
+    "updatedAt": "10. 22. 오후 10:29"
   },
   {
     "barcode": "8806102878101",
@@ -10158,7 +10662,10 @@
     "cost": 3218,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:34",
+    "updatedAt": "10. 22. 오후 10:34"
   },
   {
     "barcode": "8801047161608",
@@ -10184,8 +10691,10 @@
     "price": 5400,
     "cost": 3350,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 0,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:33"
   },
   {
     "barcode": "8801062858279",
@@ -10194,7 +10703,10 @@
     "cost": 3264,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:24",
+    "updatedAt": "10. 22. 오후 10:24"
   },
   {
     "barcode": "8888021309072",
@@ -10220,8 +10732,11 @@
     "price": 1600,
     "cost": 907,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:16",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801051015935",
@@ -10274,8 +10789,10 @@
     "price": 6500,
     "cost": 3900,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "8809770518140",
@@ -10346,8 +10863,10 @@
     "price": 7400,
     "cost": 5180,
     "category": "생활/잡화",
-    "targetStock": 1,
-    "minOrderQty": 2
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:36"
   },
   {
     "barcode": "8809368801111",
@@ -10374,7 +10893,9 @@
     "cost": 335,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "8801128503174",
@@ -10527,7 +11048,8 @@
     "cost": 2508,
     "category": "과자/간식",
     "targetStock": 1,
-    "minOrderQty": 3
+    "minOrderQty": 3,
+    "updatedAt": "10. 15. 오후 07:09"
   },
   {
     "barcode": "8888021309119",
@@ -10545,7 +11067,9 @@
     "cost": 1088,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:40"
   },
   {
     "barcode": "8801043060356",
@@ -10581,7 +11105,10 @@
     "cost": 3094,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:32",
+    "updatedAt": "10. 22. 오후 10:32"
   },
   {
     "barcode": "8801037003048",
@@ -10599,7 +11126,10 @@
     "cost": 1470,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:37",
+    "updatedAt": "10. 22. 오후 10:37"
   },
   {
     "barcode": "8809625180997",
@@ -10653,7 +11183,9 @@
     "cost": 325,
     "category": "상온",
     "targetStock": 15,
-    "minOrderQty": 15
+    "minOrderQty": 15,
+    "updatedAt": "10. 15. 오후 07:11",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801111188012",
@@ -10778,8 +11310,10 @@
     "price": 1800,
     "cost": 1080,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:06"
   },
   {
     "barcode": "8809086621213",
@@ -10806,7 +11340,8 @@
     "cost": 1360,
     "category": "과자/간식",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "updatedAt": "10. 15. 오후 07:11"
   },
   {
     "barcode": "8801030998075",
@@ -10824,7 +11359,9 @@
     "cost": 2521,
     "category": "주류",
     "targetStock": 24,
-    "minOrderQty": 24
+    "minOrderQty": 24,
+    "updatedAt": "10. 20. 오후 07:25",
+    "lastOrderDate": "10. 20. 오후 07:26"
   },
   {
     "barcode": "4901004057044",
@@ -10878,7 +11415,10 @@
     "cost": 1797,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:41",
+    "updatedAt": "10. 22. 오후 10:41"
   },
   {
     "barcode": "4902806584028",
@@ -10896,7 +11436,9 @@
     "cost": 1617,
     "category": "주류",
     "targetStock": 24,
-    "minOrderQty": 24
+    "minOrderQty": 24,
+    "updatedAt": "10. 20. 오후 07:25",
+    "lastOrderDate": "10. 20. 오후 07:26"
   },
   {
     "barcode": "8801119740014",
@@ -10922,8 +11464,10 @@
     "price": 2400,
     "cost": 715,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:20"
   },
   {
     "barcode": "8809140449425",
@@ -11067,7 +11611,11 @@
     "cost": 2520,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:33",
+    "updatedAt": "10. 22. 오후 10:33",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801038560014",
@@ -11130,7 +11678,10 @@
     "cost": 2300,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8801045290102",
@@ -11291,8 +11842,10 @@
     "price": 5500,
     "cost": 3740,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 0,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:18"
   },
   {
     "barcode": "8801045360034",
@@ -11710,12 +12263,14 @@
   },
   {
     "barcode": "8801047828396",
-    "name": "동원]참치튜나페고소마요129g(참치크래커)",
+    "name": "CP] 동원참치 튜나페 고소마요, 129g, 2개",
     "price": 4200,
     "cost": 2940,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:46"
   },
   {
     "barcode": "8801062013395",
@@ -11940,7 +12495,8 @@
     "cost": 700,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 4
+    "minOrderQty": 4,
+    "updatedAt": "10. 15. 오후 07:13"
   },
   {
     "barcode": "8801006813203",
@@ -11949,7 +12505,10 @@
     "cost": 560,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:35",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801006813104",
@@ -11958,7 +12517,9 @@
     "cost": 700,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 4
+    "minOrderQty": 4,
+    "updatedAt": "10. 15. 오후 07:13",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809285522748",
@@ -12012,7 +12573,9 @@
     "cost": 1000,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 4
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "8809076038731",
@@ -12174,7 +12737,9 @@
     "cost": 280,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 6
+    "minOrderQty": 6,
+    "updatedAt": "10. 15. 오후 07:13",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801260331536",
@@ -12237,7 +12802,10 @@
     "cost": 3640,
     "category": "라면/면류",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:42",
+    "updatedAt": "10. 22. 오후 10:42"
   },
   {
     "barcode": "8809731472047",
@@ -12309,7 +12877,10 @@
     "cost": 585,
     "category": "라면/면류",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:35",
+    "updatedAt": "10. 22. 오후 10:35"
   },
   {
     "barcode": "8801006731125",
@@ -12434,8 +13005,11 @@
     "price": 1600,
     "cost": 617,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 4,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 09:40",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801062862641",
@@ -12948,7 +13522,10 @@
     "cost": 1820,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:32",
+    "updatedAt": "10. 22. 오후 10:32"
   },
   {
     "barcode": "8809420332119",
@@ -13236,7 +13813,9 @@
     "cost": 560,
     "category": "상온",
     "targetStock": 30,
-    "minOrderQty": 30
+    "minOrderQty": 30,
+    "updatedAt": "10. 15. 오후 07:28",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8801068393668",
@@ -14037,7 +14616,9 @@
     "cost": 2200,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 8
+    "minOrderQty": 2,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "10. 22. 오후 10:37"
   },
   {
     "barcode": "8801051292909",
@@ -14046,7 +14627,10 @@
     "cost": 4515,
     "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 2
+    "minOrderQty": 2,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "10. 22. 오후 10:34",
+    "updatedAt": "10. 22. 오후 10:34"
   },
   {
     "barcode": "8801047119432",
@@ -14865,7 +15449,9 @@
     "cost": 0,
     "category": "주류",
     "targetStock": 24,
-    "minOrderQty": 24
+    "minOrderQty": 24,
+    "updatedAt": "10. 20. 오후 07:25",
+    "lastOrderDate": "10. 20. 오후 07:26"
   },
   {
     "barcode": "8801137140537",
@@ -15324,7 +15910,9 @@
     "cost": 0,
     "category": "주류",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "updatedAt": "10. 20. 오후 07:26",
+    "lastOrderDate": "10. 20. 오후 07:26"
   },
   {
     "barcode": "4901777153325",
@@ -15584,7 +16172,8 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 09:52"
+    "updatedAt": "10. 22. 오후 09:52",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809086621206",
@@ -15617,7 +16206,8 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 09:54"
+    "updatedAt": "10. 22. 오후 09:54",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8804973306488",
@@ -15626,9 +16216,9 @@
     "cost": 1190,
     "category": "과자/간식",
     "targetStock": 1,
-    "minOrderQty": 1,
+    "minOrderQty": 20,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 09:54"
+    "updatedAt": "10. 22. 오후 10:23"
   },
   {
     "barcode": "8809401631231",
@@ -15643,25 +16233,25 @@
   },
   {
     "barcode": "8806002009391",
-    "name": "광동]진한헛개차1.5L",
+    "name": "CP]광동진한헛개차, 1.5L, 12개",
     "price": 3200,
     "cost": 2240,
     "category": "음료",
-    "targetStock": 1,
-    "minOrderQty": 1,
+    "targetStock": 2,
+    "minOrderQty": 12,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 09:54"
+    "updatedAt": "10. 22. 오후 10:14"
   },
   {
     "barcode": "90000054",
-    "name": "실내용슬리퍼",
+    "name": "CP] 에버하우스 베이직 리넨 실내 일회용 슬리퍼, 그레이, 4개",
     "price": 5000,
     "cost": 3500,
     "category": "잡화",
     "targetStock": 1,
-    "minOrderQty": 1,
+    "minOrderQty": 4,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 09:55"
+    "updatedAt": "10. 22. 오후 10:10"
   },
   {
     "barcode": "8809622691441",
@@ -15705,7 +16295,8 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 09:55"
+    "updatedAt": "10. 22. 오후 09:55",
+    "lastOrderDate": "10. 22. 오후 10:45"
   },
   {
     "barcode": "8809680472921",

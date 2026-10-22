@@ -77,6 +77,33 @@ function saveOrderHistoryToDisk(history) {
   }
 }
 
+function removeSuccessfulAuditsFromDiskAndSync(barcodes) {
+  try {
+    if (!barcodes || barcodes.length === 0) return;
+    if (fs.existsSync(AUDITS_BACKUP_FILE)) {
+      const data = JSON.parse(fs.readFileSync(AUDITS_BACKUP_FILE, 'utf8'));
+      let audits = data.audits || (Array.isArray(data) ? data : []);
+      const barcodeSet = new Set(barcodes);
+      const remaining = audits.filter(a => !barcodeSet.has(a.barcode));
+      const payload = {
+        type: 'AUDITS_UPDATE',
+        senderId: 'BOT_ORDER_SUCCESS',
+        senderRole: 'ADMIN',
+        storeId: '1060',
+        timestamp: Date.now(),
+        audits: remaining
+      };
+      fs.writeFileSync(AUDITS_BACKUP_FILE, JSON.stringify(payload, null, 2), 'utf8');
+      if (client && client.connected) {
+        client.publish(TOPIC_SYNC_1060, JSON.stringify(payload), { retain: true });
+      }
+      console.log(`🧹 [실사 목록 정리] 발주 완료 품목 ${barcodes.length}건 제거 완료 (남은 실사: ${remaining.length}건)`);
+    }
+  } catch (err) {
+    console.error('실사 목록 정리 중 오류:', err.message);
+  }
+}
+
 function addOrderHistoryEntry(entry) {
   const current = getOrderHistoryFromDisk();
   const existingIdx = current.findIndex(h => h.id === entry.id);
@@ -554,6 +581,10 @@ app.post('/api/order', async (req, res) => {
 
     const result = await runDirectOrderAdd(items, sendProgress);
     console.log(`\n🎉 [로컬 REST 발주 완료] 성공: ${result.successCount}건, 실패: ${result.failures.length}건`);
+    if (result.successCount > 0) {
+      const successItems = items.filter(item => !result.failures.some(f => f.barcode === item.barcode));
+      removeSuccessfulAuditsFromDiskAndSync(successItems.map(i => i.barcode));
+    }
 
     res.json(result);
   } catch (err) {

@@ -379,6 +379,13 @@ export const storageService = {
 
   saveAudits(audits: AuditItem[]): void {
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
+    try {
+      fetch('http://localhost:3001/api/audits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audits }),
+      }).catch(() => {});
+    } catch {}
   },
 
   saveAudit(item: Omit<AuditItem, 'id' | 'updatedAt'>): AuditItem {
