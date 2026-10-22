@@ -741,6 +741,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', server: 'unifiedBot', historyCount: getOrderHistoryFromDisk().length });
 });
 
+const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
+if (fs.existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
+
 const BOT_PORT = process.env.BOT_PORT || 3001;
 app.listen(BOT_PORT, () => {
   console.log(`[PC 저장소 서버] http://localhost:${BOT_PORT} 가동 완료 (발주 내역 영구 보존 API)`);
