@@ -7178,11 +7178,12 @@
     "name": "동화]부채표까스활75ml(활명수)",
     "price": 1300,
     "cost": 900,
-    "category": "주류",
+    "category": "상온",
     "targetStock": 4,
     "minOrderQty": 10,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 10:10"
+    "updatedAt": "10. 22. 오후 10:10",
+    "vendor": "younme"
   },
   {
     "barcode": "8801062870462",
@@ -7492,11 +7493,12 @@
     "name": "팔도]왕뚜껑(1500)",
     "price": 1500,
     "cost": 1125,
-    "category": "주류",
+    "category": "상온",
     "targetStock": 4,
     "minOrderQty": 18,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "10. 22. 오후 10:30"
+    "updatedAt": "10. 22. 오후 10:30",
+    "vendor": "younme"
   },
   {
     "barcode": "8801074702423",
