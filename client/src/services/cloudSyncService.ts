@@ -183,8 +183,17 @@ class CloudSyncService {
         if (topic === prodTopic) {
           try {
             const msg = JSON.parse(payload.toString());
-            if (msg.data && msg.data.products && msg.senderId !== this.mySenderId) {
-              storageService.saveProducts(msg.data.products);
+            const prodList = msg.data?.products || (Array.isArray(msg) ? msg : null);
+            if (prodList && Array.isArray(prodList) && msg.senderId !== this.mySenderId) {
+              const local = storageService.getProducts();
+              const map = new Map();
+              local.forEach((p) => map.set(p.barcode, p));
+              prodList.forEach((p) => {
+                const ex = map.get(p.barcode);
+                map.set(p.barcode, { ...ex, ...p });
+              });
+              const merged = Array.from(map.values());
+              storageService.saveProducts(merged, false);
               this.productsUpdateListeners.forEach(l => l());
             }
           } catch (e) {

@@ -35,6 +35,24 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [activeTab, setActiveTab] = useState<'ORDER' | 'HISTORY'>('ORDER');
   const [sortUnmodifiedFirst, setSortUnmodifiedFirst] = useState(false);
   const [sessionEdited, setSessionEdited] = useState<Set<string>>(new Set());
+  type SortColumn = 'none' | 'targetStock' | 'minOrderQty' | 'finalOrderQty' | 'currentStock';
+  type SortOrder = 'asc' | 'desc';
+  const [sortColumn, setSortColumn] = useState<SortColumn>('none');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+
+  const handleToggleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      if (sortOrder === 'desc') {
+        setSortOrder('asc');
+      } else {
+        setSortColumn('none');
+        setSortOrder('desc');
+      }
+    } else {
+      setSortColumn(column);
+      setSortOrder('desc');
+    }
+  };
 
   // 발주 수량 임시 조정 (barcode -> finalQty)
   const [customQuantities, setCustomQuantities] = useState<Record<string, number>>({});
@@ -216,6 +234,28 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       })
       .catch(() => {});
 
+    fetch('http://localhost:3001/api/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success && Array.isArray(data.products) && data.products.length > 0) {
+          const local = storageService.getProducts();
+          const pMap = new Map();
+          local.forEach(p => pMap.set(p.barcode, p));
+          data.products.forEach((p: Product) => {
+            const ex = pMap.get(p.barcode);
+            pMap.set(p.barcode, { ...ex, ...p });
+          });
+          const merged = Array.from(pMap.values());
+          storageService.saveProducts(merged, false);
+          setProducts(merged);
+        }
+      })
+      .catch(() => {});
+
+    const unsubProducts = cloudSyncService.onProductsUpdate(() => {
+      setProducts(storageService.getProducts());
+    });
+
     const unsubAuth = cloudSyncService.onAuthUpdate((newWorkers) => {
       setWorkers(newWorkers);
       storageService.saveSettings({ ...storageService.getSettings(), workers: newWorkers });
@@ -230,6 +270,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       unsubSync();
       unsubStatus();
       unsubHistory();
+      unsubProducts();
     };
   }, []);
 
@@ -238,14 +279,14 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     const { product, alias } = storageService.findProduct(audit.barcode);
 
     const targetStock =
-      audit.targetStock !== undefined ? audit.targetStock : product ? product.targetStock : 1;
+      product && product.targetStock !== undefined
+        ? product.targetStock
+        : (audit.targetStock !== undefined ? audit.targetStock : 1);
 
     const minOrderQty =
-      audit.minOrderQty !== undefined
-        ? Math.max(1, audit.minOrderQty)
-        : product
-          ? Math.max(1, product.minOrderQty)
-          : 1;
+      product && product.minOrderQty !== undefined
+        ? Math.max(1, product.minOrderQty)
+        : (audit.minOrderQty !== undefined ? Math.max(1, audit.minOrderQty) : 1);
 
     const shortage = Math.max(0, targetStock - audit.stockCount);
 
@@ -615,6 +656,14 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   });
 
   
+  if (sortColumn !== 'none') {
+    filteredItems.sort((a, b) => {
+      const valA = (a as any)[sortColumn] ?? 0;
+      const valB = (b as any)[sortColumn] ?? 0;
+      return sortOrder === 'desc' ? valB - valA : valA - valB;
+    });
+  }
+
   if (sortUnmodifiedFirst) {
     filteredItems.sort((a, b) => {
       const pA = products.find(p => p.barcode === a.barcode);
@@ -1102,7 +1151,59 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               aria-label="상품 검색"
               className="w-full h-10 pl-10 pr-4 rounded-full bg-surface border border-line text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-sage-300 transition-colors"
             />
-            <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer md:self-end mt-1">
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-ink-faint font-semibold">정렬:</span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (sortColumn === 'targetStock' && sortOrder === 'desc') {
+                    setSortColumn('none');
+                  } else {
+                    setSortColumn('targetStock');
+                    setSortOrder('desc');
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1 ${
+                  sortColumn === 'targetStock' && sortOrder === 'desc'
+                    ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
+                    : 'bg-surface text-ink hover:bg-canvas border-line'
+                }`}
+              >
+                <span>🎯 목표 수량 많은순 (내림차순)</span>
+                {sortColumn === 'targetStock' && <span className="text-[11px]">{sortOrder === 'desc' ? '▼' : '▲'}</span>}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (sortColumn === 'minOrderQty' && sortOrder === 'desc') {
+                    setSortColumn('none');
+                  } else {
+                    setSortColumn('minOrderQty');
+                    setSortOrder('desc');
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1 ${
+                  sortColumn === 'minOrderQty' && sortOrder === 'desc'
+                    ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
+                    : 'bg-surface text-ink hover:bg-canvas border-line'
+                }`}
+              >
+                <span>📦 발주 단위 큰순 (내림차순)</span>
+                {sortColumn === 'minOrderQty' && <span className="text-[11px]">{sortOrder === 'desc' ? '▼' : '▲'}</span>}
+              </button>
+              {sortColumn !== 'none' && (
+                <button
+                  type="button"
+                  onClick={() => setSortColumn('none')}
+                  className="px-2 py-1 text-xs text-ink-faint hover:text-ink underline transition-colors"
+                >
+                  기본 순서로 복귀
+                </button>
+              )}
+            </div>
+            <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer">
               <input
                 type="checkbox"
                 checked={sortUnmodifiedFirst}
@@ -1132,9 +1233,33 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                   <tr className="text-[13px] text-ink-faint border-b border-line">
                     <th className="font-medium px-5 py-3">상품</th>
                     <th className="font-medium px-3 py-3 text-right whitespace-nowrap">재고</th>
-                    <th className="font-medium px-3 py-3 text-center whitespace-nowrap">목표</th>
-                    <th className="font-medium px-3 py-3 text-center whitespace-nowrap">
-                      발주단위
+                    <th
+                      onClick={() => handleToggleSort('targetStock')}
+                      className="font-medium px-3 py-3 text-center whitespace-nowrap cursor-pointer hover:bg-canvas transition-colors select-none group"
+                      title="클릭하여 목표 수량 내림차순/오름차순 정렬"
+                    >
+                      <div className="inline-flex items-center gap-1 justify-center">
+                        <span>목표</span>
+                        {sortColumn === 'targetStock' ? (
+                          <span className="text-sage-600 font-bold">{sortOrder === 'desc' ? '▼' : '▲'}</span>
+                        ) : (
+                          <span className="text-ink-faint opacity-40 group-hover:opacity-100 text-xs">↕</span>
+                        )}
+                      </div>
+                    </th>
+                    <th
+                      onClick={() => handleToggleSort('minOrderQty')}
+                      className="font-medium px-3 py-3 text-center whitespace-nowrap cursor-pointer hover:bg-canvas transition-colors select-none group"
+                      title="클릭하여 발주 단위 내림차순/오름차순 정렬"
+                    >
+                      <div className="inline-flex items-center gap-1 justify-center">
+                        <span>발주단위</span>
+                        {sortColumn === 'minOrderQty' ? (
+                          <span className="text-sage-600 font-bold">{sortOrder === 'desc' ? '▼' : '▲'}</span>
+                        ) : (
+                          <span className="text-ink-faint opacity-40 group-hover:opacity-100 text-xs">↕</span>
+                        )}
+                      </div>
                     </th>
                     <th className="font-medium px-3 py-3 text-right whitespace-nowrap">추천</th>
                     <th className="font-medium px-3 py-3 text-center whitespace-nowrap">
@@ -1226,18 +1351,28 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                           👤 {item.workerName} {item.updatedAt ? `(${item.updatedAt.replace(/:d{2}$/, '')})` : ''}
                                         </span>
                                       )}
-                                      {masterProduct?.updatedAt ? (
-                                        <span className="text-[11px] text-sage-600 bg-sage-50 px-1.5 py-0.5 rounded font-medium">
+                                      {masterProduct?.reviewStatus === 'APPROPRIATE' ? (
+                                        <span className="text-[11px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded font-medium flex items-center gap-1 shadow-sm">
+                                          ✅ 적절함 확인: {masterProduct.reviewedAt || masterProduct.updatedAt}
+                                        </span>
+                                      ) : (masterProduct?.reviewStatus === 'MODIFIED' || masterProduct?.updatedAt) ? (
+                                        <span className="text-[11px] text-sage-700 bg-sage-50 border border-sage-200 px-1.5 py-0.5 rounded font-medium flex items-center gap-1 shadow-sm">
                                           ✏️ 수정됨: {masterProduct.updatedAt}
                                         </span>
                                       ) : (
-                                        <button
-                                          type="button"
-                                          onClick={() => handleMarkReviewed(item.barcode)}
-                                          className="text-[11px] text-white bg-sage hover:bg-sage-deep px-2 py-0.5 rounded font-medium transition-colors shadow-sm"
-                                        >
-                                          ✅ 현재 값 적절함
-                                        </button>
+                                        <div className="inline-flex items-center gap-1.5">
+                                          <span className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded font-medium">
+                                            ⚠️ 미확인
+                                          </span>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleMarkReviewed(item.barcode)}
+                                            className="text-[11px] text-white bg-sage hover:bg-sage-deep px-2 py-0.5 rounded font-medium transition-colors shadow-sm"
+                                            title="이 상품의 현재 목표재고 및 발주단위를 영구 승인합니다."
+                                          >
+                                            ✅ 현재 값 적절함
+                                          </button>
+                                        </div>
                                       )}
                                       {masterProduct?.lastOrderDate && (
                                         <span className="text-[11px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">

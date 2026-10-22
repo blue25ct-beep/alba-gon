@@ -15,6 +15,8 @@ export interface Product {
   photoUrls?: string[];
   isNewProduct?: boolean;
   updatedAt?: string;
+  reviewedAt?: string;
+  reviewStatus?: 'APPROPRIATE' | 'MODIFIED';
   lastOrderDate?: string;
 }
 

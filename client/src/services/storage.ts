@@ -224,8 +224,16 @@ export const storageService = {
     }
   },
 
-  saveProducts(products: Product[]): void {
+  saveProducts(products: Product[], syncToApi = true): void {
     localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(products));
+    if (syncToApi) {
+      // PC 봇 로컬 서버(/api/products)에 비동기로 즉시 저장하여 디스크에 영구 보존
+      fetch('http://localhost:3001/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products })
+      }).catch(() => {});
+    }
   },
 
   addProduct(product: Product): void {
@@ -244,7 +252,13 @@ export const storageService = {
     const list = this.getProducts();
     const idx = list.findIndex(p => p.barcode === barcode);
     if (idx >= 0) {
-      list[idx] = { ...list[idx], minOrderQty: safeVal, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) };
+      const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      list[idx] = { 
+        ...list[idx], 
+        minOrderQty: safeVal, 
+        reviewStatus: 'MODIFIED', 
+        updatedAt: nowStr 
+      };
       this.saveProducts(list);
     }
     const audits = this.getAudits();
@@ -277,8 +291,14 @@ export const storageService = {
   markProductAsReviewed(barcode: string): void {
     const list = this.getProducts();
     const idx = list.findIndex(p => p.barcode === barcode);
+    const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     if (idx >= 0) {
-      list[idx] = { ...list[idx], updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) };
+      list[idx] = { 
+        ...list[idx], 
+        reviewStatus: 'APPROPRIATE', 
+        reviewedAt: nowStr, 
+        updatedAt: list[idx].updatedAt || nowStr 
+      };
       this.saveProducts(list);
     }
     const audits = this.getAudits();
@@ -294,7 +314,13 @@ export const storageService = {
     const list = this.getProducts();
     const idx = list.findIndex(p => p.barcode === barcode);
     if (idx >= 0) {
-      list[idx] = { ...list[idx], targetStock: safeVal, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) };
+      const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      list[idx] = { 
+        ...list[idx], 
+        targetStock: safeVal, 
+        reviewStatus: 'MODIFIED', 
+        updatedAt: nowStr 
+      };
       this.saveProducts(list);
     }
     const audits = this.getAudits();

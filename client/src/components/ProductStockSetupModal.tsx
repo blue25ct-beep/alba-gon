@@ -17,6 +17,24 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [sortUnmodifiedFirst, setSortUnmodifiedFirst] = useState(false);
   const [sessionEdited, setSessionEdited] = useState<Set<string>>(new Set());
+  type SortColumn = 'none' | 'targetStock' | 'minOrderQty';
+  type SortOrder = 'asc' | 'desc';
+  const [sortColumn, setSortColumn] = useState<SortColumn>('none');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+
+  const handleToggleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      if (sortOrder === 'desc') {
+        setSortOrder('asc');
+      } else {
+        setSortColumn('none');
+        setSortOrder('desc');
+      }
+    } else {
+      setSortColumn(column);
+      setSortOrder('desc');
+    }
+  };
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [batchTargetStock, setBatchTargetStock] = useState<number>(10);
   const [batchMinOrderQty, setBatchMinOrderQty] = useState<number>(10);
@@ -41,6 +59,14 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
   };
 
   
+  if (sortColumn !== 'none') {
+    filtered.sort((a, b) => {
+      const valA = (a as any)[sortColumn] ?? 0;
+      const valB = (b as any)[sortColumn] ?? 0;
+      return sortOrder === 'desc' ? valB - valA : valA - valB;
+    });
+  }
+
   if (sortUnmodifiedFirst) {
     filtered.sort((a, b) => {
       const isUnmodA = !a.updatedAt || sessionEdited.has(a.barcode);
@@ -120,18 +146,53 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer mb-2">
-                <input
-                  type="checkbox"
-                  checked={sortUnmodifiedFirst}
-                  onChange={(e) => {
-                  setSortUnmodifiedFirst(e.target.checked);
-                  if (!e.target.checked) setSessionEdited(new Set()); // reset when turned off
-                }}
-                  className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
-                />
-                💡 수정 안 된 상품 위로 올리기
-              </label>
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-xs text-ink-faint font-semibold">내림차순:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (sortColumn === 'targetStock' && sortOrder === 'desc') setSortColumn('none');
+                      else { setSortColumn('targetStock'); setSortOrder('desc'); }
+                    }}
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all border flex items-center gap-1 ${
+                      sortColumn === 'targetStock' && sortOrder === 'desc'
+                        ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
+                        : 'bg-surface text-ink hover:bg-canvas border-line'
+                    }`}
+                  >
+                    <span>🎯 목표 수량 많은순</span>
+                    {sortColumn === 'targetStock' && <span>{sortOrder === 'desc' ? '▼' : '▲'}</span>}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (sortColumn === 'minOrderQty' && sortOrder === 'desc') setSortColumn('none');
+                      else { setSortColumn('minOrderQty'); setSortOrder('desc'); }
+                    }}
+                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all border flex items-center gap-1 ${
+                      sortColumn === 'minOrderQty' && sortOrder === 'desc'
+                        ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
+                        : 'bg-surface text-ink hover:bg-canvas border-line'
+                    }`}
+                  >
+                    <span>📦 발주 단위 큰순</span>
+                    {sortColumn === 'minOrderQty' && <span>{sortOrder === 'desc' ? '▼' : '▲'}</span>}
+                  </button>
+                </div>
+                <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={sortUnmodifiedFirst}
+                    onChange={(e) => {
+                      setSortUnmodifiedFirst(e.target.checked);
+                      if (!e.target.checked) setSessionEdited(new Set());
+                    }}
+                    className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
+                  />
+                  💡 수정 안 된 상품 위로 올리기
+                </label>
+              </div>
               <input
                 type="text"
                 placeholder="상품명 또는 바코드"
@@ -204,8 +265,34 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
             <thead className="sticky top-0 bg-surface z-10">
               <tr className="text-[13px] text-ink-faint border-b border-line">
                 <th className="font-medium py-3 pr-3">상품</th>
-                <th className="font-medium py-3 px-3 text-center whitespace-nowrap">목표</th>
-                <th className="font-medium py-3 px-3 text-center whitespace-nowrap">발주단위</th>
+                <th
+                  onClick={() => handleToggleSort('targetStock')}
+                  className="font-medium py-3 px-3 text-center whitespace-nowrap cursor-pointer hover:bg-canvas transition-colors select-none group"
+                  title="클릭하여 목표 수량 내림차순/오름차순 정렬"
+                >
+                  <div className="inline-flex items-center gap-1 justify-center">
+                    <span>목표</span>
+                    {sortColumn === 'targetStock' ? (
+                      <span className="text-sage-600 font-bold">{sortOrder === 'desc' ? '▼' : '▲'}</span>
+                    ) : (
+                      <span className="text-ink-faint opacity-40 group-hover:opacity-100 text-xs">↕</span>
+                    )}
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleToggleSort('minOrderQty')}
+                  className="font-medium py-3 px-3 text-center whitespace-nowrap cursor-pointer hover:bg-canvas transition-colors select-none group"
+                  title="클릭하여 발주 단위 내림차순/오름차순 정렬"
+                >
+                  <div className="inline-flex items-center gap-1 justify-center">
+                    <span>발주단위</span>
+                    {sortColumn === 'minOrderQty' ? (
+                      <span className="text-sage-600 font-bold">{sortOrder === 'desc' ? '▼' : '▲'}</span>
+                    ) : (
+                      <span className="text-ink-faint opacity-40 group-hover:opacity-100 text-xs">↕</span>
+                    )}
+                  </div>
+                </th>
                 <th className="py-3 pl-3 w-16">
                   <span className="sr-only">저장 상태</span>
                 </th>
@@ -218,7 +305,9 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
                     <span className="block text-ink leading-snug break-keep">{p.name}</span>
                     <span className="block mt-0.5 text-[13px] text-ink-faint tabular">
                       {p.barcode} · {p.category}
-                      {p.updatedAt ? (
+                      {p.reviewStatus === 'APPROPRIATE' ? (
+                        ` · ✅ 적절함 확인: ${p.reviewedAt || p.updatedAt}`
+                      ) : (p.reviewStatus === 'MODIFIED' || p.updatedAt) ? (
                         ` · ✏️ 수정: ${p.updatedAt}`
                       ) : (
                         <button
