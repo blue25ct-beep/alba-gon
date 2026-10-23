@@ -9,3 +9,4 @@ dist-ssr
 .system_generated
 bot/*_backup.json
 bot/audits_archive_*.json
+GEMINI.md

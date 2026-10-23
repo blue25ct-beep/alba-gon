@@ -42,7 +42,7 @@ const HISTORY_BACKUP_FILE = path.join(__dirname, '..', 'order_history_backup.jso
 
 const TOPIC_AUTO_ORDER_1060 = `albagom-v2/sync/store_1060/auto_order_eval`;
 
-const DEFAULT_DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1559680394444673076/xC_ZlBnDBYpOTd2PGDcywLA4LdFEgGzQ3Hothe7wiEsPmNPkb7uoLbSb67f3wv-5PeNL';
+const DEFAULT_DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1563176287529603145/XnpuqrIQek_oIn750tfeJ7bseLgW_dHvoF7bblGeWIENVLqfL26s7U1ZVBlHCKWoZs4H';
 
 function getOrderHistoryFromDisk() {
   try {

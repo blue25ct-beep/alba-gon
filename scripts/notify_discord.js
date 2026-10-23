@@ -1,4 +1,22 @@
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1559680394444673076/xC_ZlBnDBYpOTd2PGDcywLA4LdFEgGzQ3Hothe7wiEsPmNPkb7uoLbSb67f3wv-5PeNL';
+const fs = require('fs');
+const path = require('path');
+
+function getWebhookUrl() {
+  if (process.env.DISCORD_WEBHOOK_URL) return process.env.DISCORD_WEBHOOK_URL;
+  const envPath = path.join(__dirname, '..', '.env');
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('DISCORD_WEBHOOK_URL=')) {
+        return trimmed.replace('DISCORD_WEBHOOK_URL=', '').trim();
+      }
+    }
+  }
+  return 'https://discord.com/api/webhooks/1563176287529603145/XnpuqrIQek_oIn750tfeJ7bseLgW_dHvoF7bblGeWIENVLqfL26s7U1ZVBlHCKWoZs4H';
+}
+
+const DISCORD_WEBHOOK_URL = getWebhookUrl();
 
 async function sendNotification(summaryText) {
   const content = summaryText || process.argv.slice(2).join(' ') || '작업이 완료되었습니다.';
