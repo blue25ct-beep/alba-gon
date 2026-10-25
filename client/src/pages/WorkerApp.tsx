@@ -30,7 +30,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   const [toastMessage, setToastMessage] = useState<{ text: string; sub?: string } | null>(null);
   
   const sendDiscordNotification = (message: string) => {
-    const webhookUrl = storageService.getSettings().discordWebhookUrl || 'https://discord.com/api/webhooks/1563176287529603145/XnpuqrIQek_oIn750tfeJ7bseLgW_dHvoF7bblGeWIENVLqfL26s7U1ZVBlHCKWoZs4H';
+    const webhookUrl = storageService.getSettings().discordWebhookUrl;
     if (webhookUrl) {
       fetch(webhookUrl, {
         method: 'POST',

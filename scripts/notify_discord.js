@@ -13,7 +13,7 @@ function getWebhookUrl() {
       }
     }
   }
-  return 'https://discord.com/api/webhooks/1563176287529603145/XnpuqrIQek_oIn750tfeJ7bseLgW_dHvoF7bblGeWIENVLqfL26s7U1ZVBlHCKWoZs4H';
+  return '';
 }
 
 const DISCORD_WEBHOOK_URL = getWebhookUrl();
