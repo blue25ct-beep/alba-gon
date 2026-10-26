@@ -38,10 +38,10 @@ class CloudSyncService {
   constructor() {
     let id = '';
     try {
-      id = sessionStorage.getItem('albagom_device_id') || '';
+      id = localStorage.getItem('albagom_device_id') || '';
       if (!id) {
         id = `dev_${Math.random().toString(36).substring(2, 9)}_${Date.now().toString(36)}`;
-        sessionStorage.setItem('albagom_device_id', id);
+        localStorage.setItem('albagom_device_id', id);
       }
     } catch {
       id = `dev_${Math.random().toString(36).substring(2, 9)}`;
@@ -281,8 +281,15 @@ class CloudSyncService {
               }
               return itemObj;
             });
-            storageService.saveAudits(validAudits);
-            this.notifySync(validAudits, msg);
+            // 스마트 병합: 기존 로컬 스캔 품목이 유실되지 않도록 보존 및 통합
+            const mergedAudits = storageService.mergeAudits(validAudits);
+            this.notifySync(mergedAudits, msg);
+
+            // 로컬에 원격 페이로드에 없던 최신 스캔 품목이 있다면, 클라우드에 즉시 전체 목록 재동기화
+            if (mergedAudits.length > validAudits.length) {
+              console.log(`[CloudSync] 로컬 추가 품목 보호 및 통합 클라우드 재동기화 (${validAudits.length}건 -> ${mergedAudits.length}건)`);
+              this.broadcastAudits(mergedAudits, msg.senderRole);
+            }
           } else if (msg.type === 'AUDITS_CLEAR') {
             const clearedAt = (msg as any).clearedAt || msg.timestamp || Date.now();
             try { localStorage.setItem('albagom_last_cleared_at', clearedAt.toString()); } catch(e){}

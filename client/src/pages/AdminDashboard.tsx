@@ -252,8 +252,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       .then(res => res.json())
       .then(data => {
         if (data && data.success && Array.isArray(data.audits) && data.audits.length > 0) {
-          storageService.saveAudits(data.audits);
-          setAudits(data.audits);
+          const merged = storageService.mergeAudits(data.audits);
+          setAudits(merged);
         }
       })
       .catch(() => {});

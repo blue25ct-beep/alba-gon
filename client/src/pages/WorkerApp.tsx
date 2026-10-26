@@ -82,9 +82,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
     setAudits(initialAudits);
 
     cloudSyncService.connect(undefined, 'WORKER');
-    if (initialAudits.length > 0) {
-      cloudSyncService.broadcastAudits(initialAudits, 'WORKER');
-    }
+    // 초기 마운트 시 구형 캐시로 클라우드를 덮어쓰지 않고, 연결 후 수신되는 클라우드 데이터와 자동 병합하도록 대기
 
     const unsubSync = cloudSyncService.onSync((newAudits) => {
       setAudits(newAudits);

@@ -11,6 +11,7 @@ const KEYS = {
   SETTINGS: 'albagom_settings_v1',
   LAST_CLEARED_AUDITS: 'albagom_last_cleared_audits_v1',
   RECENT_DELETED_AUDITS: 'albagom_recent_deleted_audits_v1',
+  DELETED_TOMBSTONES: 'albagom_deleted_tombstones_v1',
 };
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -377,6 +378,85 @@ export const storageService = {
     }
   },
 
+  getDeletedTombstones(): Record<string, number> {
+    try {
+      const data = localStorage.getItem(KEYS.DELETED_TOMBSTONES);
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  },
+
+  recordDeletedTombstone(barcode: string, timestamp = Date.now()): void {
+    try {
+      const tombstones = this.getDeletedTombstones();
+      tombstones[barcode] = timestamp;
+      localStorage.setItem(KEYS.DELETED_TOMBSTONES, JSON.stringify(tombstones));
+    } catch (e) {
+      console.error('Failed to record deleted tombstone', e);
+    }
+  },
+
+  removeDeletedTombstone(barcode: string): void {
+    try {
+      const tombstones = this.getDeletedTombstones();
+      if (tombstones[barcode]) {
+        delete tombstones[barcode];
+        localStorage.setItem(KEYS.DELETED_TOMBSTONES, JSON.stringify(tombstones));
+      }
+    } catch (e) {}
+  },
+
+  clearDeletedTombstones(): void {
+    localStorage.removeItem(KEYS.DELETED_TOMBSTONES);
+  },
+
+  // 스마트 병합: 원격에서 실사가 수신되더라도 로컬 스캔 품목을 절대 일방적으로 덮어쓰지 않고 양방향 병합
+  mergeAudits(incoming: AuditItem[]): AuditItem[] {
+    const local = this.getAudits();
+    const tombstones = this.getDeletedTombstones();
+    let lastClearedAt = 0;
+    try {
+      lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10);
+    } catch (e) {}
+
+    const map = new Map<string, AuditItem>();
+
+    // 1. 로컬 실사 보존
+    for (const item of local) {
+      if (!item || !item.barcode) continue;
+      const itemTime = parseInt(item.id, 10) || 0;
+      if (lastClearedAt > 0 && itemTime > 0 && itemTime < lastClearedAt) continue;
+      const deletedAt = tombstones[item.barcode] || 0;
+      if (deletedAt > 0 && itemTime <= deletedAt) continue;
+      map.set(item.barcode, item);
+    }
+
+    // 2. 원격 수신 실사 스마트 병합
+    for (const inc of incoming) {
+      if (!inc || !inc.barcode) continue;
+      const incTime = parseInt(inc.id, 10) || 0;
+      if (lastClearedAt > 0 && incTime > 0 && incTime < lastClearedAt) continue;
+      const deletedAt = tombstones[inc.barcode] || 0;
+      if (deletedAt > 0 && incTime <= deletedAt) continue;
+
+      const existing = map.get(inc.barcode);
+      if (!existing) {
+        map.set(inc.barcode, inc);
+      } else {
+        const existingTime = parseInt(existing.id, 10) || 0;
+        if (incTime >= existingTime) {
+          map.set(inc.barcode, { ...existing, ...inc });
+        }
+      }
+    }
+
+    const merged = Array.from(map.values());
+    merged.sort((a, b) => (parseInt(b.id, 10) || 0) - (parseInt(a.id, 10) || 0));
+    this.saveAudits(merged);
+    return merged;
+  },
+
   saveAudits(audits: AuditItem[]): void {
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
     try {
@@ -389,6 +469,7 @@ export const storageService = {
   },
 
   saveAudit(item: Omit<AuditItem, 'id' | 'updatedAt'>): AuditItem {
+    this.removeDeletedTombstone(item.barcode);
     const audits = this.getAudits();
     // 媛숈? 諛붿퐫?쒖쓽 ?ㅼ궗媛 ?대? ?덉쑝硫?理쒖떊 ?섎웾?쇰줈 ?낅뜲?댄듃
     const existingIndex = audits.findIndex(a => a.barcode === item.barcode);
@@ -506,6 +587,7 @@ export const storageService = {
     const itemToDelete = current.find(a => a.id === identifier || a.barcode === identifier);
     if (itemToDelete) {
       this.addRecentlyDeletedAudit(itemToDelete);
+      this.recordDeletedTombstone(itemToDelete.barcode);
     }
     const audits = current.filter(a => a.id !== identifier && a.barcode !== identifier);
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
@@ -517,6 +599,7 @@ export const storageService = {
       this.saveLastClearedAudits(current, reason);
     }
     localStorage.setItem(KEYS.AUDITS, JSON.stringify([]));
+    this.clearDeletedTombstones();
   },
 
   getLatestOrderForRecovery(): OrderHistoryEntry | null {
