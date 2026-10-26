@@ -109,13 +109,32 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
     });
   
     const unsubClear = cloudSyncService.onClearCommand(() => {
-      setAudits([]);
-      storageService.clearAudits();
+      const current = storageService.getAudits();
+      if (current.length === 0) {
+        setAudits([]);
+        storageService.clearAudits();
+      } else {
+        console.warn('[WorkerApp] 근무자 실사 보호: 외부 clear 명령 무시');
+      }
     });
+
+    const handleWakeup = () => {
+      if (document.visibilityState === 'visible') {
+        const local = storageService.getAudits();
+        if (local.length > 0) {
+          setAudits(local);
+          cloudSyncService.broadcastAudits(local, 'WORKER');
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleWakeup);
+    window.addEventListener('pageshow', handleWakeup);
 
     const unsubProducts = cloudSyncService.onProductsUpdate(() => { /* reload prevented */ });
 
     return () => {
+      document.removeEventListener('visibilitychange', handleWakeup);
+      window.removeEventListener('pageshow', handleWakeup);
       unsubSync();
       unsubStatus();
       unsubClear();

@@ -106,6 +106,8 @@ function removeSuccessfulAuditsFromDiskAndSync(barcodes) {
       const remaining = audits.filter(a => !barcodeSet.has(a.barcode));
       const payload = {
         type: 'AUDITS_UPDATE',
+        subType: 'ORDER_COMPLETED',
+        orderedBarcodes: barcodes,
         senderId: 'BOT_ORDER_SUCCESS',
         senderRole: 'ADMIN',
         storeId: '1060',

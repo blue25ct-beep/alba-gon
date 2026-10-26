@@ -12,6 +12,7 @@ const KEYS = {
   LAST_CLEARED_AUDITS: 'albagom_last_cleared_audits_v1',
   RECENT_DELETED_AUDITS: 'albagom_recent_deleted_audits_v1',
   DELETED_TOMBSTONES: 'albagom_deleted_tombstones_v1',
+  WORKER_SAFETY_BACKUP: 'albagom_worker_safety_backup_v1',
 };
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -411,8 +412,8 @@ export const storageService = {
     localStorage.removeItem(KEYS.DELETED_TOMBSTONES);
   },
 
-  // 스마트 병합: 원격에서 실사가 수신되더라도 로컬 스캔 품목을 절대 일방적으로 덮어쓰지 않고 양방향 병합
-  mergeAudits(incoming: AuditItem[]): AuditItem[] {
+    // 스마트 병합: 근무자 폰 최우선 보존 (isWorkerDevice) 및 원격 근무자 실사 최우선 반영 (isIncomingFromWorker)
+  mergeAudits(incoming: AuditItem[], isWorkerDevice = false, isIncomingFromWorker = false): AuditItem[] {
     const local = this.getAudits();
     const tombstones = this.getDeletedTombstones();
     let lastClearedAt = 0;
@@ -442,11 +443,24 @@ export const storageService = {
 
       const existing = map.get(inc.barcode);
       if (!existing) {
+        // 기존 로컬에 없던 새로운 품목은 추가
         map.set(inc.barcode, inc);
       } else {
-        const existingTime = parseInt(existing.id, 10) || 0;
-        if (incTime >= existingTime) {
+        if (isWorkerDevice) {
+          // ★ [최우선 규칙 1] 현재 기기가 근무자 핸드폰인 경우:
+          // 근무자가 직접 스캔한 로컬 데이터가 절대 최우선!
+          // 원격에서 어떤 수량/수정이 들어오더라도 근무자 폰의 실사 수량을 절대 덮어쓰지 않음
+          continue;
+        } else if (isIncomingFromWorker) {
+          // ★ [최우선 규칙 2] 원격 발신자가 근무자인 경우 (관리자 화면이나 봇에서 수신):
+          // 근무자의 현장 스캔 실사가 최우선!
           map.set(inc.barcode, { ...existing, ...inc });
+        } else {
+          // 동일 권한 간에는 최신 타임스탬프 기준 병합
+          const existingTime = parseInt(existing.id, 10) || 0;
+          if (incTime >= existingTime) {
+            map.set(inc.barcode, { ...existing, ...inc });
+          }
         }
       }
     }
@@ -593,7 +607,7 @@ export const storageService = {
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
   },
 
-  clearAudits(reason = '목록 비우기'): void {
+  clearAudits(reason = '목록 비우기', clearSafetyBackup = false): void {
     const current = this.getAudits();
     if (current.length > 0) {
       this.saveLastClearedAudits(current, reason);

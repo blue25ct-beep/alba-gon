@@ -10,6 +10,8 @@ export interface AuditsSyncMessage {
   timestamp: number;
   audits: AuditItem[];
   data?: any;
+  subType?: string;
+  orderedBarcodes?: string[];
 }
 
 export type SyncStatus = 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED' | 'ERROR';
@@ -34,6 +36,7 @@ class CloudSyncService {
   private lastSyncTime: string = '';
   private pingResolvers: Set<(val: boolean) => void> = new Set();
   private pendingAuditsPayload: AuditsSyncMessage | null = null;
+  private currentRole: 'WORKER' | 'ADMIN' = 'WORKER';
 
   constructor() {
     let id = '';
@@ -132,6 +135,7 @@ class CloudSyncService {
   }
 
   public connect(storeId?: string, role: 'WORKER' | 'ADMIN' = 'WORKER') {
+    this.currentRole = role;
     const targetStoreId = storeId || storageService.getSettings().younmeId || '1060';
     this.currentStoreId = targetStoreId;
 
@@ -281,19 +285,48 @@ class CloudSyncService {
               }
               return itemObj;
             });
-            // 스마트 병합: 기존 로컬 스캔 품목이 유실되지 않도록 보존 및 통합
-            const mergedAudits = storageService.mergeAudits(validAudits);
+            // 발주 완료 정리 메시지인 경우: 발주 성공 품목만 안전하게 제거
+            if (msg.subType === 'ORDER_COMPLETED' && Array.isArray(msg.orderedBarcodes)) {
+              const orderedSet = new Set(msg.orderedBarcodes);
+              const current = storageService.getAudits();
+              const remaining = current.filter((a: any) => !orderedSet.has(a.barcode));
+              msg.orderedBarcodes.forEach((b: string) => storageService.recordDeletedTombstone(b));
+              storageService.saveAudits(remaining);
+              this.notifySync(remaining, msg);
+              return;
+            }
+
+            const isWorkerDevice = this.currentRole === 'WORKER';
+            const isIncomingFromWorker = msg.senderRole === 'WORKER';
+
+            // 스마트 병합: 근무자 폰 최우선 보존 (isWorkerDevice, isIncomingFromWorker)
+            const mergedAudits = storageService.mergeAudits(validAudits, isWorkerDevice, isIncomingFromWorker);
             this.notifySync(mergedAudits, msg);
 
-            // 로컬에 원격 페이로드에 없던 최신 스캔 품목이 있다면, 클라우드에 즉시 전체 목록 재동기화
-            if (mergedAudits.length > validAudits.length) {
+            // 근무자 폰이거나, 로컬에 원격 페이로드에 없던 최신 품목이 있다면 클라우드에 즉시 전체 목록 재동기화
+            if (isWorkerDevice) {
+              const localCount = storageService.getAudits().length;
+              if (localCount > validAudits.length || JSON.stringify(mergedAudits) !== JSON.stringify(validAudits)) {
+                console.log(`[CloudSync] 근무자 폰 실사 최우선 보존 및 클라우드 동기화 (${localCount}건)`);
+                this.broadcastAudits(mergedAudits, 'WORKER');
+              }
+            } else if (mergedAudits.length > validAudits.length) {
               console.log(`[CloudSync] 로컬 추가 품목 보호 및 통합 클라우드 재동기화 (${validAudits.length}건 -> ${mergedAudits.length}건)`);
-              this.broadcastAudits(mergedAudits, msg.senderRole);
+              this.broadcastAudits(mergedAudits, msg.senderRole || this.currentRole);
             }
           } else if (msg.type === 'AUDITS_CLEAR') {
+            // 근무자 폰 환경에서는 스캔한 실사가 있는 경우 외부 CLEAR 명령을 무시하여 유실 방지
+            if (this.currentRole === 'WORKER') {
+              const local = storageService.getAudits();
+              if (local.length > 0) {
+                console.warn(`[CloudSync] 근무자 폰 실사 ${local.length}건 보호: 외부 비우기 명령 차단 및 클라우드 복구`);
+                this.broadcastAudits(local, 'WORKER');
+                return;
+              }
+            }
             const clearedAt = (msg as any).clearedAt || msg.timestamp || Date.now();
             try { localStorage.setItem('albagom_last_cleared_at', clearedAt.toString()); } catch(e){}
-            storageService.clearAudits();
+            storageService.clearAudits('REMOTE_CLEAR', false);
             this.clearListeners.forEach((l) => l());
             this.notifySync([], msg);
           }
