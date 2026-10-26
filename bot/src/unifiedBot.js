@@ -369,8 +369,8 @@ client.on('message', async (topic, message) => {
           continue;
         }
 
-        const targetStock = audit.targetStock !== undefined ? audit.targetStock : (product.targetStock || 1);
-        const minOrderQty = audit.minOrderQty !== undefined ? audit.minOrderQty : (product.minOrderQty || 1);
+        const targetStock = (product && product.targetStock !== undefined) ? product.targetStock : (audit.targetStock !== undefined ? audit.targetStock : 1);
+        const minOrderQty = (product && product.minOrderQty !== undefined) ? Math.max(1, product.minOrderQty) : (audit.minOrderQty !== undefined ? Math.max(1, audit.minOrderQty) : 1);
         const currentStock = audit.stockCount || 0;
         const deficit = Math.max(0, targetStock - currentStock);
 
@@ -679,7 +679,20 @@ app.post('/api/products', (req, res) => {
       products.forEach(p => {
         const exist = currentMap.get(p.barcode);
         if (exist) {
-          currentMap.set(p.barcode, { ...exist, ...p });
+          if (p.reviewStatus === 'MODIFIED' || p.targetStock !== undefined || p.minOrderQty !== undefined) {
+            currentMap.set(p.barcode, { ...exist, ...p });
+          } else if (exist.reviewStatus === 'MODIFIED') {
+            currentMap.set(p.barcode, {
+              ...p,
+              ...exist,
+              targetStock: exist.targetStock,
+              minOrderQty: exist.minOrderQty,
+              reviewStatus: exist.reviewStatus,
+              updatedAt: exist.updatedAt,
+            });
+          } else {
+            currentMap.set(p.barcode, { ...exist, ...p });
+          }
         } else {
           currentMap.set(p.barcode, p);
         }

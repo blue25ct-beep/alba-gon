@@ -263,11 +263,31 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       .then(data => {
         if (data && data.success && Array.isArray(data.products) && data.products.length > 0) {
           const local = storageService.getProducts();
+          const customized = storageService.getCustomizedSettings();
           const pMap = new Map();
           local.forEach(p => pMap.set(p.barcode, p));
           data.products.forEach((p: Product) => {
             const ex = pMap.get(p.barcode);
-            pMap.set(p.barcode, { ...ex, ...p });
+            const c = customized[p.barcode];
+            if (c) {
+              pMap.set(p.barcode, {
+                ...ex,
+                ...p,
+                targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
+                minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : p.minOrderQty,
+                reviewStatus: c.reviewStatus || p.reviewStatus,
+                updatedAt: c.updatedAt || p.updatedAt,
+              });
+            } else if (ex && ex.reviewStatus === 'MODIFIED') {
+              pMap.set(p.barcode, {
+                ...p,
+                ...ex,
+                targetStock: ex.targetStock,
+                minOrderQty: ex.minOrderQty,
+              });
+            } else {
+              pMap.set(p.barcode, { ...ex, ...p });
+            }
           });
           const merged = Array.from(pMap.values());
           storageService.saveProducts(merged, false);

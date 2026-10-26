@@ -13,6 +13,7 @@ const KEYS = {
   RECENT_DELETED_AUDITS: 'albagom_recent_deleted_audits_v1',
   DELETED_TOMBSTONES: 'albagom_deleted_tombstones_v1',
   WORKER_SAFETY_BACKUP: 'albagom_worker_safety_backup_v1',
+  CUSTOMIZED_PRODUCT_SETTINGS: 'albagom_customized_product_settings_v1',
 };
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -211,29 +212,79 @@ export const storageService = {
     this.saveOrderHistory([]);
   },
 
-  getProducts(): Product[] {
+    getCustomizedSettings(): Record<string, { targetStock?: number; minOrderQty?: number; reviewStatus?: string; updatedAt?: string }> {
     try {
+      const data = localStorage.getItem(KEYS.CUSTOMIZED_PRODUCT_SETTINGS);
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  },
+
+  recordCustomizedSetting(barcode: string, setting: { targetStock?: number; minOrderQty?: number; reviewStatus?: string; updatedAt?: string }): void {
+    try {
+      const all = this.getCustomizedSettings();
+      all[barcode] = { ...all[barcode], ...setting };
+      localStorage.setItem(KEYS.CUSTOMIZED_PRODUCT_SETTINGS, JSON.stringify(all));
+    } catch (e) {
+      console.error('Failed to record customized setting', e);
+    }
+  },
+
+getProducts(): Product[] {
+    try {
+      const customized = this.getCustomizedSettings();
+      let list: Product[] = [];
       const data = localStorage.getItem(KEYS.PRODUCTS);
-      if (!data) {
-        // 理쒖큹 ?ㅽ뻾 ??459媛??묒? 湲곕낯 ?곹뭹 ?깅줉
-        const initial = seedProducts as Product[];
-        localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(initial));
-        return initial;
+      if (data) {
+        list = JSON.parse(data);
+      } else {
+        list = seedProducts as Product[];
+        localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(list));
       }
-      return JSON.parse(data);
+      // 점장님이 직접 수정한 목표재고/발주단위 영구 보존 및 최우선 적용
+      if (Object.keys(customized).length > 0) {
+        list = list.map(p => {
+          const c = customized[p.barcode];
+          if (c) {
+            return {
+              ...p,
+              targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
+              minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : p.minOrderQty,
+              reviewStatus: (c.reviewStatus as any) || p.reviewStatus,
+              updatedAt: c.updatedAt || p.updatedAt,
+            };
+          }
+          return p;
+        });
+      }
+      return list;
     } catch {
       return seedProducts as Product[];
     }
   },
 
   saveProducts(products: Product[], syncToApi = true): void {
-    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(products));
+    const customized = this.getCustomizedSettings();
+    const secured = products.map(p => {
+      const c = customized[p.barcode];
+      if (c) {
+        return {
+          ...p,
+          targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
+          minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : p.minOrderQty,
+          reviewStatus: (c.reviewStatus as any) || p.reviewStatus,
+          updatedAt: c.updatedAt || p.updatedAt,
+        };
+      }
+      return p;
+    });
+    localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(secured));
     if (syncToApi) {
-      // PC 봇 로컬 서버(/api/products)에 비동기로 즉시 저장하여 디스크에 영구 보존
       fetch('http://localhost:3001/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ products })
+        body: JSON.stringify({ products: secured })
       }).catch(() => {});
     }
   },
@@ -251,10 +302,11 @@ export const storageService = {
 
   updateProductMinOrderQty(barcode: string, minOrderQty: number): void {
     const safeVal = Math.max(1, minOrderQty);
+    const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    this.recordCustomizedSetting(barcode, { minOrderQty: safeVal, reviewStatus: 'MODIFIED', updatedAt: nowStr });
     const list = this.getProducts();
     const idx = list.findIndex(p => p.barcode === barcode);
     if (idx >= 0) {
-      const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
       list[idx] = { 
         ...list[idx], 
         minOrderQty: safeVal, 
@@ -313,10 +365,11 @@ export const storageService = {
 
   updateProductTargetStock(barcode: string, targetStock: number): void {
     const safeVal = Math.max(0, targetStock);
+    const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    this.recordCustomizedSetting(barcode, { targetStock: safeVal, reviewStatus: 'MODIFIED', updatedAt: nowStr });
     const list = this.getProducts();
     const idx = list.findIndex(p => p.barcode === barcode);
     if (idx >= 0) {
-      const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
       list[idx] = { 
         ...list[idx], 
         targetStock: safeVal, 
@@ -339,7 +392,19 @@ export const storageService = {
     const targetBarcode = alias ? alias.newBarcode : barcode;
 
     const products = this.getProducts();
-    const product = products.find(p => p.barcode === targetBarcode || p.barcode === barcode);
+    let product = products.find(p => p.barcode === targetBarcode || p.barcode === barcode);
+    if (product) {
+      const customized = this.getCustomizedSettings()[product.barcode];
+      if (customized) {
+        product = {
+          ...product,
+          targetStock: customized.targetStock !== undefined ? customized.targetStock : product.targetStock,
+          minOrderQty: customized.minOrderQty !== undefined ? customized.minOrderQty : product.minOrderQty,
+          reviewStatus: (customized.reviewStatus as any) || product.reviewStatus,
+          updatedAt: customized.updatedAt || product.updatedAt,
+        };
+      }
+    }
 
     return { product, alias };
   },

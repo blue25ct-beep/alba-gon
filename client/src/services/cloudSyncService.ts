@@ -190,11 +190,31 @@ class CloudSyncService {
             const prodList = msg.data?.products || (Array.isArray(msg) ? msg : null);
             if (prodList && Array.isArray(prodList) && msg.senderId !== this.mySenderId) {
               const local = storageService.getProducts();
+              const customized = storageService.getCustomizedSettings();
               const map = new Map();
               local.forEach((p) => map.set(p.barcode, p));
-              prodList.forEach((p) => {
+              prodList.forEach((p: any) => {
                 const ex = map.get(p.barcode);
-                map.set(p.barcode, { ...ex, ...p });
+                const c = customized[p.barcode];
+                const base = ex ? { ...p, ...ex } : p;
+                if (c) {
+                  map.set(p.barcode, {
+                    ...base,
+                    targetStock: c.targetStock !== undefined ? c.targetStock : base.targetStock,
+                    minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : base.minOrderQty,
+                    reviewStatus: c.reviewStatus || base.reviewStatus,
+                    updatedAt: c.updatedAt || base.updatedAt,
+                  });
+                } else if (ex && (ex.reviewStatus === 'MODIFIED' || ex.targetStock !== undefined)) {
+                  map.set(p.barcode, {
+                    ...p,
+                    ...ex,
+                    targetStock: ex.targetStock,
+                    minOrderQty: ex.minOrderQty,
+                  });
+                } else {
+                  map.set(p.barcode, { ...ex, ...p });
+                }
               });
               const merged = Array.from(map.values());
               storageService.saveProducts(merged, false);
@@ -272,15 +292,19 @@ class CloudSyncService {
                 itemObj.vendor = 'younme';
                 itemObj.category = '상온';
               }
-              // 미등록 상품 자동 마스터 복원
+              // 미등록 상품 자동 마스터 복원 및 점장님 설정 목표재고/발주단위 최우선 보존
               const { product } = storageService.findProduct(itemObj.barcode);
               if (product && product.name && product.name !== '미등록 상품') {
                 return {
                   ...itemObj,
                   productName: product.name,
                   isUnmapped: false,
-                  targetStock: itemObj.targetStock || product.targetStock || 1,
-                  minOrderQty: itemObj.minOrderQty || product.minOrderQty || 1,
+                  targetStock: (product.targetStock !== undefined && product.targetStock !== null)
+                    ? product.targetStock
+                    : (itemObj.targetStock || 1),
+                  minOrderQty: (product.minOrderQty !== undefined && product.minOrderQty !== null)
+                    ? product.minOrderQty
+                    : (itemObj.minOrderQty || 1),
                 };
               }
               return itemObj;
