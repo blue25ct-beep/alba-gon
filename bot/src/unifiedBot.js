@@ -1,3 +1,22 @@
+
+function updateEnvFile(key, value) {
+  const envPaths = [
+    path.resolve(__dirname, '../../.env'),
+    path.resolve(__dirname, '../.env')
+  ];
+  for (const envPath of envPaths) {
+    try {
+      let content = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
+      const regex = new RegExp(`^${key}=.*$`, 'm');
+      if (regex.test(content)) {
+        content = content.replace(regex, `${key}=${value}`);
+      } else {
+        content = content ? `${content.trim()}\n${key}=${value}\n` : `${key}=${value}\n`;
+      }
+      fs.writeFileSync(envPath, content, 'utf8');
+    } catch (e) {}
+  }
+}
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
@@ -284,6 +303,15 @@ client.on('message', async (topic, message) => {
   if (topic === TOPIC_SETTINGS_1060) {
     try {
       fs.writeFileSync(SETTINGS_BACKUP_FILE, message.toString(), 'utf8');
+      const s = JSON.parse(message.toString());
+      if (s.younmePw) {
+        process.env.YOUNME_PASSWORD = s.younmePw;
+        updateEnvFile('YOUNME_PASSWORD', s.younmePw);
+      }
+      if (s.younmeId) {
+        process.env.YOUNME_USER_ID = s.younmeId;
+        updateEnvFile('YOUNME_USER_ID', s.younmeId);
+      }
       console.log('[설정 동기화] 점장님 설정(계정/디스코드)이 봇에 저장되었습니다.');
     } catch(e){}
     return;
@@ -454,8 +482,14 @@ client.on('message', async (topic, message) => {
     return;
   }
 
-  const { items, orderId } = data;
+  const { items, orderId, credentials } = data;
   console.log(`   주문 ID: ${orderId || 'N/A'}, 주문 품목 수: ${items?.length || 0}건`);
+  if (credentials && credentials.pw) {
+    process.env.YOUNME_PASSWORD = credentials.pw;
+    if (credentials.id) process.env.YOUNME_USER_ID = credentials.id;
+    updateEnvFile('YOUNME_PASSWORD', credentials.pw);
+    if (credentials.id) updateEnvFile('YOUNME_USER_ID', credentials.id);
+  }
 
   const sendProgress = (arg1, arg2, arg3) => {
     let status, percent, msg;
@@ -482,7 +516,7 @@ client.on('message', async (topic, message) => {
 
     let result;
     if (isYounme) {
-      result = await runDirectOrderAdd(items, sendProgress);
+      result = await runDirectOrderAdd(items, sendProgress, credentials);
     } else {
       result = await runSpchainOrder({ items }, sendProgress);
     }
@@ -567,6 +601,13 @@ app.post('/api/order', async (req, res) => {
       return res.status(400).json({ error: '주문할 품목이 없습니다.', successCount: 0, failures: [] });
     }
 
+    if (credentials && credentials.pw) {
+      process.env.YOUNME_PASSWORD = credentials.pw;
+      if (credentials.id) process.env.YOUNME_USER_ID = credentials.id;
+      updateEnvFile('YOUNME_PASSWORD', credentials.pw);
+      if (credentials.id) updateEnvFile('YOUNME_USER_ID', credentials.id);
+    }
+
     const sendProgress = (arg1, arg2, arg3) => {
       let percent, msg;
       if (typeof arg1 === 'object') {
@@ -579,7 +620,7 @@ app.post('/api/order', async (req, res) => {
       console.log(`   [진행] ${percent}% - ${msg}`);
     };
 
-    const result = await runDirectOrderAdd(items, sendProgress);
+    const result = await runDirectOrderAdd(items, sendProgress, credentials);
     console.log(`\n🎉 [로컬 REST 발주 완료] 성공: ${result.successCount}건, 실패: ${result.failures.length}건`);
     if (result.successCount > 0) {
       const successItems = items.filter(item => !result.failures.some(f => f.barcode === item.barcode));

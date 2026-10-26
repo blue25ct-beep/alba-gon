@@ -6,8 +6,40 @@ const http = require('http');
 const querystring = require('querystring');
 const iconv = require('iconv-lite');
 
-const USER_ID = process.env.YOUNME_USER_ID || '047458';
-const USER_PW = process.env.YOUNME_PASSWORD;
+const fs = require('fs');
+
+function getYounmeCredentials(overrideCredentials = null) {
+  if (overrideCredentials && overrideCredentials.pw) {
+    return {
+      userId: overrideCredentials.id || process.env.YOUNME_USER_ID || '1060',
+      userPw: overrideCredentials.pw,
+    };
+  }
+
+  // 1. settings_backup.json 확인 (점장님 설정 UI에서 입력한 계정 정보)
+  const settingsBackupPath = path.resolve(__dirname, '../settings_backup.json');
+  if (fs.existsSync(settingsBackupPath)) {
+    try {
+      const s = JSON.parse(fs.readFileSync(settingsBackupPath, 'utf8'));
+      if (s.younmePw) {
+        return {
+          userId: s.younmeId || process.env.YOUNME_USER_ID || '1060',
+          userPw: s.younmePw,
+        };
+      }
+    } catch (e) {}
+  }
+
+  // 2. process.env 환경변수 확인
+  if (process.env.YOUNME_PASSWORD) {
+    return {
+      userId: process.env.YOUNME_USER_ID || '1060',
+      userPw: process.env.YOUNME_PASSWORD,
+    };
+  }
+
+  return null;
+}
 
 // 1. 기본 마스터 데이터 로드 (460여 개 품목 유앤미 공식 공급단가 캐시)
 let seedMap = {};
@@ -89,10 +121,14 @@ async function fetchYounmeProductInfo(sessionCookie, folder, barcode, orderDate)
   return null;
 }
 
-async function runDirectOrderAdd(items, onProgress) {
-  if (!USER_PW) {
-    throw new Error('.env 파일에 YOUNME_PASSWORD 가 설정되어 있지 않습니다.');
+async function runDirectOrderAdd(items, onProgress, overrideCredentials = null) {
+  const creds = getYounmeCredentials(overrideCredentials);
+  if (!creds || !creds.userPw) {
+    throw new Error('유앤미24 비밀번호가 설정되어 있지 않습니다. 사이트 설정(톱니바퀴)에서 유앤미 비밀번호를 입력해주세요.');
   }
+
+  const USER_ID = creds.userId;
+  const USER_PW = creds.userPw;
 
   // 1. 유앤미24 로그인
   const loginPayload = querystring.stringify({
