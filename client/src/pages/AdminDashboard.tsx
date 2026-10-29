@@ -60,6 +60,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('DISCONNECTED');
   const [orderHistory, setOrderHistory] = useState<OrderHistoryEntry[]>(() => storageService.getOrderHistory());
+  const [archivedAudits, setArchivedAudits] = useState<Record<string, AuditItem[]>>({});
+  const [expandedArchiveDate, setExpandedArchiveDate] = useState<string | null>(null);
 
   const historyStats = React.useMemo(() => {
     const history = orderHistory;
@@ -209,6 +211,15 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     setAliases(storageService.getAliases());
     setFailures(storageService.getOrderFailures());
     setOrderHistory(storageService.getOrderHistory());
+    setArchivedAudits(storageService.getArchivedAuditsByDate());
+    fetch('http://localhost:3001/api/archived-audits')
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.success && d.archives) {
+          setArchivedAudits(prev => ({ ...d.archives, ...prev } as Record<string, AuditItem[]>));
+        }
+      })
+      .catch(() => {});
   };
 
     useEffect(() => {
@@ -990,8 +1001,76 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                         </div>
                       </div>
                     );
-                  })}
+                                    })}
                 </div>
+              </div>
+
+              {/* 과거 날짜별 실사 아카이브 보관함 */}
+              <div className="mt-10 pt-6 border-t border-line">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-ink flex items-center gap-2">
+                      <span>📁 과거 날짜별 실사 아카이브 보관함</span>
+                    </h2>
+                    <p className="text-xs text-ink-faint mt-1">
+                      오늘 날짜가 아닌 과거 실사 데이터는 이곳에 해당 날짜별로 안전하게 격리 보관되며, 당일 발주 화면에 섞이지 않습니다.
+                    </p>
+                  </div>
+                </div>
+
+                {Object.keys(archivedAudits).length === 0 ? (
+                  <p className="text-xs text-ink-faint py-4 text-center bg-sunken/40 rounded-xl border border-line">
+                    보관된 과거 실사 아카이브가 없습니다.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {Object.entries(archivedAudits)
+                      .sort(([a], [b]) => b.localeCompare(a))
+                      .map(([dateKey, rawItems]) => {
+                        const items = rawItems as AuditItem[];
+                        const isExpanded = expandedArchiveDate === dateKey;
+                        const sampleWorker = (items[0] as any)?.workerName || '과거근무자';
+                        return (
+                          <div key={dateKey} className="bg-canvas border border-line rounded-xl overflow-hidden shadow-xs">
+                            <button
+                              type="button"
+                              onClick={() => setExpandedArchiveDate(isExpanded ? null : dateKey)}
+                              className="w-full flex items-center justify-between p-4 text-left hover:bg-sunken/30 transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="font-bold text-sm text-ink">📅 {dateKey}</span>
+                                <span className="text-xs bg-line/60 text-ink px-2 py-0.5 rounded-full font-medium">
+                                  👤 {sampleWorker} 외 실사 {items.length}건
+                                </span>
+                              </div>
+                              <span className="text-xs text-ink-faint font-semibold">
+                                {isExpanded ? '접기 ▲' : '품목 보기 ▼'}
+                              </span>
+                            </button>
+
+                            {isExpanded && (
+                              <div className="p-4 pt-0 border-t border-line/60 bg-sunken/20">
+                                <div className="max-h-60 overflow-y-auto space-y-1.5 mt-3 pr-1 text-xs">
+                                  {items.map((it: AuditItem, idx: number) => (
+                                    <div key={idx} className="flex items-center justify-between py-1 px-2 rounded bg-canvas border border-line/50">
+                                      <span className="truncate pr-2 font-medium text-ink">
+                                        {idx + 1}. {it.productName}
+                                      </span>
+                                      <div className="flex items-center gap-2 shrink-0 text-ink-faint text-[11px]">
+                                        <span>재고: <strong className="text-ink">{it.stockCount}개</strong></span>
+                                        <span>| 목표: {it.targetStock}개</span>
+                                        <span>| 실사자: {it.workerName}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -1000,6 +1079,19 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
 
       {activeTab === 'ORDER' && (
         <>
+        {/* 오늘 실사 세션 & 근무자 안내 배너 */}
+        <div className="w-full flex flex-wrap items-center justify-between gap-3 bg-emerald-50 border border-emerald-200/80 px-4 py-3 rounded-2xl text-xs text-emerald-950 font-medium mb-6 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="font-bold text-sm">📅 오늘 발주 관리: {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span className="text-emerald-700">| 오늘 근무자: <strong className="text-emerald-950 font-bold">손명원</strong></span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-emerald-200">
+              🔒 당일 실사만 자동 보존 (과거 날짜 실사는 '발주 내역 및 통계' 탭에 날짜별로 안전 보관됨)
+            </span>
+          </div>
+        </div>
   
       {/* 요약 */}
       <section className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">

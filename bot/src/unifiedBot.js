@@ -721,6 +721,26 @@ app.post('/api/products', (req, res) => {
   res.status(400).json({ success: false, message: '유효한 상품 배열이 제공되지 않았습니다.' });
 });
 
+app.get('/api/archived-audits', (req, res) => {
+  try {
+    const botDir = path.join(__dirname, '..');
+    const archives = {};
+    fs.readdirSync(botDir).filter(f => f.startsWith('audits_archive_')).forEach(f => {
+      const dateStr = f.replace('audits_archive_', '').replace('.json', '');
+      try {
+        const data = JSON.parse(fs.readFileSync(path.join(botDir, f), 'utf8'));
+        const list = Array.isArray(data) ? data : (data.audits || []);
+        if (list.length > 0) {
+          archives[dateStr] = list;
+        }
+      } catch(e) {}
+    });
+    res.json({ success: true, archives });
+  } catch(e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 app.get('/api/audits', (req, res) => {
   try {
     if (fs.existsSync(AUDITS_BACKUP_FILE)) {

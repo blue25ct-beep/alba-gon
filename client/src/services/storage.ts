@@ -14,7 +14,43 @@ const KEYS = {
   DELETED_TOMBSTONES: 'albagom_deleted_tombstones_v1',
   WORKER_SAFETY_BACKUP: 'albagom_worker_safety_backup_v1',
   CUSTOMIZED_PRODUCT_SETTINGS: 'albagom_customized_product_settings_v1',
+  ARCHIVED_AUDITS: 'albagom_archived_audits_by_date_v1',
 };
+
+// 당일(오늘) 실사 여부 판정 헬퍼 (과거 세션 데이터의 현재 화면 혼입 원천 차단)
+export function isTodayAudit(item: any): boolean {
+  if (!item) return false;
+  const now = new Date();
+  const todayM = now.getMonth() + 1;
+  const todayD = now.getDate();
+  const todayYear = now.getFullYear();
+
+  // 1. id 타임스탬프 (밀리초) 검사
+  const t = parseInt(item.id, 10);
+  if (!isNaN(t) && t > 1000000000000) {
+    const d = new Date(t);
+    if (d.getFullYear() === todayYear && (d.getMonth() + 1) === todayM && d.getDate() === todayD) {
+      return true;
+    }
+    return false;
+  }
+
+  // 2. updatedAt 날짜 문자열 검사
+  if (item.updatedAt && typeof item.updatedAt === 'string') {
+    if (
+      item.updatedAt.includes(todayM + '. ' + todayD + '.') ||
+      item.updatedAt.includes(todayM + '월 ' + todayD + '일') ||
+      item.updatedAt.includes(todayYear + '-' + String(todayM).padStart(2, '0') + '-' + String(todayD).padStart(2, '0'))
+    ) {
+      return true;
+    }
+    if (/\d{1,2}\.\s*\d{1,2}\./.test(item.updatedAt) || /\d{4}-\d{2}-\d{2}/.test(item.updatedAt)) {
+      return false;
+    }
+  }
+
+  return true;
+}
 
 const DEFAULT_SETTINGS: AppSettings = {
   managerPin: '1180',
@@ -432,36 +468,99 @@ getProducts(): Product[] {
   },
 
   // --- ?ш퀬 ?ㅼ궗 (Audits) ---
-    getAudits(): AuditItem[] {
+    archivePastAudits(pastItems: AuditItem[]): void {
+    if (!pastItems || pastItems.length === 0) return;
     try {
-      const MAX_AUDIT_AGE_MS = 24 * 60 * 60 * 1000;
-      const now = Date.now();
+      const raw = localStorage.getItem(KEYS.ARCHIVED_AUDITS);
+      const archive: Record<string, AuditItem[]> = raw ? JSON.parse(raw) : {};
+
+      for (const item of pastItems) {
+        if (!item || !item.barcode) continue;
+        let dateKey = '과거_실사_기록';
+        const t = parseInt(item.id, 10);
+        if (!isNaN(t) && t > 1000000000000) {
+          const d = new Date(t);
+          dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        } else if (item.updatedAt) {
+          const match = item.updatedAt.match(/(\d{1,2})\.\s*(\d{1,2})\./);
+          if (match) {
+            dateKey = `2026-${match[1].padStart(2, '0')}-${match[2].padStart(2, '0')}`;
+          } else {
+            dateKey = item.updatedAt.split('오')[0].trim();
+          }
+        }
+
+        if (!archive[dateKey]) {
+          archive[dateKey] = [];
+        }
+        if (!archive[dateKey].some(a => a.barcode === item.barcode)) {
+          archive[dateKey].push(item);
+        }
+      }
+
+      localStorage.setItem(KEYS.ARCHIVED_AUDITS, JSON.stringify(archive));
+    } catch (e) {
+      console.error('Failed to archive past audits', e);
+    }
+  },
+
+  getArchivedAuditsByDate(): Record<string, AuditItem[]> {
+    try {
+      const raw = localStorage.getItem(KEYS.ARCHIVED_AUDITS);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  },
+
+  getAudits(): AuditItem[] {
+    try {
       const data = localStorage.getItem(KEYS.AUDITS);
       if (data) {
         const parsed = JSON.parse(data);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // 24시간 이내의 당일 실사만 반환 (과거 세션 데이터 및 이전 근무자 실사 자동 혼입 차단)
-          const valid = parsed.filter((a: any) => {
-            if (a.workerName === '하진현') return false;
-            const t = parseInt(a.id, 10) || 0;
-            return t === 0 || (now - t <= MAX_AUDIT_AGE_MS);
-          });
-          return valid;
+          const todayAudits: AuditItem[] = [];
+          const pastAudits: AuditItem[] = [];
+
+          for (const a of parsed) {
+            // 과거 근무자(하진현 등)이거나 당일 실사가 아닌 항목 엄격 분리
+            if (a.workerName === '하진현' || !isTodayAudit(a)) {
+              pastAudits.push(a);
+            } else {
+              todayAudits.push(a);
+            }
+          }
+
+          // 과거 실사는 과거 날짜별 아카이브로 안전하게 분리 격리 보관
+          if (pastAudits.length > 0) {
+            this.archivePastAudits(pastAudits);
+            localStorage.setItem(KEYS.AUDITS, JSON.stringify(todayAudits));
+          }
+
+          return todayAudits;
         }
       }
+
       // 로컬 스토리지 키가 비어있는 경우 근무자 세이프티 백업에서 복원
       const backupData = localStorage.getItem(KEYS.WORKER_SAFETY_BACKUP);
       if (backupData) {
         const backupParsed = JSON.parse(backupData);
         if (Array.isArray(backupParsed) && backupParsed.length > 0) {
-          const valid = backupParsed.filter((a: any) => {
-            if (a.workerName === '하진현') return false;
-            const t = parseInt(a.id, 10) || 0;
-            return t === 0 || (now - t <= MAX_AUDIT_AGE_MS);
-          });
-          if (valid.length > 0) {
-            localStorage.setItem(KEYS.AUDITS, JSON.stringify(valid));
-            return valid;
+          const todayValid: AuditItem[] = [];
+          const pastBackup: AuditItem[] = [];
+          for (const a of backupParsed) {
+            if (a.workerName === '하진현' || !isTodayAudit(a)) {
+              pastBackup.push(a);
+            } else {
+              todayValid.push(a);
+            }
+          }
+          if (pastBackup.length > 0) {
+            this.archivePastAudits(pastBackup);
+          }
+          if (todayValid.length > 0) {
+            localStorage.setItem(KEYS.AUDITS, JSON.stringify(todayValid));
+            return todayValid;
           }
         }
       }
@@ -504,12 +603,10 @@ getProducts(): Product[] {
     localStorage.removeItem(KEYS.DELETED_TOMBSTONES);
   },
 
-    // 스마트 병합: 근무자 폰 최우선 보존 (isWorkerDevice) 및 원격 근무자 실사 최우선 반영 (isIncomingFromWorker)
+  // 스마트 병합: 근무자 폰 최우선 보존 (isWorkerDevice) 및 원격 근무자 실사 최우선 반영 (isIncomingFromWorker)
   mergeAudits(incoming: AuditItem[], isWorkerDevice = false, isIncomingFromWorker = false): AuditItem[] {
-    const local = this.getAudits();
+    const local = this.getAudits(); // 이미 오늘 실사만 반환됨
     const tombstones = this.getDeletedTombstones();
-    const MAX_AUDIT_AGE_MS = 24 * 60 * 60 * 1000;
-    const now = Date.now();
     let lastClearedAt = 0;
     try {
       lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10);
@@ -517,50 +614,49 @@ getProducts(): Product[] {
 
     const map = new Map<string, AuditItem>();
 
-    // 1. 로컬 실사 보존 (24시간 이상 지난 과거 데이터 및 이전 근무자 실사 자동 혼입 차단)
+    // 1. 로컬 실사 보존 (오늘 실사만)
     for (const item of local) {
       if (!item || !item.barcode) continue;
-      if (item.workerName === '하진현') continue;
+      if (item.workerName === '하진현' || !isTodayAudit(item)) continue;
       const itemTime = parseInt(item.id, 10) || 0;
-      if (itemTime > 0 && (now - itemTime > MAX_AUDIT_AGE_MS)) continue;
       if (lastClearedAt > 0 && itemTime > 0 && itemTime < lastClearedAt) continue;
       const deletedAt = tombstones[item.barcode] || 0;
       if (deletedAt > 0 && itemTime <= deletedAt) continue;
       map.set(item.barcode, item);
     }
 
-    // 2. 원격 수신 실사 스마트 병합 (24시간 이상 지난 과거 데이터 및 이전 근무자 차단)
+    // 2. 원격 수신 실사 스마트 병합 (오늘 실사만)
+    const pastIncoming: AuditItem[] = [];
     for (const inc of incoming) {
       if (!inc || !inc.barcode) continue;
-      if (inc.workerName === '하진현') continue;
+      if (inc.workerName === '하진현' || !isTodayAudit(inc)) {
+        pastIncoming.push(inc);
+        continue;
+      }
       const incTime = parseInt(inc.id, 10) || 0;
-      if (incTime > 0 && (now - incTime > MAX_AUDIT_AGE_MS)) continue;
       if (lastClearedAt > 0 && incTime > 0 && incTime < lastClearedAt) continue;
       const deletedAt = tombstones[inc.barcode] || 0;
       if (deletedAt > 0 && incTime <= deletedAt) continue;
 
       const existing = map.get(inc.barcode);
       if (!existing) {
-        // 기존 로컬에 없던 새로운 품목은 추가
         map.set(inc.barcode, inc);
       } else {
         if (isWorkerDevice) {
-          // ★ [최우선 규칙 1] 현재 기기가 근무자 핸드폰인 경우:
-          // 근무자가 직접 스캔한 로컬 데이터가 절대 최우선!
-          // 원격에서 어떤 수량/수정이 들어오더라도 근무자 폰의 실사 수량을 절대 덮어쓰지 않음
           continue;
         } else if (isIncomingFromWorker) {
-          // ★ [최우선 규칙 2] 원격 발신자가 근무자인 경우 (관리자 화면이나 봇에서 수신):
-          // 근무자의 현장 스캔 실사가 최우선!
           map.set(inc.barcode, { ...existing, ...inc });
         } else {
-          // 동일 권한 간에는 최신 타임스탬프 기준 병합
           const existingTime = parseInt(existing.id, 10) || 0;
           if (incTime >= existingTime) {
             map.set(inc.barcode, { ...existing, ...inc });
           }
         }
       }
+    }
+
+    if (pastIncoming.length > 0) {
+      this.archivePastAudits(pastIncoming);
     }
 
     const merged = Array.from(map.values());
