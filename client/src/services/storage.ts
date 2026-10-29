@@ -440,8 +440,9 @@ getProducts(): Product[] {
       if (data) {
         const parsed = JSON.parse(data);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // 24시간 이내의 당일 실사만 반환 (과거 세션 데이터 자동 혼입 방지)
+          // 24시간 이내의 당일 실사만 반환 (과거 세션 데이터 및 이전 근무자 실사 자동 혼입 차단)
           const valid = parsed.filter((a: any) => {
+            if (a.workerName === '하진현') return false;
             const t = parseInt(a.id, 10) || 0;
             return t === 0 || (now - t <= MAX_AUDIT_AGE_MS);
           });
@@ -454,6 +455,7 @@ getProducts(): Product[] {
         const backupParsed = JSON.parse(backupData);
         if (Array.isArray(backupParsed) && backupParsed.length > 0) {
           const valid = backupParsed.filter((a: any) => {
+            if (a.workerName === '하진현') return false;
             const t = parseInt(a.id, 10) || 0;
             return t === 0 || (now - t <= MAX_AUDIT_AGE_MS);
           });
@@ -515,9 +517,10 @@ getProducts(): Product[] {
 
     const map = new Map<string, AuditItem>();
 
-    // 1. 로컬 실사 보존 (24시간 이상 지난 과거 데이터는 당일 실사에 자동 혼입되지 않도록 차단)
+    // 1. 로컬 실사 보존 (24시간 이상 지난 과거 데이터 및 이전 근무자 실사 자동 혼입 차단)
     for (const item of local) {
       if (!item || !item.barcode) continue;
+      if (item.workerName === '하진현') continue;
       const itemTime = parseInt(item.id, 10) || 0;
       if (itemTime > 0 && (now - itemTime > MAX_AUDIT_AGE_MS)) continue;
       if (lastClearedAt > 0 && itemTime > 0 && itemTime < lastClearedAt) continue;
@@ -526,10 +529,12 @@ getProducts(): Product[] {
       map.set(item.barcode, item);
     }
 
-    // 2. 원격 수신 실사 스마트 병합
+    // 2. 원격 수신 실사 스마트 병합 (24시간 이상 지난 과거 데이터 및 이전 근무자 차단)
     for (const inc of incoming) {
       if (!inc || !inc.barcode) continue;
+      if (inc.workerName === '하진현') continue;
       const incTime = parseInt(inc.id, 10) || 0;
+      if (incTime > 0 && (now - incTime > MAX_AUDIT_AGE_MS)) continue;
       if (lastClearedAt > 0 && incTime > 0 && incTime < lastClearedAt) continue;
       const deletedAt = tombstones[inc.barcode] || 0;
       if (deletedAt > 0 && incTime <= deletedAt) continue;
