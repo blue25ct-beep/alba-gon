@@ -434,11 +434,36 @@ getProducts(): Product[] {
   // --- ?ш퀬 ?ㅼ궗 (Audits) ---
     getAudits(): AuditItem[] {
     try {
+      const MAX_AUDIT_AGE_MS = 24 * 60 * 60 * 1000;
+      const now = Date.now();
       const data = localStorage.getItem(KEYS.AUDITS);
-      if (!data) {
-        return [];
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // 24시간 이내의 당일 실사만 반환 (과거 세션 데이터 자동 혼입 방지)
+          const valid = parsed.filter((a: any) => {
+            const t = parseInt(a.id, 10) || 0;
+            return t === 0 || (now - t <= MAX_AUDIT_AGE_MS);
+          });
+          return valid;
+        }
       }
-      return JSON.parse(data);
+      // 로컬 스토리지 키가 비어있는 경우 근무자 세이프티 백업에서 복원
+      const backupData = localStorage.getItem(KEYS.WORKER_SAFETY_BACKUP);
+      if (backupData) {
+        const backupParsed = JSON.parse(backupData);
+        if (Array.isArray(backupParsed) && backupParsed.length > 0) {
+          const valid = backupParsed.filter((a: any) => {
+            const t = parseInt(a.id, 10) || 0;
+            return t === 0 || (now - t <= MAX_AUDIT_AGE_MS);
+          });
+          if (valid.length > 0) {
+            localStorage.setItem(KEYS.AUDITS, JSON.stringify(valid));
+            return valid;
+          }
+        }
+      }
+      return [];
     } catch {
       return [];
     }
@@ -481,6 +506,8 @@ getProducts(): Product[] {
   mergeAudits(incoming: AuditItem[], isWorkerDevice = false, isIncomingFromWorker = false): AuditItem[] {
     const local = this.getAudits();
     const tombstones = this.getDeletedTombstones();
+    const MAX_AUDIT_AGE_MS = 24 * 60 * 60 * 1000;
+    const now = Date.now();
     let lastClearedAt = 0;
     try {
       lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10);
@@ -488,10 +515,11 @@ getProducts(): Product[] {
 
     const map = new Map<string, AuditItem>();
 
-    // 1. 로컬 실사 보존
+    // 1. 로컬 실사 보존 (24시간 이상 지난 과거 데이터는 당일 실사에 자동 혼입되지 않도록 차단)
     for (const item of local) {
       if (!item || !item.barcode) continue;
       const itemTime = parseInt(item.id, 10) || 0;
+      if (itemTime > 0 && (now - itemTime > MAX_AUDIT_AGE_MS)) continue;
       if (lastClearedAt > 0 && itemTime > 0 && itemTime < lastClearedAt) continue;
       const deletedAt = tombstones[item.barcode] || 0;
       if (deletedAt > 0 && itemTime <= deletedAt) continue;
