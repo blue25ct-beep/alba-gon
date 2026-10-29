@@ -13,6 +13,7 @@ import {
   Users,
   Share2,
   RotateCcw,
+  MessageSquare,
 } from 'lucide-react';
 import { AuditItem, Product, OrderItem, OrderFailure, BarcodeAlias, WorkerAuth, OrderHistoryEntry } from '../types';
 import * as XLSX from 'xlsx';
@@ -165,6 +166,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [showFailureModal, setShowFailureModal] = useState(false);
   const [showStockSetupModal, setShowStockSetupModal] = useState(false);
   const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [showDiscordImportModal, setShowDiscordImportModal] = useState(false);
+  const [discordImportText, setDiscordImportText] = useState('');
 
   const [editingBarcode, setEditingBarcode] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
@@ -617,6 +620,56 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   };
 
   
+  const handleImportFromDiscord = () => {
+    if (!discordImportText.trim()) return;
+    const lines = discordImportText.split('\n');
+    const newItems: AuditItem[] = [];
+    const now = Date.now();
+    const existing = storageService.getAudits();
+    const map = new Map<string, AuditItem>();
+    existing.forEach(a => map.set(a.barcode, a));
+
+    lines.forEach((line, idx) => {
+      const barcodeMatch = line.match(/88\d{11}|40\d{11}/);
+      if (barcodeMatch) {
+        const barcode = barcodeMatch[0];
+        let name = '';
+        if (line.includes('📦')) {
+          const parts = line.replace('📦', '').split(',');
+          name = parts[0]?.trim() || '';
+        }
+        const stockMatch = line.match(/재고:\s*(\d+)개/);
+        const stock = stockMatch ? parseInt(stockMatch[1], 10) : 0;
+        const { product } = storageService.findProduct(barcode);
+        const item: AuditItem = {
+          id: (now + idx).toString(),
+          barcode,
+          productName: product?.name || name || '디스코드 복원 상품',
+          stockCount: stock,
+          targetStock: product?.targetStock || 1,
+          minOrderQty: product?.minOrderQty || 1,
+          workerName: '디스코드복원',
+          updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          vendor: product?.vendor || 'younme'
+        };
+        map.set(barcode, item);
+        newItems.push(item);
+      }
+    });
+
+    if (newItems.length > 0) {
+      const merged = Array.from(map.values());
+      storageService.saveAudits(merged);
+      setAudits(merged);
+      cloudSyncService.broadcastAudits(merged, 'ADMIN');
+      alert(`✅ 디스코드 텍스트에서 ${newItems.length}개 품목을 성공적으로 복원하여 사이트에 동기화했습니다!`);
+      setShowDiscordImportModal(false);
+      setDiscordImportText('');
+    } else {
+      alert('디스코드 형식(📦 상품명, 바코드, 재고: N개)에 맞는 품목을 찾을 수 없습니다.');
+    }
+  };
+
   const handleRestoreAudits = () => {
     setShowRestoreModal(true);
   };
@@ -1805,6 +1858,50 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           alert(`🎉 총 ${count}건 (${sourceName})이 실사 목록으로 성공적으로 복구되었습니다!`);
         }}
       />
+
+      {showDiscordImportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-canvas border border-ink/10 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-ink/5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-indigo-600" />
+                <h3 className="font-bold text-ink">디스코드 발주 내역으로 즉시 복원</h3>
+              </div>
+              <button onClick={() => setShowDiscordImportModal(false)} className="p-1 hover:bg-ink/5 rounded-lg text-ink-faint">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3">
+              <p className="text-sm text-ink-muted">
+                디스코드 채널에 올라온 발주 알림 텍스트(📦 ...)를 복사하여 아래에 붙여넣으시면, 사이트 실사 목록에 누락 없이 즉시 자동 복원 및 동기화됩니다.
+              </p>
+              <textarea
+                value={discordImportText}
+                onChange={(e) => setDiscordImportText(e.target.value)}
+                placeholder="예시:
+📦 사조]로하이팝콘버터맛90g, 8802010119008, 재고: 2개
+📦 코카]코카콜라캔250ml, 8801094013004, 재고: 5개..."
+                rows={8}
+                className="w-full p-3 rounded-xl border border-ink/10 bg-canvas text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div className="p-4 border-t border-ink/5 flex items-center justify-end gap-2 bg-canvas-subtle">
+              <button
+                onClick={() => setShowDiscordImportModal(false)}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-ink-muted hover:bg-ink/5"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleImportFromDiscord}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
+              >
+                복원 및 사이트 동기화
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
         </>
       )}
 </div>

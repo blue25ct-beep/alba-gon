@@ -51,23 +51,19 @@ class CloudSyncService {
     }
     this.mySenderId = id;
 
-    // iOS Safari / 모바일 브라우저 백그라운드 복귀 및 화면 켜짐 시 자동 소켓 복구
+    // iOS Safari / 모바일 브라우저 백그라운드 복귀 및 화면 켜짐 시 강제 재연결 및 상태 점검
     if (typeof window !== 'undefined') {
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          console.log('[CloudSync] 화면 복귀 감지 (iOS/모바일) - 연결 상태 점검');
+      const handleWakeup = () => {
+        if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+          console.log('[CloudSync] 화면 활성화/온라인 감지 - 실시간 연결 상태 점검');
           if (!this.client || !this.client.connected) {
-            this.connect(this.currentStoreId);
+            this.reconnect();
           }
         }
-      });
-
-      window.addEventListener('pageshow', (e: any) => {
-        if (e.persisted) {
-          console.log('[CloudSync] pageshow(bfcache) 감지 - 재연결');
-          this.connect(this.currentStoreId);
-        }
-      });
+      };
+      document.addEventListener('visibilitychange', handleWakeup);
+      window.addEventListener('pageshow', handleWakeup);
+      window.addEventListener('online', handleWakeup);
     }
   }
 
@@ -143,6 +139,11 @@ class CloudSyncService {
       return;
     }
 
+    if (this.client) {
+      try { this.client.end(true); } catch(e) {}
+      this.client = null;
+    }
+
     this.notifyStatus('CONNECTING');
 
     const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
@@ -154,8 +155,9 @@ class CloudSyncService {
       this.client = mqtt.connect(brokerUrl, {
         clientId,
         clean: true,
-        connectTimeout: 8000,
-        reconnectPeriod: 4000,
+        connectTimeout: 6000,
+        reconnectPeriod: 2000,
+        keepalive: 15, // 모바일 망 끊김 감지 및 방지용 15초 keepalive
       });
 
       this.client.on('connect', () => {
@@ -443,6 +445,33 @@ class CloudSyncService {
         }
       } catch(e) {}
 
+      const doPublish = (c: MqttClient) => {
+        let finished = false;
+        const publishTimeout = setTimeout(() => {
+          if (!finished) {
+            finished = true;
+            console.warn('[CloudSync] 발행 응답 지연(좀비 소켓 의심) - 소켓 재연결 시도');
+            this.reconnect();
+            resolve(false);
+          }
+        }, 3500);
+
+        c.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
+          if (!finished) {
+            finished = true;
+            clearTimeout(publishTimeout);
+            if (err) {
+              console.error('[CloudSync] 발행 실패:', err);
+              resolve(false);
+            } else {
+              this.pendingAuditsPayload = null;
+              this.notifyStatus('CONNECTED');
+              resolve(true);
+            }
+          }
+        });
+      };
+
       if (!this.client || !this.client.connected) {
         this.connect(this.currentStoreId, role);
         let attempts = 0;
@@ -450,10 +479,7 @@ class CloudSyncService {
           attempts++;
           if (this.client && this.client.connected) {
             clearInterval(timer);
-            this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
-              if (!err) this.pendingAuditsPayload = null;
-              resolve(!err);
-            });
+            doPublish(this.client);
           } else if (attempts >= 25) { // 5초 대기
             clearInterval(timer);
             console.warn('[CloudSync] 연결 지연 - 연결 완료 시 자동 전송 대기열에 보관됨');
@@ -463,15 +489,7 @@ class CloudSyncService {
         return;
       }
 
-      this.client.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
-        if (err) {
-          console.error('[CloudSync] 발행 실패:', err);
-          resolve(false);
-        } else {
-          this.pendingAuditsPayload = null;
-          resolve(true);
-        }
-      });
+      doPublish(this.client);
     });
   }
 
