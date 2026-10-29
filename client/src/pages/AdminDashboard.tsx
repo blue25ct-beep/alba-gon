@@ -303,8 +303,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               pMap.set(p.barcode, { ...ex, ...p });
             }
           });
-          const merged = Array.from(pMap.values());
-          storageService.saveProducts(merged, false);
+                    const merged = Array.from(pMap.values());
+          storageService.saveProducts(merged, true);
           setProducts(merged);
         }
       })
@@ -324,7 +324,28 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       if (time) setLastSyncTime(time);
     });
 
+        // 봇 서버 연결 감지 및 브라우저 최신 마스터 상품 자동 동기화 (봇 켜짐 감지 시 영구 저장 보장)
+    let botConnected = false;
+    const botCheckInterval = setInterval(() => {
+      fetch('http://localhost:3001/api/health')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.status === 'ok') {
+            if (!botConnected) {
+              botConnected = true;
+              console.log('[봇 연동 감지] 브라우저에 저장된 목표재고/발주단위 설정을 봇 PC 하드디스크에 영구 저장합니다.');
+              const currentProds = storageService.getProducts();
+              storageService.saveProducts(currentProds, true);
+            }
+          }
+        })
+        .catch(() => {
+          botConnected = false;
+        });
+    }, 4000);
+
     return () => {
+      clearInterval(botCheckInterval);
       unsubSync();
       unsubStatus();
       unsubHistory();
