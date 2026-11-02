@@ -1118,7 +1118,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="font-bold text-sm">📅 오늘 발주 관리: {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            <span className="text-emerald-700">| 오늘 근무자: <strong className="text-emerald-950 font-bold">손명원</strong></span>
+            <span className="text-emerald-700">| 오늘 근무자: <strong className="text-emerald-950 font-bold">{audits.find(a => a.workerName)?.workerName || '하진현'}</strong></span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-emerald-200">
