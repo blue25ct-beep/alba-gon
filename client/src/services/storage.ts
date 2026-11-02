@@ -611,7 +611,7 @@ getProducts(): Product[] {
         }
       }
       // 11월 2일 실사 긴급 구출: 로컬 스토리지가 비어있는 경우 11월 2일 하진현 실사 112개 자동 로드
-      if (hajinhyunAudits && hajinhyunAudits.length > 0 && isTodayAudit(hajinhyunAudits[0])) {
+      if (!data && !localStorage.getItem('albagom_last_cleared_at') && hajinhyunAudits && hajinhyunAudits.length > 0 && isTodayAudit(hajinhyunAudits[0])) {
         const hAudits = hajinhyunAudits as AuditItem[];
         localStorage.setItem(KEYS.AUDITS, JSON.stringify(hAudits));
         return hAudits;
@@ -876,13 +876,22 @@ getProducts(): Product[] {
 
   restoreItemsToAudits(newAudits: AuditItem[]): { addedCount: number; totalCount: number } {
     if (!newAudits || newAudits.length === 0) return { addedCount: 0, totalCount: this.getAudits().length };
+    try {
+      localStorage.removeItem('albagom_last_cleared_at');
+    } catch (e) {}
+
     const current = this.getAudits();
     const existingBarcodes = new Set(current.map(a => a.barcode));
     let addedCount = 0;
+    const now = Date.now();
 
-    newAudits.forEach(item => {
+    newAudits.forEach((item, idx) => {
+      this.removeDeletedTombstone(item.barcode);
       if (!existingBarcodes.has(item.barcode)) {
-        current.push(item);
+        current.push({
+          ...item,
+          id: (now + idx).toString(),
+        });
         existingBarcodes.add(item.barcode);
         addedCount++;
       }
