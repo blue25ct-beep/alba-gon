@@ -1,5 +1,6 @@
 import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings, OrderHistoryEntry } from '../types';
 import seedProducts from '../data/seedProducts.json';
+import hajinhyunAudits from '../data/audits_20261102_hajinhyun.json';
 import * as XLSX from 'xlsx';
 
 const KEYS = {
@@ -607,6 +608,12 @@ getProducts(): Product[] {
           }
         }
       }
+      // 11월 2일 실사 긴급 구출: 로컬 스토리지가 비어있는 경우 11월 2일 하진현 실사 112개 자동 로드
+      if (hajinhyunAudits && hajinhyunAudits.length > 0 && isTodayAudit(hajinhyunAudits[0])) {
+        const hAudits = hajinhyunAudits as AuditItem[];
+        localStorage.setItem(KEYS.AUDITS, JSON.stringify(hAudits));
+        return hAudits;
+      }
       return [];
     } catch {
       return [];
@@ -677,9 +684,9 @@ getProducts(): Product[] {
         continue;
       }
       const incTime = parseInt(inc.id, 10) || 0;
-      if (lastClearedAt > 0 && incTime > 0 && incTime < lastClearedAt) continue;
+      if (!isIncomingFromWorker && inc.workerName !== '하진현' && lastClearedAt > 0 && incTime > 0 && incTime < lastClearedAt) continue;
       const deletedAt = tombstones[inc.barcode] || 0;
-      if (deletedAt > 0 && incTime <= deletedAt) continue;
+      if (!isIncomingFromWorker && inc.workerName !== '하진현' && deletedAt > 0 && incTime <= deletedAt) continue;
 
       const existing = map.get(inc.barcode);
       if (!existing) {
