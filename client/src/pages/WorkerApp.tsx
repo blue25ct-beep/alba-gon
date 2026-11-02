@@ -110,21 +110,12 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
   
     const unsubClear = cloudSyncService.onClearCommand(() => {
       const current = storageService.getAudits();
-      if (current.length === 0) {
-        setAudits([]);
-        storageService.clearAudits();
-      } else {
-        console.warn('[WorkerApp] 근무자 실사 보호: 외부 clear 명령 무시');
-      }
+      setAudits(current);
     });
 
     const handleWakeup = () => {
       if (document.visibilityState === 'visible') {
-        const local = storageService.getAudits();
-        if (local.length > 0) {
-          setAudits(local);
-          cloudSyncService.broadcastAudits(local, 'WORKER');
-        }
+        setAudits(storageService.getAudits());
       }
     };
     document.addEventListener('visibilitychange', handleWakeup);

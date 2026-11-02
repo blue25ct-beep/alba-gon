@@ -592,10 +592,17 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
         storageService.saveLastClearedAudits(clearedAuditsToBackup, `${vendorName} 발주 성공 (발주 및 수량 0 실사 품목 정리)`);
 
         // 발주 완료 품목 및 발주 수량 0인 실사 품목 완전 제거 (로컬 및 원격 즉시 반영)
+        toRemoveBarcodes.forEach((b) => storageService.recordDeletedTombstone(b));
         const remainingAudits = allAuditsNow.filter((a) => !toRemoveBarcodes.has(a.barcode));
         storageService.saveAudits(remainingAudits);
         setAudits(remainingAudits);
         if (remainingAudits.length === 0) {
+          try { localStorage.setItem('albagom_last_cleared_at', Date.now().toString()); } catch (e) {}
+          fetch('http://localhost:3001/api/audits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audits: [], isClear: true })
+          }).catch(() => {});
           cloudSyncService.broadcastClear('ADMIN');
         } else {
           cloudSyncService.broadcastAudits(remainingAudits, 'ADMIN');

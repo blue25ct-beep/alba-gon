@@ -202,6 +202,7 @@ class CloudSyncService {
                 if (c) {
                   map.set(p.barcode, {
                     ...base,
+                    name: (c.name && c.name.trim()) ? c.name : base.name,
                     targetStock: c.targetStock !== undefined ? c.targetStock : base.targetStock,
                     minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : base.minOrderQty,
                     reviewStatus: c.reviewStatus || base.reviewStatus,
@@ -279,17 +280,12 @@ class CloudSyncService {
           } else if (msg.type === 'AUDITS_UPDATE') {
             let lastClearedAt = 0;
             try { lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10); } catch(e){}
-            if (msg.timestamp && lastClearedAt > 0 && (lastClearedAt - msg.timestamp > 60 * 60 * 1000)) {
-              console.log('[CloudSync] 무시됨: 1시간 이상 과거의 이전 세션 실사 업데이트');
+            if (msg.timestamp && lastClearedAt > 0 && msg.timestamp < lastClearedAt - 5000) {
+              console.log('[CloudSync] 무시됨: 목록 비우기 이전 시각의 실사 메시지');
               return;
             }
-            // 최신 전송된 메시지(msg.timestamp >= lastClearedAt)의 실사는 과거 ID를 현재로 갱신하여 안전하게 유지
-            const validAudits = (msg.audits || []).map((a: any, idx: number) => {
-              const auditTime = parseInt(a.id, 10);
-              let itemObj = a;
-              if (!isNaN(auditTime) && auditTime < lastClearedAt) {
-                itemObj = { ...a, id: ((msg.timestamp || Date.now()) + idx).toString() };
-              }
+            const validAudits = (msg.audits || []).map((a: any) => {
+              let itemObj = { ...a };
               if (itemObj.barcode === '8806016310018' || itemObj.barcode === '8801128503211') {
                 itemObj.vendor = 'younme';
                 itemObj.category = '상온';
@@ -341,17 +337,18 @@ class CloudSyncService {
               this.broadcastAudits(mergedAudits, msg.senderRole || this.currentRole);
             }
           } else if (msg.type === 'AUDITS_CLEAR') {
-            // 근무자 폰 환경에서는 스캔한 실사가 있는 경우 외부 CLEAR 명령을 무시하여 유실 방지
+            const clearedAt = (msg as any).clearedAt || msg.timestamp || Date.now();
+            try { localStorage.setItem('albagom_last_cleared_at', clearedAt.toString()); } catch(e){}
             if (this.currentRole === 'WORKER') {
               const local = storageService.getAudits();
-              if (local.length > 0) {
-                console.warn(`[CloudSync] 근무자 폰 실사 ${local.length}건 보호: 외부 비우기 명령 차단 및 클라우드 복구`);
-                this.broadcastAudits(local, 'WORKER');
+              const newerItems = local.filter((a) => (parseInt(a.id, 10) || 0) > clearedAt);
+              if (newerItems.length > 0) {
+                storageService.saveAudits(newerItems);
+                this.notifySync(newerItems, msg);
+                this.broadcastAudits(newerItems, 'WORKER');
                 return;
               }
             }
-            const clearedAt = (msg as any).clearedAt || msg.timestamp || Date.now();
-            try { localStorage.setItem('albagom_last_cleared_at', clearedAt.toString()); } catch(e){}
             storageService.clearAudits('REMOTE_CLEAR', false);
             this.clearListeners.forEach((l) => l());
             this.notifySync([], msg);
