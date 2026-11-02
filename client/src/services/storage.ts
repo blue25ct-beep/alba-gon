@@ -1,6 +1,5 @@
 import { Product, AuditItem, BarcodeAlias, OrderFailure, AppSettings, OrderHistoryEntry } from '../types';
 import seedProducts from '../data/seedProducts.json';
-import hajinhyunAudits from '../data/audits_20261102_hajinhyun.json';
 import * as XLSX from 'xlsx';
 
 const KEYS = {
@@ -569,11 +568,14 @@ getProducts(): Product[] {
         const todayAudits: AuditItem[] = [];
         const pastAudits: AuditItem[] = [];
 
+        let lastClearedAt = 0;
+        try { lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10); } catch (e) {}
         for (const a of parsed) {
-          // 특정 근무자 하드코딩 배제 없이, 순수하게 '오늘 날짜 실사'인지 여부만 엄격 판정
           if (!isTodayAudit(a)) {
             pastAudits.push(a);
           } else {
+            const aTime = parseInt(a.id, 10) || 0;
+            if (lastClearedAt > 0 && aTime > 0 && aTime < lastClearedAt) continue;
             todayAudits.push(a);
           }
         }
@@ -588,7 +590,7 @@ getProducts(): Product[] {
       }
 
       // 로컬 스토리지 키가 비어있는 경우 근무자 세이프티 백업에서 복원
-      const backupData = localStorage.getItem(KEYS.WORKER_SAFETY_BACKUP);
+      const backupData = !localStorage.getItem('albagom_last_cleared_at') ? localStorage.getItem(KEYS.WORKER_SAFETY_BACKUP) : null;
       if (backupData) {
         const backupParsed = JSON.parse(backupData);
         if (Array.isArray(backupParsed) && backupParsed.length > 0) {
@@ -609,12 +611,6 @@ getProducts(): Product[] {
             return todayValid;
           }
         }
-      }
-      // 11월 2일 실사 긴급 구출: 로컬 스토리지가 비어있는 경우 11월 2일 하진현 실사 112개 자동 로드
-      if (!data && !localStorage.getItem('albagom_last_cleared_at') && hajinhyunAudits && hajinhyunAudits.length > 0 && isTodayAudit(hajinhyunAudits[0])) {
-        const hAudits = hajinhyunAudits as AuditItem[];
-        localStorage.setItem(KEYS.AUDITS, JSON.stringify(hAudits));
-        return hAudits;
       }
       return [];
     } catch {
@@ -686,9 +682,9 @@ getProducts(): Product[] {
         continue;
       }
       const incTime = parseInt(inc.id, 10) || 0;
-      if (!isIncomingFromWorker && inc.workerName !== '하진현' && lastClearedAt > 0 && incTime > 0 && incTime < lastClearedAt) continue;
+      if (lastClearedAt > 0 && incTime > 0 && incTime < lastClearedAt) continue;
       const deletedAt = tombstones[inc.barcode] || 0;
-      if (!isIncomingFromWorker && inc.workerName !== '하진현' && deletedAt > 0 && incTime <= deletedAt) continue;
+      if (deletedAt > 0 && incTime <= deletedAt) continue;
 
       const existing = map.get(inc.barcode);
       if (!existing) {
@@ -859,8 +855,23 @@ getProducts(): Product[] {
     if (current.length > 0) {
       this.saveLastClearedAudits(current, reason);
     }
+    try {
+      localStorage.setItem('albagom_last_cleared_at', Date.now().toString());
+    } catch (e) {}
     localStorage.setItem(KEYS.AUDITS, JSON.stringify([]));
+    if (clearSafetyBackup) {
+      localStorage.removeItem(KEYS.WORKER_SAFETY_BACKUP);
+    } else {
+      localStorage.removeItem(KEYS.WORKER_SAFETY_BACKUP);
+    }
     this.clearDeletedTombstones();
+    try {
+      fetch('http://localhost:3001/api/audits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ audits: [], isClear: true }),
+      }).catch(() => {});
+    } catch {}
   },
 
   getLatestOrderForRecovery(): OrderHistoryEntry | null {
