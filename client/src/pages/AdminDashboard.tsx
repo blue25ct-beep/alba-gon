@@ -36,7 +36,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [activeTab, setActiveTab] = useState<'ORDER' | 'HISTORY'>('ORDER');
   const [sortUnmodifiedFirst, setSortUnmodifiedFirst] = useState(false);
   const [sessionEdited, setSessionEdited] = useState<Set<string>>(new Set());
-  type SortColumn = 'none' | 'targetStock' | 'minOrderQty' | 'finalOrderQty' | 'currentStock';
+  type SortColumn = 'none' | 'targetStock' | 'minOrderQty' | 'recommendedQty' | 'finalOrderQty' | 'currentStock';
   type SortOrder = 'asc' | 'desc';
   const [sortColumn, setSortColumn] = useState<SortColumn>('none');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
@@ -1419,64 +1419,23 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               className="w-full h-10 pl-10 pr-4 rounded-full bg-surface border border-line text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-sage-300 transition-colors"
             />
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs text-ink-faint font-semibold">정렬:</span>
+          <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+            {sortColumn !== 'none' && (
               <button
                 type="button"
-                onClick={() => {
-                  if (sortColumn === 'targetStock' && sortOrder === 'desc') {
-                    setSortColumn('none');
-                  } else {
-                    setSortColumn('targetStock');
-                    setSortOrder('desc');
-                  }
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1 ${
-                  sortColumn === 'targetStock' && sortOrder === 'desc'
-                    ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
-                    : 'bg-surface text-ink hover:bg-canvas border-line'
-                }`}
+                onClick={() => setSortColumn('none')}
+                className="px-2 py-1 text-xs text-ink-faint hover:text-ink underline transition-colors"
               >
-                <span>🎯 목표 수량 많은순 (내림차순)</span>
-                {sortColumn === 'targetStock' && <span className="text-[11px]">{sortOrder === 'desc' ? '▼' : '▲'}</span>}
+                정렬 초기화
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (sortColumn === 'minOrderQty' && sortOrder === 'desc') {
-                    setSortColumn('none');
-                  } else {
-                    setSortColumn('minOrderQty');
-                    setSortOrder('desc');
-                  }
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border flex items-center gap-1 ${
-                  sortColumn === 'minOrderQty' && sortOrder === 'desc'
-                    ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
-                    : 'bg-surface text-ink hover:bg-canvas border-line'
-                }`}
-              >
-                <span>📦 발주 단위 큰순 (내림차순)</span>
-                {sortColumn === 'minOrderQty' && <span className="text-[11px]">{sortOrder === 'desc' ? '▼' : '▲'}</span>}
-              </button>
-              {sortColumn !== 'none' && (
-                <button
-                  type="button"
-                  onClick={() => setSortColumn('none')}
-                  className="px-2 py-1 text-xs text-ink-faint hover:text-ink underline transition-colors"
-                >
-                  기본 순서로 복귀
-                </button>
-              )}
-            </div>
+            )}
             <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer">
               <input
                 type="checkbox"
                 checked={sortUnmodifiedFirst}
                 onChange={(e) => {
                   setSortUnmodifiedFirst(e.target.checked);
-                  if (!e.target.checked) setSessionEdited(new Set()); // reset when turned off
+                  if (!e.target.checked) setSessionEdited(new Set());
                 }}
                 className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
               />
@@ -1499,7 +1458,20 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                 <thead>
                   <tr className="text-[13px] text-ink-faint border-b border-line">
                     <th className="font-medium px-5 py-3">상품</th>
-                    <th className="font-medium px-3 py-3 text-right whitespace-nowrap">재고</th>
+                    <th
+                      onClick={() => handleToggleSort('currentStock')}
+                      className="font-medium px-3 py-3 text-right whitespace-nowrap cursor-pointer hover:bg-canvas transition-colors select-none group"
+                      title="클릭하여 재고 수량 내림차순/오름차순 정렬"
+                    >
+                      <div className="inline-flex items-center gap-1 justify-end">
+                        <span>재고</span>
+                        {sortColumn === 'currentStock' ? (
+                          <span className="text-sage-600 font-bold">{sortOrder === 'desc' ? '▼' : '▲'}</span>
+                        ) : (
+                          <span className="text-ink-faint opacity-40 group-hover:opacity-100 text-xs">↕</span>
+                        )}
+                      </div>
+                    </th>
                     <th
                       onClick={() => handleToggleSort('targetStock')}
                       className="font-medium px-3 py-3 text-center whitespace-nowrap cursor-pointer hover:bg-canvas transition-colors select-none group"
@@ -1528,9 +1500,33 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                         )}
                       </div>
                     </th>
-                    <th className="font-medium px-3 py-3 text-right whitespace-nowrap">추천</th>
-                    <th className="font-medium px-3 py-3 text-center whitespace-nowrap">
-                      발주 수량
+                    <th
+                      onClick={() => handleToggleSort('recommendedQty')}
+                      className="font-medium px-3 py-3 text-right whitespace-nowrap cursor-pointer hover:bg-canvas transition-colors select-none group"
+                      title="클릭하여 추천 수량 내림차순/오름차순 정렬"
+                    >
+                      <div className="inline-flex items-center gap-1 justify-end">
+                        <span>추천</span>
+                        {sortColumn === 'recommendedQty' ? (
+                          <span className="text-sage-600 font-bold">{sortOrder === 'desc' ? '▼' : '▲'}</span>
+                        ) : (
+                          <span className="text-ink-faint opacity-40 group-hover:opacity-100 text-xs">↕</span>
+                        )}
+                      </div>
+                    </th>
+                    <th
+                      onClick={() => handleToggleSort('finalOrderQty')}
+                      className="font-medium px-3 py-3 text-center whitespace-nowrap cursor-pointer hover:bg-canvas transition-colors select-none group"
+                      title="클릭하여 발주 수량 내림차순/오름차순 정렬"
+                    >
+                      <div className="inline-flex items-center gap-1 justify-center">
+                        <span>발주 수량</span>
+                        {sortColumn === 'finalOrderQty' ? (
+                          <span className="text-sage-600 font-bold">{sortOrder === 'desc' ? '▼' : '▲'}</span>
+                        ) : (
+                          <span className="text-ink-faint opacity-40 group-hover:opacity-100 text-xs">↕</span>
+                        )}
+                      </div>
                     </th>
                     <th className="px-3 py-3">
                       <span className="sr-only">제외</span>

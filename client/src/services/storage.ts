@@ -249,7 +249,7 @@ export const storageService = {
     this.saveOrderHistory([]);
   },
 
-    getCustomizedSettings(): Record<string, { targetStock?: number; minOrderQty?: number; reviewStatus?: string; updatedAt?: string }> {
+    getCustomizedSettings(): Record<string, { name?: string; targetStock?: number; minOrderQty?: number; reviewStatus?: string; updatedAt?: string }> {
     try {
       const data = localStorage.getItem(KEYS.CUSTOMIZED_PRODUCT_SETTINGS);
       return data ? JSON.parse(data) : {};
@@ -258,7 +258,7 @@ export const storageService = {
     }
   },
 
-  recordCustomizedSetting(barcode: string, setting: { targetStock?: number; minOrderQty?: number; reviewStatus?: string; updatedAt?: string }): void {
+  recordCustomizedSetting(barcode: string, setting: { name?: string; targetStock?: number; minOrderQty?: number; reviewStatus?: string; updatedAt?: string }): void {
     try {
       const all = this.getCustomizedSettings();
       all[barcode] = { ...all[barcode], ...setting };
@@ -285,8 +285,9 @@ getProducts(): Product[] {
           const c = customized[p.barcode];
           if (c) {
             return {
-              ...p,
-              targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
+            ...p,
+            name: c.name || p.name,
+            targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
               minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : p.minOrderQty,
               reviewStatus: (c.reviewStatus as any) || p.reviewStatus,
               updatedAt: c.updatedAt || p.updatedAt,
@@ -307,8 +308,9 @@ getProducts(): Product[] {
       const c = customized[p.barcode];
       if (c) {
         return {
-          ...p,
-          targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
+            ...p,
+            name: c.name || p.name,
+            targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
           minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : p.minOrderQty,
           reviewStatus: (c.reviewStatus as any) || p.reviewStatus,
           updatedAt: c.updatedAt || p.updatedAt,
@@ -784,6 +786,7 @@ getProducts(): Product[] {
         updatedAt: nowStr,
       });
     }
+    this.recordCustomizedSetting(barcode, { name: trimmed, reviewStatus: 'MODIFIED', updatedAt: nowStr });
     this.saveProducts(products, true);
   },
 

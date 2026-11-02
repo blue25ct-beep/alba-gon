@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Lock, Bell, Users, ShoppingBag, Zap, Plus, Trash2, Send, Check, Eye, EyeOff } from 'lucide-react';
+import { X, Lock, Bell, Users, ShoppingBag, Plus, Trash2, Send, Check, Eye, EyeOff } from 'lucide-react';
 import { storageService } from '../services/storage';
 import { cloudSyncService } from '../services/cloudSyncService';
 import { WorkerAuth } from '../types';
@@ -44,9 +44,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const [showSpchainPw, setShowSpchainPw] = useState(false);
 
   // 5. 자동발주 토글
-  const [autoOrderEnabled, setAutoOrderEnabled] = useState(
-    current.autoOrderEnabled !== undefined ? current.autoOrderEnabled : true
-  );
+  
 
   const [saved, setSaved] = useState(false);
   const productCount = storageService.getProducts().length;
@@ -132,7 +130,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       younmePw: younmePw.trim(),
       spchainId: spchainId.trim(),
       spchainPw: spchainPw.trim(),
-      autoOrderEnabled,
+      autoOrderEnabled: false,
     };
 
     storageService.saveSettings(updatedSettings);
@@ -412,28 +410,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* 5. 자동 발주 옵션 */}
-          <div className="bg-sunken/40 rounded-2xl p-4 border border-line/70 flex items-center justify-between gap-4">
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2 text-ink">
-                <Zap className="w-4 h-4 text-sage" />
-                <h3 className="text-[14px] font-bold">자동 발주 활성화</h3>
-              </div>
-              <p className="text-[12px] text-ink-faint break-keep">
-                근무자 스캔 종료 30분 무반응 시, 검수된 품목에 대해 봇이 장바구니 담기를 자동으로 실행합니다.
-              </p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer shrink-0">
-              <input
-                type="checkbox"
-                checked={autoOrderEnabled}
-                onChange={(e) => setAutoOrderEnabled(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-line peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-line after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
-            </label>
           </div>
         </form>
 

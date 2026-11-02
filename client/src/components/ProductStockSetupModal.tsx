@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, X, Check } from 'lucide-react';
+import { Search, X, Check, Pencil } from 'lucide-react';
 import { Product } from '../types';
 import { storageService } from '../services/storage';
 import { analyzeAndRecommend } from '../services/smartRecommendation';
@@ -22,6 +22,10 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
   const [sortColumn, setSortColumn] = useState<SortColumn>('none');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
+  // 상품명 수정 상태
+  const [editingBarcode, setEditingBarcode] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
+
   const handleToggleSort = (column: SortColumn) => {
     if (sortColumn === column) {
       if (sortOrder === 'desc') {
@@ -35,6 +39,7 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
       setSortOrder('desc');
     }
   };
+
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [batchTargetStock, setBatchTargetStock] = useState<number>(10);
   const [batchMinOrderQty, setBatchMinOrderQty] = useState<number>(10);
@@ -51,14 +56,31 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     return matchesSearch && matchesCat;
   });
 
-  
   const handleMarkReviewed = (barcode: string) => {
     storageService.markProductAsReviewed(barcode);
     setProducts(storageService.getProducts());
     onUpdated();
   };
 
-  
+  const handleStartEditName = (barcode: string, currentName: string) => {
+    setEditingBarcode(barcode);
+    setEditingName(currentName);
+  };
+
+  const handleSaveEditName = (barcode: string) => {
+    const trimmed = editingName.trim();
+    if (trimmed) {
+      storageService.registerProductName(barcode, trimmed);
+      setProducts(storageService.getProducts());
+      setSessionEdited(prev => new Set(prev).add(barcode));
+      setSavedId(barcode);
+      setTimeout(() => setSavedId(null), 1000);
+      onUpdated();
+    }
+    setEditingBarcode(null);
+    setEditingName('');
+  };
+
   if (sortColumn !== 'none') {
     filtered.sort((a, b) => {
       const valA = (a as any)[sortColumn] ?? 0;
@@ -82,12 +104,14 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     field: 'targetStock' | 'minOrderQty',
     val: number
   ) => {
-    const updated = products.map((p) =>
-      p.barcode === barcode ? { ...p, [field]: Math.max(1, val), updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) } : p
-    );
-    setProducts(updated);
+    const safeVal = Math.max(1, val);
+    if (field === 'targetStock') {
+      storageService.updateProductTargetStock(barcode, safeVal);
+    } else {
+      storageService.updateProductMinOrderQty(barcode, safeVal);
+    }
+    setProducts(storageService.getProducts());
     setSessionEdited(prev => new Set(prev).add(barcode));
-    storageService.saveProducts(updated);
     setSavedId(barcode);
     setTimeout(() => setSavedId(null), 1000);
     onUpdated();
@@ -96,9 +120,13 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
   const handleBatchUpdateTargetStock = () => {
     if (!confirm(`${filtered.length}개 상품의 목표 재고를 ${batchTargetStock}개로 바꿉니다.`)) return;
 
+    const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     const filteredBarcodes = new Set(filtered.map((f) => f.barcode));
+    filteredBarcodes.forEach((b) => {
+      storageService.recordCustomizedSetting(b, { targetStock: batchTargetStock, reviewStatus: 'MODIFIED', updatedAt: nowStr });
+    });
     const updated = products.map((p) =>
-      filteredBarcodes.has(p.barcode) ? { ...p, targetStock: batchTargetStock, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) } : p
+      filteredBarcodes.has(p.barcode) ? { ...p, targetStock: batchTargetStock, reviewStatus: 'MODIFIED' as const, updatedAt: nowStr } : p
     );
 
     setProducts(updated);
@@ -109,9 +137,13 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
   const handleBatchUpdateMinOrderQty = () => {
     if (!confirm(`${filtered.length}개 상품의 발주단위를 ${batchMinOrderQty}개로 바꿉니다.`)) return;
 
+    const nowStr = new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     const filteredBarcodes = new Set(filtered.map((f) => f.barcode));
+    filteredBarcodes.forEach((b) => {
+      storageService.recordCustomizedSetting(b, { minOrderQty: batchMinOrderQty, reviewStatus: 'MODIFIED', updatedAt: nowStr });
+    });
     const updated = products.map((p) =>
-      filteredBarcodes.has(p.barcode) ? { ...p, minOrderQty: batchMinOrderQty, updatedAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) } : p
+      filteredBarcodes.has(p.barcode) ? { ...p, minOrderQty: batchMinOrderQty, reviewStatus: 'MODIFIED' as const, updatedAt: nowStr } : p
     );
 
     setProducts(updated);
@@ -127,9 +159,9 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
       <div className="bg-surface rounded-3xl w-full max-w-4xl shadow-xl animate-settle overflow-hidden flex flex-col max-h-[92vh]">
         <div className="p-6 pb-5 flex justify-between items-start gap-4 shrink-0">
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold text-ink">목표 재고</h2>
+            <h2 className="text-lg font-semibold text-ink">목표 재고 · 상품명 관리</h2>
             <p className="mt-1 text-sm text-ink-soft leading-relaxed break-keep">
-              여기서 정한 목표 재고를 채우도록 발주 수량이 계산됩니다.
+              상품명, 목표 재고, 발주 단위를 수정할 수 있으며, 열 제목(목표/발주단위)을 눌러 정렬할 수 있습니다.
             </p>
           </div>
           <button
@@ -143,56 +175,24 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
 
         {/* 검색 · 일괄 변경 */}
         <div className="px-6 pb-5 space-y-3 shrink-0">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer">
+              <input
+                type="checkbox"
+                checked={sortUnmodifiedFirst}
+                onChange={(e) => {
+                  setSortUnmodifiedFirst(e.target.checked);
+                  if (!e.target.checked) setSessionEdited(new Set());
+                }}
+                className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
+              />
+              💡 수정 안 된 상품 위로 올리기
+            </label>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-ink-faint absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-xs text-ink-faint font-semibold">내림차순:</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (sortColumn === 'targetStock' && sortOrder === 'desc') setSortColumn('none');
-                      else { setSortColumn('targetStock'); setSortOrder('desc'); }
-                    }}
-                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all border flex items-center gap-1 ${
-                      sortColumn === 'targetStock' && sortOrder === 'desc'
-                        ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
-                        : 'bg-surface text-ink hover:bg-canvas border-line'
-                    }`}
-                  >
-                    <span>🎯 목표 수량 많은순</span>
-                    {sortColumn === 'targetStock' && <span>{sortOrder === 'desc' ? '▼' : '▲'}</span>}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (sortColumn === 'minOrderQty' && sortOrder === 'desc') setSortColumn('none');
-                      else { setSortColumn('minOrderQty'); setSortOrder('desc'); }
-                    }}
-                    className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all border flex items-center gap-1 ${
-                      sortColumn === 'minOrderQty' && sortOrder === 'desc'
-                        ? 'bg-sage-600 text-white border-sage-600 shadow-sm'
-                        : 'bg-surface text-ink hover:bg-canvas border-line'
-                    }`}
-                  >
-                    <span>📦 발주 단위 큰순</span>
-                    {sortColumn === 'minOrderQty' && <span>{sortOrder === 'desc' ? '▼' : '▲'}</span>}
-                  </button>
-                </div>
-                <label className="flex items-center gap-2 text-[13px] text-ink font-medium cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={sortUnmodifiedFirst}
-                    onChange={(e) => {
-                      setSortUnmodifiedFirst(e.target.checked);
-                      if (!e.target.checked) setSessionEdited(new Set());
-                    }}
-                    className="w-4 h-4 text-sage-600 rounded border-line focus:ring-sage-500"
-                  />
-                  💡 수정 안 된 상품 위로 올리기
-                </label>
-              </div>
               <input
                 type="text"
                 placeholder="상품명 또는 바코드"
@@ -302,7 +302,60 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
               {filtered.slice(0, 100).map((p) => (
                 <tr key={p.barcode}>
                   <td className="py-3 pr-3 max-w-md">
-                    <span className="block text-ink leading-snug break-keep">{p.name}</span>
+                    {editingBarcode === p.barcode ? (
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <input
+                          type="text"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleSaveEditName(p.barcode);
+                            if (e.key === 'Escape') {
+                              setEditingBarcode(null);
+                              setEditingName('');
+                            }
+                          }}
+                          autoFocus
+                          className="flex-1 h-8 px-2.5 rounded-lg bg-canvas border border-sage-400 text-sm text-ink focus:outline-none"
+                          placeholder="새 상품명 입력"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleSaveEditName(p.barcode)}
+                          className="h-8 px-2.5 rounded-lg bg-sage text-white text-xs font-medium hover:bg-sage-deep transition-colors shrink-0"
+                        >
+                          저장
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingBarcode(null);
+                            setEditingName('');
+                          }}
+                          className="h-8 px-2 rounded-lg bg-sunken text-ink-soft text-xs hover:text-ink transition-colors shrink-0"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 group/name">
+                        <span
+                          onClick={() => handleStartEditName(p.barcode, p.name)}
+                          className="text-ink leading-snug break-keep cursor-pointer hover:text-sage-700 hover:underline transition-colors"
+                          title="클릭하여 상품명 수정"
+                        >
+                          {p.name}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleStartEditName(p.barcode, p.name)}
+                          className="p-1 rounded-md text-ink-faint hover:text-ink hover:bg-sunken transition-colors shrink-0"
+                          title="상품명 수정"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                     <span className="block mt-0.5 text-[13px] text-ink-faint tabular">
                       {p.barcode} · {p.category}
                       {p.reviewStatus === 'APPROPRIATE' ? (
