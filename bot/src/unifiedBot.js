@@ -212,10 +212,7 @@ client.on('connect', () => {
       client.publish(TOPIC_AUTH_1060, fs.readFileSync(AUTH_BACKUP_FILE, 'utf8'), { retain: true });
       restored = true;
     }
-    if (fs.existsSync(AUDITS_BACKUP_FILE)) {
-      client.publish(TOPIC_SYNC_1060, fs.readFileSync(AUDITS_BACKUP_FILE, 'utf8'), { retain: true });
-      restored = true;
-    }
+    // 주의: 봇이 꺼져있던 동안 근무자가 스캔한 최신 클라우드 데이터를 덮어쓰지 않도록 시작 시 AUDITS_BACKUP_FILE을 강제 publish하지 않음
     if (fs.existsSync(PRODUCTS_BACKUP_FILE)) {
       try {
         const pRaw = JSON.parse(fs.readFileSync(PRODUCTS_BACKUP_FILE, 'utf8'));
@@ -761,7 +758,17 @@ app.get('/api/audits', (req, res) => {
 
 app.post('/api/audits', (req, res) => {
   try {
-    const { audits, senderId, senderRole } = req.body || {};
+    const { audits, senderId, senderRole, isClear, broadcast } = req.body || {};
+    if (isClear) {
+      try {
+        if (fs.existsSync(AUDITS_BACKUP_FILE)) {
+          const emergencyFile = path.join(__dirname, '..', 'audits_last_cleared_backup.json');
+          fs.copyFileSync(AUDITS_BACKUP_FILE, emergencyFile);
+          fs.unlinkSync(AUDITS_BACKUP_FILE);
+        }
+      } catch (e) {}
+      return res.json({ success: true, count: 0, audits: [] });
+    }
     if (Array.isArray(audits)) {
       const payload = {
         type: 'AUDITS_UPDATE',
@@ -772,7 +779,7 @@ app.post('/api/audits', (req, res) => {
         audits,
       };
       fs.writeFileSync(AUDITS_BACKUP_FILE, JSON.stringify(payload), 'utf8');
-      if (client && client.connected) {
+      if (broadcast === true && client && client.connected) {
         client.publish(TOPIC_SYNC_1060, JSON.stringify(payload), { qos: 1, retain: true });
       }
       return res.json({ success: true, count: audits.length, audits });

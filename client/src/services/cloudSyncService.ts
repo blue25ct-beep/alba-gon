@@ -257,7 +257,7 @@ class CloudSyncService {
         if (topic !== topicSync) return;
         try {
           const msg: AuditsSyncMessage = JSON.parse(payload.toString());
-          if (msg.senderId === this.mySenderId) {
+          if (msg.senderId === this.mySenderId || (msg.senderId === 'REST_API' && msg.subType !== 'FORCE_RESTORE')) {
             return;
           }
 

@@ -713,8 +713,9 @@ getProducts(): Product[] {
     return merged;
   },
 
-  saveAudits(audits: AuditItem[]): void {
+  saveAudits(audits: AuditItem[], syncToServer = true): void {
     localStorage.setItem(KEYS.AUDITS, JSON.stringify(audits));
+    if (!syncToServer) return;
     try {
       fetch('http://localhost:3001/api/audits', {
         method: 'POST',
