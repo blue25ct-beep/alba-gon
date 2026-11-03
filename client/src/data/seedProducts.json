@@ -1,5 +1,28 @@
 [
   {
+    "barcode": "8801021106878",
+    "name": "오비라거캔-355ml",
+    "category": "미등록신상품",
+    "price": 0,
+    "cost": 0,
+    "targetStock": 6,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:30",
+    "lastOrderDate": "11. 3. 오후 11:33"
+  },
+  {
+    "barcode": "8888017220046",
+    "name": "신)타이거라들러레몬캔-500ml",
+    "category": "미등록신상품",
+    "price": 0,
+    "cost": 0,
+    "targetStock": 6,
+    "minOrderQty": 1,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:33"
+  },
+  {
     "barcode": "8806011416142",
     "name": "CP] 동아제약 얼박 음료, 20개, 210ml",
     "category": "과자/간식",
@@ -8149,10 +8172,11 @@
     "price": 2800,
     "cost": 1902,
     "category": "주류",
-    "targetStock": 24,
+    "targetStock": 10,
     "minOrderQty": 24,
-    "updatedAt": "10. 20. 오후 07:25",
-    "lastOrderDate": "10. 20. 오후 07:26"
+    "updatedAt": "11. 3. 오후 11:32",
+    "lastOrderDate": "11. 3. 오후 11:33",
+    "reviewStatus": "MODIFIED"
   },
   {
     "barcode": "8801048101023",
@@ -8454,7 +8478,7 @@
     "reviewStatus": "APPROPRIATE",
     "reviewedAt": "10. 22. 오후 10:33",
     "updatedAt": "10. 22. 오후 10:33",
-    "lastOrderDate": "11. 2. 오후 10:14"
+    "lastOrderDate": "10. 29. 오후 10:50"
   },
   {
     "barcode": "8801117377205",
@@ -11685,8 +11709,11 @@
     "price": 2800,
     "cost": 1915,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 12,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:29",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "8802774001991",
@@ -11807,8 +11834,11 @@
     "price": 4500,
     "cost": 2388,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 12,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:30",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "8801117197308",
@@ -11944,8 +11974,10 @@
     "price": 1800,
     "cost": 1315,
     "category": "주류",
-    "targetStock": 20,
-    "minOrderQty": 20
+    "targetStock": 10,
+    "minOrderQty": 20,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:28"
   },
   {
     "barcode": "8801100159733",
@@ -11953,8 +11985,11 @@
     "price": 3300,
     "cost": 2260,
     "category": "주류",
-    "targetStock": 20,
-    "minOrderQty": 20
+    "targetStock": 10,
+    "minOrderQty": 20,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:29",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "8801056048150",
@@ -11998,8 +12033,11 @@
     "price": 1800,
     "cost": 1309,
     "category": "주류",
-    "targetStock": 20,
-    "minOrderQty": 20
+    "targetStock": 10,
+    "minOrderQty": 20,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:29",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "8809422044447",
@@ -15770,8 +15808,11 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 20,
-    "minOrderQty": 20
+    "targetStock": 10,
+    "minOrderQty": 20,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:29",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "8801100133498",
@@ -15961,8 +16002,11 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 6,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:30",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "8801030995470",
@@ -16033,8 +16077,11 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 20,
-    "minOrderQty": 20
+    "targetStock": 10,
+    "minOrderQty": 20,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:29",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "4977042240922",
@@ -16159,8 +16206,10 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 8,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:29"
   },
   {
     "barcode": "8801030951483",
@@ -16186,8 +16235,11 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 7,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:31",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "5000213030622",
@@ -16285,8 +16337,11 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 10,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:30",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "4901004058379",
@@ -16303,17 +16358,22 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 8,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:29"
   },
   {
     "barcode": "8801022023181",
-    "name": "Unknown",
+    "name": "클라크러시패트-1.6L",
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 1,
-    "minOrderQty": 1
+    "targetStock": 2,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:24",
+    "lastOrderDate": "11. 3. 오후 11:33"
   },
   {
     "barcode": "8801119773418",
@@ -16458,8 +16518,10 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 4,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:29"
   },
   {
     "barcode": "8410793336125",
@@ -16557,8 +16619,10 @@
     "price": 0,
     "cost": 0,
     "category": "주류",
-    "targetStock": 24,
-    "minOrderQty": 24
+    "targetStock": 7,
+    "minOrderQty": 24,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 3. 오후 11:31"
   },
   {
     "barcode": "8712000057190",
