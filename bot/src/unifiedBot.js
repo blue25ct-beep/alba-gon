@@ -253,7 +253,7 @@ client.on('message', async (topic, message) => {
       if (msg.type === 'AUDITS_UPDATE') {
         fs.writeFileSync(AUDITS_BACKUP_FILE, message.toString(), 'utf8');
         try {
-          const dateStr = new Date().toISOString().slice(0, 10);
+          const dateStr = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
           const archiveFile = path.join(__dirname, '..', `audits_archive_${dateStr}.json`);
           fs.writeFileSync(archiveFile, message.toString(), 'utf8');
         } catch(e) {}
@@ -742,6 +742,18 @@ app.get('/api/audits', (req, res) => {
   try {
     if (fs.existsSync(AUDITS_BACKUP_FILE)) {
       const data = JSON.parse(fs.readFileSync(AUDITS_BACKUP_FILE, 'utf8'));
+      const todayKst = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+      const fileKst = data.timestamp ? new Date(data.timestamp + 9 * 3600 * 1000).toISOString().slice(0, 10) : todayKst;
+      if (fileKst !== todayKst) {
+        try {
+          const archiveFile = path.join(__dirname, '..', `audits_archive_${fileKst}.json`);
+          if (!fs.existsSync(archiveFile)) {
+            fs.copyFileSync(AUDITS_BACKUP_FILE, archiveFile);
+          }
+          fs.unlinkSync(AUDITS_BACKUP_FILE);
+        } catch (e) {}
+        return res.json({ success: true, count: 0, audits: [] });
+      }
       const audits = data.audits || (Array.isArray(data) ? data : []);
       return res.json({
         success: true,

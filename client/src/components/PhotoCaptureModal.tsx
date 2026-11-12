@@ -55,7 +55,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
     let width = videoRef.current.videoWidth || 640;
     let height = videoRef.current.videoHeight || 480;
     
-    const MAX_SIZE = 600;
+    const MAX_SIZE = 320;
     if (width > height && width > MAX_SIZE) {
       height *= MAX_SIZE / width;
       width = MAX_SIZE;
@@ -69,7 +69,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
     const ctx = canvas.getContext('2d');
     if (ctx) {
       ctx.drawImage(videoRef.current, 0, 0, width, height);
-      const newPhoto = canvas.toDataURL('image/jpeg', 0.6);
+      const newPhoto = canvas.toDataURL('image/jpeg', 0.45);
       setCapturedPhotos((prev) => [...prev, newPhoto]);
     }
   };
@@ -84,7 +84,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_SIZE = 600;
+          const MAX_SIZE = 320;
           let width = img.width;
           let height = img.height;
           if (width > height && width > MAX_SIZE) {
@@ -99,7 +99,7 @@ export const PhotoCaptureModal: React.FC<PhotoCaptureModalProps> = ({
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.45);
             setCapturedPhotos((prev) => [...prev, dataUrl]);
           }
         };

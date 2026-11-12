@@ -304,7 +304,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
             }
           });
                     const merged = Array.from(pMap.values());
-          storageService.saveProducts(merged, true);
+          storageService.saveProducts(merged, false);
           setProducts(merged);
         }
       })

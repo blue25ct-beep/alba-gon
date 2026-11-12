@@ -413,21 +413,24 @@ class CloudSyncService {
     return new Promise((resolve) => {
       const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
 
+      let safeAudits = audits;
+      try {
+        if (JSON.stringify(audits).length > 90000) {
+          safeAudits = audits.map(a => a.photoUrls && a.photoUrls.length > 1 ? { ...a, photoUrls: [a.photoUrls[0]] } : a);
+          if (JSON.stringify(safeAudits).length > 120000) {
+            safeAudits = safeAudits.map(a => a.photoUrls && a.photoUrls.length > 0 ? { ...a, photoUrls: [] } : a);
+          }
+        }
+      } catch (e) {}
+
       const payload: AuditsSyncMessage = {
         type: 'AUDITS_UPDATE',
         senderId: this.mySenderId,
         senderRole: role,
         storeId: this.currentStoreId,
         timestamp: Date.now(),
-        audits,
+        audits: safeAudits,
       };
-
-      this.lastSyncTime = new Date().toLocaleTimeString('ko-KR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      });
-      this.notifyStatus('CONNECTED');
 
       this.pendingAuditsPayload = payload;
 
@@ -451,7 +454,7 @@ class CloudSyncService {
             this.reconnect();
             resolve(false);
           }
-        }, 3500);
+        }, 6000);
 
         c.publish(topicSync, JSON.stringify(payload), { qos: 1, retain: true }, (err) => {
           if (!finished) {
@@ -462,6 +465,11 @@ class CloudSyncService {
               resolve(false);
             } else {
               this.pendingAuditsPayload = null;
+              this.lastSyncTime = new Date().toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              });
               this.notifyStatus('CONNECTED');
               resolve(true);
             }
