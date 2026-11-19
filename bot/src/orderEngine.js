@@ -195,8 +195,13 @@ async function runDirectOrderAdd(items, onProgress, overrideCredentials = null) 
     }
 
     const targetBarcode = item.usingAliasBarcode || item.barcode;
-    const isChilled = item.category?.includes('냉동') || item.category?.includes('저온') || item.category?.includes('냉장');
-    const folder = isChilled ? 'app3' : 'app1';
+    const masterCategory = (seedMap[targetBarcode] && seedMap[targetBarcode].category) || item.category || '';
+    const isChilled = masterCategory.includes('냉동') || masterCategory.includes('저온') || masterCategory.includes('냉장');
+    let folder = isChilled ? 'app3' : 'app1';
+    if (folder === 'app3') {
+      const app1Check = await fetchYounmeProductInfo(sessionCookie, 'app1', targetBarcode, orderDate);
+      if (app1Check && app1Check.price > 0) folder = 'app1';
+    }
 
     const percent = Math.round(20 + ((i + 1) / items.length) * 75);
 
