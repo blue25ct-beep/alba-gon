@@ -30,6 +30,7 @@ export const CHILLED_ZONES = [
   { id: 'FREEZER_B', label: '🥶 수직 냉동고 B' },
   { id: 'SHOWCASE_A', label: '🥗 쇼케이스 A' },
   { id: 'SHOWCASE_B', label: '🥛 쇼케이스 B' },
+  { id: 'BASKET', label: '🧺 하단 바구니' },
 ] as const;
 
 // 매장 실사진 6구역 배치도 기준 저온 + 합동진열 상온 통합 체크리스트
@@ -236,19 +237,19 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8801104304023', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업아메리카노350ml
   ['8801104304047', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업카페라떼350ml
   ['8801104306591', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업바닐라라떼350ml
-  // 하단 외부 바구니 (상온 합동진열: 컵시리얼 3종 / 통조림 / 케찹)
-  ['8801083333304', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 켈로그]콘푸로스트 컵시리얼40g
-  ['8801083323305', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 켈로그]첵스 컵시리얼40g
-  ['8801083330303', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 켈로그]아몬드후레이크컵시리얼40g
-  ['8801007314891', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // CJ]스팸120g (작은거)
-  ['8801047111849', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 동원]라이트스탠다드참치150g
-  ['8801047121350', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 동원]야채참치150g
-  ['8801047123750', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 동원]고추참치150g
-  ['8801045360034', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 오뚜기]초당옥수수스위트콘340g
-  ['8801047141099', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 동원]자연산꽁치캔400g
-  ['8801123600519', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 롯데햄]장조림80g
-  ['8801045100111', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 오뚜기]토마토케찹300g
-  ['8801045880112', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }], // 오뚜기]황도캔400g
+  // === 7. 하단 바구니 (상온 합동진열: 컵시리얼 3종 / 통조림 / 케찹) ===
+  ['8801083333304', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]콘푸로스트 컵시리얼40g
+  ['8801083323305', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]첵스 컵시리얼40g
+  ['8801083330303', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]아몬드후레이크컵시리얼40g
+  ['8801007314891', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // CJ]스팸120g (작은거)
+  ['8801047111849', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]라이트스탠다드참치150g
+  ['8801047121350', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]야채참치150g
+  ['8801047123750', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]고추참치150g
+  ['8801045360034', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 오뚜기]초당옥수수스위트콘340g
+  ['8801047141099', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]자연산꽁치캔400g
+  ['8801123600519', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 롯데햄]장조림80g
+  ['8801045100111', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '소스', vendor: 'younme' }], // 오뚜기]토마토케찹300g
+  ['8801045880112', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 오뚜기]황도캔400g
 ];
 
 export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklistEntry> = Object.fromEntries(
@@ -292,6 +293,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
     '🥶 수직 냉동고 B': false,
     '🥗 쇼케이스 A': false,
     '🥛 쇼케이스 B': false,
+    '🧺 하단 바구니': false,
   });
 
   // 체크리스트 상품별 근무자 선택 재고 상태 (null = 아직 버튼 안 누름)
@@ -510,11 +512,11 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* 1. 6구역 빠른 선택 탭 */}
+      {/* 1. 7구역 빠른 선택 탭 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <div>
-            <h4 className="font-bold text-ink text-base">🗺️ 구역별 재고 체크표 (6구역)</h4>
+            <h4 className="font-bold text-ink text-base">🗺️ 구역별 재고 체크표 (7구역)</h4>
             <p className="text-xs text-ink-faint mt-0.5">
               서 계신 구역을 눌러 부족한 상품의 현재 재고만 톡톡 눌러주세요.
             </p>
