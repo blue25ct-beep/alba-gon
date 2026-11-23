@@ -6,6 +6,7 @@ const http = require('http');
 const querystring = require('querystring');
 const iconv = require('iconv-lite');
 const fs = require('fs');
+const { reconcileOrders } = require('./orderReconciler');
 
 function getYounmeCredentials(overrideCredentials = null) {
   if (overrideCredentials && overrideCredentials.pw) {
@@ -322,6 +323,8 @@ async function runDirectOrderAdd(items, onProgress, overrideCredentials = null) 
 
   let successCount = 0;
   const failures = [];
+  const app1Requested = [];
+  const app3Requested = [];
 
   // 3. 품목 순회하며 상온(app1) 또는 저온(app3) 장바구니 추가
   for (let i = 0; i < items.length; i++) {
@@ -355,6 +358,11 @@ async function runDirectOrderAdd(items, onProgress, overrideCredentials = null) 
     const percent = Math.round(20 + ((i + 1) / items.length) * 75);
 
     if (folder === 'app3') {
+      app3Requested.push({
+        barcode: targetBarcode,
+        productName: item.productName || (seedMap[targetBarcode] && seedMap[targetBarcode].name) || targetBarcode,
+        expectedQty: item.finalOrderQty,
+      });
       // ★ 유앤미 저온(app3) 전용 장바구니 담기 (POST /app3/apiOrder.asp, order_dev=h)
       try {
         const live3 = await fetchYounmeProductInfo(sessionCookie, 'app3', targetBarcode, app3OrderDate);
@@ -504,6 +512,11 @@ async function runDirectOrderAdd(items, onProgress, overrideCredentials = null) 
     }
 
     // ★ 상온(app1) 장바구니 추가
+    app1Requested.push({
+      barcode: targetBarcode,
+      productName: item.productName || (seedMap[targetBarcode] && seedMap[targetBarcode].name) || targetBarcode,
+      expectedQty: item.finalOrderQty,
+    });
     let determinedPrice = Number(item.cost) || Number(item.price) || 0;
     let determinedUnit = 'EA';
     let determinedCs = 'j';
@@ -590,7 +603,122 @@ async function runDirectOrderAdd(items, onProgress, overrideCredentials = null) 
     }
   }
 
-  return { successCount, failures };
+  // 4. 발주 직후 유앤미 실제 장바구니 재조회 및 교차검증
+  const verification = {};
+  try {
+    if (onProgress) {
+      onProgress({ step: 'VERIFYING', percent: 97, message: '유앤미24 실제 장바구니와 발주 리스트를 교차검증하는 중...' });
+    }
+    if (app1Requested.length > 0) {
+      const actualApp1 = await fetchYounmeCartItems(sessionCookie, 'app1', orderDate);
+      verification.app1 = reconcileOrders(app1Requested, actualApp1, { unitLabel: '개' });
+    }
+    if (app3Requested.length > 0) {
+      const actualApp3 = await fetchYounmeCartItems(sessionCookie, 'app3', app3OrderDate);
+      verification.app3 = reconcileOrders(app3Requested, actualApp3, { unitLabel: '개' });
+    }
+  } catch (verifyErr) {
+    console.error('[교차검증 오류 - 유앤미]:', verifyErr.message);
+  }
+
+  return { successCount, failures, verification };
+}
+
+function parseYounmeCartHtml(html) {
+  const items = [];
+  const rows = html.split(/<tr[\s>]/i).slice(1).map(p => p.split(/<\/tr>/i)[0]);
+  for (const r of rows) {
+    const mCode = r.match(/data_view\(['"](\d{8,14})['"]\)/) || r.match(/cart_arrange\(['"](\d{8,14})['"]/);
+    if (!mCode) continue;
+    const barcode = mCode[1];
+    const mName = r.match(/data_view\(['"]\d+['"]\)[^>]*>([\s\S]*?)<\/a>/i);
+    let name = mName ? mName[1].replace(/<[^>]+>/g, '').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim() : '';
+    if (!name || /^EA$/i.test(name)) {
+      name = (seedMap[barcode] && seedMap[barcode].name) || barcode;
+    }
+    const mQty = r.match(/<option[^>]+value=["']?(\d+)["']?[^>]*selected/i);
+    const qty = mQty ? parseInt(mQty[1], 10) : 1;
+    items.push({ barcode, name, qty });
+  }
+  return items;
+}
+
+function parseYounmeAppListHtml(html) {
+  const items = [];
+  const rows = html.split(/<tr[\s>]/i).slice(1).map(p => p.split(/<\/tr>/i)[0]);
+  for (const r of rows) {
+    const tds = [...r.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map(m =>
+      m[1].replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim()
+    );
+    const bcIdx = tds.findIndex(t => /^\d{8,14}$/.test(t));
+    if (bcIdx === -1) continue;
+    const rowText = tds.join(' ');
+    if (rowText.includes('취소') || rowText.includes('반품') || rowText.includes('마감')) continue;
+    if (!rowText.includes('신청')) continue;
+    const barcode = tds[bcIdx];
+    let name = (tds[bcIdx - 1] || '').replace(/\s+EA$/i, '').trim();
+    if (!name || /^EA$/i.test(name)) {
+      name = (seedMap[barcode] && seedMap[barcode].name) || barcode;
+    }
+    const qty = parseInt((tds[bcIdx + 2] || '1').replace(/[^0-9]/g, ''), 10) || 1;
+    items.push({ barcode, name, qty });
+  }
+  return items;
+}
+
+async function fetchYounmeCartItems(sessionCookie, folder, orderDate) {
+  const dev = folder === 'app3' ? 'h' : 'j';
+  const ovRes = await httpRequest({
+    hostname: 'www.younme24.com',
+    port: 80,
+    path: `/${folder}/orderView.asp?order_date=${orderDate}&order_dev=${dev}&order_type=1`,
+    method: 'GET',
+    headers: { Cookie: sessionCookie, 'User-Agent': 'Mozilla/5.0' },
+  });
+  const cartItems = parseYounmeCartHtml(iconv.decode(ovRes.body, 'EUC-KR'));
+  // 장바구니가 비어 있거나 이미 확정(주문신청)된 경우도 포함해 합산
+  const iso = `${orderDate.slice(0, 4)}-${orderDate.slice(4, 6)}-${orderDate.slice(6, 8)}`;
+  const lb = querystring.stringify({ search_date1: iso, search_date2: iso, s_type: '1' });
+  const lRes = await httpRequest({
+    hostname: 'www.younme24.com',
+    port: 80,
+    path: `/${folder}/appList.asp`,
+    method: 'POST',
+    headers: {
+      Cookie: sessionCookie,
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': Buffer.byteLength(lb),
+      'User-Agent': 'Mozilla/5.0',
+    },
+  }, lb);
+  const confirmedItems = parseYounmeAppListHtml(iconv.decode(lRes.body, 'EUC-KR'));
+  return [...cartItems, ...confirmedItems];
+}
+
+async function fetchYounmeSiteSnapshot(overrideCredentials = null) {
+  const creds = getYounmeCredentials(overrideCredentials);
+  if (!creds || !creds.userPw) {
+    throw new Error('유앤미24 로그인 정보가 없습니다.');
+  }
+  const loginPayload = querystring.stringify({ home: 'y', userid: creds.userId, passwd: creds.userPw });
+  const loginRes = await httpRequest({
+    hostname: 'www.younme24.com', port: 80, path: '/member/login.asp', method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(loginPayload), 'User-Agent': 'Mozilla/5.0' },
+  }, loginPayload);
+  const sessionCookie = (loginRes.headers['set-cookie'] || []).map(c => c.split(';')[0]).join('; ');
+  if (!sessionCookie) throw new Error('유앤미24 로그인 실패');
+
+  const out = {};
+  for (const folder of ['app1', 'app3']) {
+    const appRes = await httpRequest({ hostname: 'www.younme24.com', port: 80, path: `/${folder}/app.asp`, method: 'GET', headers: { Cookie: sessionCookie } });
+    const mOrder = iconv.decode(appRes.body, 'EUC-KR').match(/name=["']order_date["']\s+value=["'](\d{8})["']/);
+    const orderDate = mOrder ? mOrder[1] : new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10).replace(/-/g, '');
+    out[folder] = {
+      orderDate,
+      items: await fetchYounmeCartItems(sessionCookie, folder, orderDate),
+    };
+  }
+  return out;
 }
 
 async function fetchPendingDPlus1Barcodes(overrideCredentials = null) {
@@ -665,4 +793,4 @@ async function fetchPendingDPlus1Barcodes(overrideCredentials = null) {
   return { barcodes: Array.from(pendingSet), details };
 }
 
-module.exports = { runDirectOrderAdd, fetchPendingDPlus1Barcodes };
+module.exports = { runDirectOrderAdd, fetchPendingDPlus1Barcodes, fetchYounmeSiteSnapshot };

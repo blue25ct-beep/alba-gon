@@ -166,6 +166,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
   };
   const [lastSyncTime, setLastSyncTime] = useState<string>('');
   const [isRefreshingSync, setIsRefreshingSync] = useState(false);
+  const [isVerifyingSiteOrders, setIsVerifyingSiteOrders] = useState(false);
 
   const [showUnmappedModal, setShowUnmappedModal] = useState(false);
   const [showAliasModal, setShowAliasModal] = useState(false);
@@ -567,6 +568,68 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
     cloudSyncService.resyncRetainedState();
     loadData();
     setTimeout(() => setIsRefreshingSync(false), 600);
+  };
+
+  const handleManualSiteVerify = async () => {
+    if (isVerifyingSiteOrders) return;
+    setIsVerifyingSiteOrders(true);
+    try {
+      // 오늘 발주 이력이 있으면 그 품목들을, 없으면 현재 발주 예정 목록을 기준으로 비교
+      const todayPrefix = `${new Date().getMonth() + 1}. ${new Date().getDate()}.`;
+      const todayHistItems = orderHistory
+        .filter((h) => h.orderDate && h.orderDate.includes(todayPrefix))
+        .flatMap((h) =>
+          (h.items || []).map((it: any) => ({
+            ...it,
+            vendor: h.vendor === 'SPCHAIN' ? 'spchain' : (it.vendor || 'younme'),
+          }))
+        );
+      const targetItems = todayHistItems.length > 0 ? todayHistItems : combinedOrderItems.filter((i) => i.finalOrderQty > 0);
+      const settings = storageService.getSettings();
+      const res = await fetch('http://localhost:3001/api/verify-orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vendor: 'ALL',
+          items: targetItems,
+          credentials: settings.younmePw ? { id: settings.younmeId || '1060', pw: settings.younmePw } : null,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || '교차검증 실패');
+
+      const v = data.verification || {};
+      const lines: string[] = ['🔍 실제 사이트 교차검증 완료 (디스코드 공유됨)'];
+      if (v.younme?.app1) {
+        const a1 = v.younme.app1;
+        lines.push(
+          a1.requestedCount
+            ? `• 유앤미 상온: 요청 ${a1.requestedCount}건 / 일치 ${a1.matchedCount} / 누락 ${a1.missingCount} / 수량불일치 ${a1.qtyMismatchCount}`
+            : `• 유앤미 상온: 실제 사이트 ${a1.actualTotalOnSite || 0}건 확인`
+        );
+      }
+      if (v.younme?.app3) {
+        const a3 = v.younme.app3;
+        lines.push(
+          a3.requestedCount
+            ? `• 유앤미 저온: 요청 ${a3.requestedCount}건 / 일치 ${a3.matchedCount} / 누락 ${a3.missingCount} / 수량불일치 ${a3.qtyMismatchCount}`
+            : `• 유앤미 저온: 실제 사이트 ${a3.actualTotalOnSite || 0}건 확인`
+        );
+      }
+      if (v.spchain) {
+        const sp = v.spchain;
+        lines.push(
+          sp.requestedCount
+            ? `• 생필체인 주류: 요청 ${sp.requestedCount}건 / 일치 ${sp.matchedCount} / 누락 ${sp.missingCount} / 수량불일치 ${sp.qtyMismatchCount}`
+            : `• 생필체인 주류: 실제 사이트 ${sp.actualTotalOnSite || 0}건 확인`
+        );
+      }
+      alert(lines.join('\n'));
+    } catch (err: any) {
+      alert(`교차검증 오류: ${err?.message || '로컬 알바곤 봇(포트 3001)이 실행 중인지 확인해 주세요.'}`);
+    } finally {
+      setIsVerifyingSiteOrders(false);
+    }
   };
 
   const handleStartEditName = (barcode: string, currentName: string) => {
@@ -1452,6 +1515,17 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
             className="hidden"
           />
         </label>
+
+        <button
+          type="button"
+          onClick={handleManualSiteVerify}
+          disabled={isVerifyingSiteOrders}
+          className="inline-flex items-center gap-2 h-10 px-4 rounded-full text-sm font-medium text-cyan-800 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 transition-colors disabled:opacity-50"
+          title="유앤미(상온·저온)·생필체인(주류) 실제 사이트 주문 내역과 대조하여 누락 여부를 디스코드로 공유합니다."
+        >
+          <RefreshCw className={`w-4 h-4 ${isVerifyingSiteOrders ? 'animate-spin' : ''}`} />
+          {isVerifyingSiteOrders ? '실제 사이트 교차검증 중...' : '🔍 실제 사이트 교차검증'}
+        </button>
       </div>
 
       {/* 목록 */}

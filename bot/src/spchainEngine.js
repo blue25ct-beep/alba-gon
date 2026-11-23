@@ -1,6 +1,7 @@
 require('dotenv').config();
 const mqtt = require('mqtt');
 const puppeteer = require('puppeteer');
+const { reconcileOrders } = require('./orderReconciler');
 
 // 테스트용 하드코딩
 const STORE_ID = 'SPCHAIN_047458'; 
@@ -100,6 +101,27 @@ async function runSpchainOrder(orderPayload, sendProgress) {
                 results.push({ barcode: item.barcode, status: 'fail' });
             }
         }
+        // 발주 루프 완료 직후 실제 생필체인 주문현황(OrderMainView.do?flag=total) 교차검증
+        let verification = null;
+        try {
+            if (sendProgress) sendProgress('VERIFYING', 95, '생필체인 실제 주문 내역과 교차검증 중...');
+            const actualSpItems = await readSpchainOrderItems(page);
+            const spRequested = orderPayload.items.map(item => {
+                const boxQty = Math.max(1, Math.round(item.finalOrderQty / (item.minOrderQty || 1)));
+                return {
+                    barcode: item.barcode,
+                    productName: item.productName,
+                    expectedQty: boxQty,
+                    unitLabel: '박스',
+                    subDetail: `${item.finalOrderQty}병`,
+                };
+            });
+            verification = reconcileOrders(spRequested, actualSpItems, { unitLabel: '박스' });
+        } catch (verifyErr) {
+            console.error('[SPChain 교차검증 오류]:', verifyErr.message);
+        }
+        const failures = results.filter(r => r.status === 'fail').map(r => ({ barcode: r.barcode, reason: 'SPChain 상품 검색 실패' }));
+        return { successCount: results.length - failures.length, failures, verification };
     } catch (err) {
         console.error('[SPChain] 주문 에러:', err);
         return { success: false, reason: err.message, results };
@@ -107,8 +129,61 @@ async function runSpchainOrder(orderPayload, sendProgress) {
         if (browser) { await browser.close(); browser = null; }
         isProcessing = false;
     }
-    const failures = results.filter(r => r.status === 'fail').map(r => ({ barcode: r.barcode, reason: 'SPChain 상품 검색 실패' }));
-    return { successCount: results.length - failures.length, failures };
 }
 
-module.exports = { runSpchainOrder };
+async function readSpchainOrderItems(page) {
+    await page.goto('https://etop.spchain.co.kr:446/order/OrderMainView.do?flag=total', { waitUntil: 'networkidle2' });
+    return await page.evaluate(() => {
+        const out = [];
+        for (const tr of document.querySelectorAll('tr')) {
+            const codeEl = tr.querySelector('input[name="item_code"]');
+            const nameEl = tr.querySelector('input[name="item_name"]');
+            const qtyEl = tr.querySelector('input[name="rcv_qty_2_1"]');
+            const boxEl = tr.querySelector('input[name="qty_per_box_1"]');
+            if (codeEl && qtyEl) {
+                const boxQty = parseInt(qtyEl.value, 10) || 0;
+                if (boxQty > 0) {
+                    out.push({
+                        barcode: codeEl.value.trim(),
+                        name: (nameEl ? nameEl.value : '').trim(),
+                        qty: boxQty,
+                        qtyPerBox: parseInt(boxEl ? boxEl.value : '1', 10) || 1,
+                    });
+                }
+            }
+        }
+        return out;
+    });
+}
+
+async function fetchSpchainSiteSnapshot() {
+    let b = null;
+    try {
+        b = await puppeteer.launch({
+            headless: 'new',
+            executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            args: ['--no-sandbox']
+        });
+        const page = await b.newPage();
+        page.on('dialog', async d => { try { await d.accept(); } catch (e) {} });
+        await page.goto('https://etop.spchain.co.kr:446/order/login.do', { waitUntil: 'networkidle2' });
+        await page.evaluate((id, pw) => {
+            const textInputs = Array.from(document.querySelectorAll('input')).filter(i => i.type === 'text');
+            const pwInputs = Array.from(document.querySelectorAll('input')).filter(i => i.type === 'password');
+            if (textInputs.length > 0) textInputs[0].value = id;
+            if (pwInputs.length > 0) pwInputs[0].value = pw;
+            const loginBtn = document.querySelector('button, input[type="submit"], input[type="button"], a[class*="login"], a[id*="login"]');
+            if (loginBtn) loginBtn.click();
+            else {
+                const form = document.querySelector('form');
+                if (form) form.submit();
+            }
+        }, SP_ID, SP_PW);
+        try { await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 10000 }); } catch (e) {}
+        return await readSpchainOrderItems(page);
+    } finally {
+        if (b) await b.close();
+    }
+}
+
+module.exports = { runSpchainOrder, fetchSpchainSiteSnapshot };

@@ -27,9 +27,11 @@ const cors = require('cors');
 const mqtt = require('mqtt');
 
 // 유앤미 주문 처리 엔진
-const { runDirectOrderAdd, fetchPendingDPlus1Barcodes } = require('./orderEngine');
+const { runDirectOrderAdd, fetchPendingDPlus1Barcodes, fetchYounmeSiteSnapshot } = require('./orderEngine');
 // 생필체인 주문 처리 엔진
-const { runSpchainOrder } = require('./spchainEngine');
+const { runSpchainOrder, fetchSpchainSiteSnapshot } = require('./spchainEngine');
+// 발주 교차검증 및 디스코드 리포트
+const { reconcileOrders, formatReconcileDiscordReport } = require('./orderReconciler');
 
 const STORE_ID = process.env.YOUNME_USER_ID || '1060';
 const SPCHAIN_ID = 'SPCHAIN_047458';
@@ -153,12 +155,51 @@ function getDiscordWebhookUrl() {
 
 function sendDiscord(message) {
   const url = getDiscordWebhookUrl();
-  if (!url) return;
+  if (!url || !message) return;
   fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content: message }),
   }).catch(err => console.error('[디스코드 알림 오류]:', err.message));
+}
+
+function reportOrderVerification(vendorType, verification, resultFailures = []) {
+  if (!verification) return new Set();
+  const missingBarcodes = new Set();
+
+  const processOne = (label, v) => {
+    if (!v || !v.requestedCount) return;
+    const report = formatReconcileDiscordReport(label, v);
+    if (report) {
+      console.log(`\n${report}\n`);
+      sendDiscord(report);
+    }
+    if (Array.isArray(v.missing)) {
+      v.missing.forEach(m => {
+        missingBarcodes.add(m.barcode);
+        if (!resultFailures.some(f => f.barcode === m.barcode)) {
+          resultFailures.push({
+            id: `verify_miss_${Date.now()}_${m.barcode}`,
+            barcode: m.barcode,
+            productName: m.productName || m.barcode,
+            failReason: 'MISSING_ON_SITE',
+            failDetail: `발주 교차검증 결과 실제 ${label} 사이트 목록에서 누락됨 (요청 ${m.expectedQty}${m.unitLabel || '개'})`,
+            attemptedQty: m.expectedQty,
+            failedAt: new Date().toLocaleTimeString('ko-KR'),
+          });
+        }
+      });
+    }
+  };
+
+  if (vendorType === 'YOUNME') {
+    if (verification.app1) processOne('유앤미24 (상온)', verification.app1);
+    if (verification.app3) processOne('유앤미24 (저온)', verification.app3);
+  } else if (vendorType === 'SPCHAIN') {
+    processOne('생필체인 (주류)', verification);
+  }
+
+  return missingBarcodes;
 }
 
 
@@ -532,6 +573,7 @@ client.on('message', async (topic, message) => {
           discordMsg += `\n- 실패/품절: ${result.failures.length}건 (${result.failures.map(f => f.productName).slice(0, 3).join(', ')})`;
         }
         sendDiscord(discordMsg);
+        reportOrderVerification('YOUNME', result.verification, result.failures);
       } catch (err) {
         console.error('❌ [자동발주 실패]:', err.message);
         sendDiscord(`🚨 **[자동발주 실패]** 발주 엔진 실행 중 오류가 발생했습니다: ${err.message}`);
@@ -602,9 +644,12 @@ client.on('message', async (topic, message) => {
     }
 
     console.log(`\n✅ [${vendorName}] 처리 완료! (성공: ${result.successCount}건)`);
+    const missingSet = reportOrderVerification(isYounme ? 'YOUNME' : 'SPCHAIN', result.verification, result.failures);
     
     if (result.successCount > 0) {
-      const successItems = items.filter(item => !result.failures.some(f => f.barcode === item.barcode));
+      const successItems = items.filter(item =>
+        !result.failures.some(f => f.barcode === item.barcode) && !missingSet.has(item.barcode)
+      );
       const totalAmount = successItems.reduce((sum, item) => sum + ((item.cost || 0) * (item.finalOrderQty || 1)), 0);
       addOrderHistoryEntry({
         id: orderId || Date.now().toString(),
@@ -620,7 +665,8 @@ client.on('message', async (topic, message) => {
       status: 'DONE',
       successCount: result.successCount,
       failures: result.failures,
-      message: `${vendorName} 장바구니 담기가 성공적으로 완료되었습니다!`,
+      verification: result.verification || null,
+      message: `${vendorName} 장바구니 담기 및 교차검증이 완료되었습니다!`,
     }));
 
   } catch (err) {
@@ -707,9 +753,12 @@ app.post('/api/order', async (req, res) => {
     };
 
     const result = await runDirectOrderAdd(items, sendProgress, credentials);
-    console.log(`\n🎉 [로컬 REST 발주 완료] 성공: ${result.successCount}건, 실패: ${result.failures.length}건`);
+    const missingSet = reportOrderVerification('YOUNME', result.verification, result.failures);
+    console.log(`\n🎉 [로컬 REST 발주 완료] 성공: ${result.successCount}건, 실패/누락: ${result.failures.length}건`);
     if (result.successCount > 0) {
-      const successItems = items.filter(item => !result.failures.some(f => f.barcode === item.barcode));
+      const successItems = items.filter(item =>
+        !result.failures.some(f => f.barcode === item.barcode) && !missingSet.has(item.barcode)
+      );
       removeSuccessfulAuditsFromDiskAndSync(successItems.map(i => i.barcode));
     }
 
@@ -717,6 +766,60 @@ app.post('/api/order', async (req, res) => {
   } catch (err) {
     console.error('❌ [로컬 REST 발주 실패]:', err.message);
     res.status(500).json({ error: err.message, successCount: 0, failures: [] });
+  }
+});
+
+// 수동 교차검증 API: 실제 유앤미(상온·저온) / 생필체인(주류) 사이트 주문 내역을 읽어 요청 목록과 비교하고 디스코드 공유
+app.post('/api/verify-orders', async (req, res) => {
+  try {
+    const { vendor = 'ALL', items = [], credentials = null } = req.body || {};
+    const verification = {};
+
+    if (vendor === 'ALL' || vendor === 'YOUNME') {
+      const snap = await fetchYounmeSiteSnapshot(credentials);
+      const app1Req = items.filter(i => i.vendor !== 'chilled' && i.vendor !== 'spchain').map(i => ({
+        barcode: i.usingAliasBarcode || i.barcode,
+        productName: i.productName,
+        expectedQty: i.finalOrderQty || 1,
+      }));
+      const app3Req = items.filter(i => i.vendor === 'chilled').map(i => ({
+        barcode: i.usingAliasBarcode || i.barcode,
+        productName: i.productName,
+        expectedQty: i.finalOrderQty || 1,
+      }));
+      verification.younme = {
+        app1: app1Req.length > 0 ? reconcileOrders(app1Req, snap.app1.items, { unitLabel: '개' }) : { actualTotalOnSite: snap.app1.items.length, items: snap.app1.items },
+        app3: app3Req.length > 0 ? reconcileOrders(app3Req, snap.app3.items, { unitLabel: '개' }) : { actualTotalOnSite: snap.app3.items.length, items: snap.app3.items },
+      };
+      if (app1Req.length > 0 || app3Req.length > 0) {
+        reportOrderVerification('YOUNME', verification.younme, []);
+      }
+    }
+
+    if (vendor === 'ALL' || vendor === 'SPCHAIN') {
+      const spSnap = await fetchSpchainSiteSnapshot();
+      const spReq = items.filter(i => i.vendor === 'spchain').map(i => {
+        const boxQty = Math.max(1, Math.round((i.finalOrderQty || 1) / (i.minOrderQty || 1)));
+        return {
+          barcode: i.barcode,
+          productName: i.productName,
+          expectedQty: boxQty,
+          unitLabel: '박스',
+          subDetail: `${i.finalOrderQty || 1}병`,
+        };
+      });
+      verification.spchain = spReq.length > 0
+        ? reconcileOrders(spReq, spSnap, { unitLabel: '박스' })
+        : { actualTotalOnSite: spSnap.length, items: spSnap };
+      if (spReq.length > 0) {
+        reportOrderVerification('SPCHAIN', verification.spchain, []);
+      }
+    }
+
+    res.json({ success: true, verification });
+  } catch (err) {
+    console.error('❌ [수동 교차검증 오류]:', err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
