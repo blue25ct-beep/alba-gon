@@ -303,11 +303,13 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
       .then(data => {
         if (data && data.success && Array.isArray(data.products) && data.products.length > 0) {
           const local = storageService.getProducts();
+          const localMap = new Map(local.map(p => [p.barcode, p]));
           const customized = storageService.getCustomizedSettings();
-          const pMap = new Map();
-          local.forEach(p => pMap.set(p.barcode, p));
+          const pMap = new Map<string, Product>();
+
+          // 1. 서버 마스터 목록을 기준으로 반영 (삭제 정리된 구형 상품이 브라우저 캐시에서 되살아나지 않도록 방지)
           data.products.forEach((p: Product) => {
-            const ex = pMap.get(p.barcode);
+            const ex = localMap.get(p.barcode);
             const c = customized[p.barcode];
             if (c) {
               pMap.set(p.barcode, {
@@ -316,7 +318,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
                 name: (c.name && c.name.trim()) ? c.name : ((ex?.name && (ex.name.startsWith('CP]') || ex.name.includes('쿠팡]'))) ? ex.name : p.name),
                 targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
                 minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : p.minOrderQty,
-                reviewStatus: c.reviewStatus || p.reviewStatus,
+                reviewStatus: (c.reviewStatus as Product['reviewStatus']) || p.reviewStatus,
                 updatedAt: c.updatedAt || p.updatedAt,
               });
             } else if (ex && ex.reviewStatus === 'MODIFIED') {
@@ -330,7 +332,21 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
               pMap.set(p.barcode, { ...ex, ...p });
             }
           });
-                    const merged = Array.from(pMap.values());
+
+          // 2. 로컬에서 사용자가 직접 새로 등록한 미등록신상품/쿠팡 상품만 추가 보존
+          local.forEach((p) => {
+            if (!pMap.has(p.barcode)) {
+              const isUserCreated =
+                p.isNewProduct ||
+                p.category === '미등록신상품' ||
+                Boolean(p.name && (p.name.startsWith('CP]') || p.name.includes('쿠팡]')));
+              if (isUserCreated) {
+                pMap.set(p.barcode, p);
+              }
+            }
+          });
+
+          const merged = Array.from(pMap.values());
           storageService.saveProducts(merged, false);
           setProducts(merged);
         }

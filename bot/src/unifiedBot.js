@@ -161,6 +161,60 @@ function sendDiscord(message) {
   }).catch(err => console.error('[디스코드 알림 오류]:', err.message));
 }
 
+
+function mergeProductsSafely(incomingProducts) {
+  const currentMap = new Map();
+  if (fs.existsSync(PRODUCTS_BACKUP_FILE)) {
+    try {
+      const raw = JSON.parse(fs.readFileSync(PRODUCTS_BACKUP_FILE, 'utf8'));
+      const currentList = Array.isArray(raw) ? raw : (raw.products || []);
+      currentList.forEach(p => { if (p && p.barcode) currentMap.set(p.barcode, p); });
+    } catch (e) {}
+  }
+
+  // 기존 마스터가 아예 비어 있을 때만 전체 수신 허용
+  const hasBase = currentMap.size > 0;
+
+  incomingProducts.forEach(p => {
+    if (!p || !p.barcode) return;
+    const exist = currentMap.get(p.barcode);
+    if (exist) {
+      const existIsCp = exist.name && (exist.name.startsWith('CP]') || exist.name.includes('쿠팡]'));
+      const incomingIsCp = p.name && (p.name.startsWith('CP]') || p.name.includes('쿠팡]'));
+      const preservedName = (existIsCp && !incomingIsCp) ? exist.name : (p.name || exist.name);
+      if (p.reviewStatus === 'MODIFIED' || p.targetStock !== undefined || p.minOrderQty !== undefined) {
+        currentMap.set(p.barcode, { ...exist, ...p, name: preservedName });
+      } else if (exist.reviewStatus === 'MODIFIED') {
+        currentMap.set(p.barcode, {
+          ...p,
+          ...exist,
+          name: preservedName,
+          targetStock: exist.targetStock,
+          minOrderQty: exist.minOrderQty,
+          reviewStatus: exist.reviewStatus,
+          updatedAt: exist.updatedAt,
+        });
+      } else {
+        currentMap.set(p.barcode, { ...exist, ...p, name: preservedName });
+      }
+    } else if (!hasBase) {
+      currentMap.set(p.barcode, p);
+    } else {
+      // 삭제 정리된 구형 상품이 구형 브라우저/MQTT 캐시에서 되살아나는 것을 차단
+      // 단, 사용자가 현장에서 직접 신규 등록한 상품(미등록신상품/쿠팡)만 추가 허용
+      const isUserCreated =
+        p.isNewProduct ||
+        p.category === '미등록신상품' ||
+        Boolean(p.name && (p.name.startsWith('CP]') || p.name.includes('쿠팡]')));
+      if (isUserCreated) {
+        currentMap.set(p.barcode, p);
+      }
+    }
+  });
+
+  return Array.from(currentMap.values());
+}
+
 function getMasterProducts() {
   try {
     if (fs.existsSync(PRODUCTS_BACKUP_FILE)) {
@@ -268,8 +322,9 @@ client.on('message', async (topic, message) => {
         } catch(e) {}
       } else if (msg.type === 'BACKUP_DATA' && msg.data) {
         if (msg.data.products && Array.isArray(msg.data.products) && msg.data.products.length > 0) {
-          fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(msg.data.products), 'utf8');
-          console.log(`[백업 동기화] 마스터 상품 데이터 ${msg.data.products.length}건 봇 저장 완료`);
+          const merged = mergeProductsSafely(msg.data.products);
+          fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(merged, null, 2), 'utf8');
+          console.log(`[백업 동기화] 마스터 상품 데이터 ${merged.length}건 봇 저장 완료`);
         }
         if (msg.data.settings) {
           fs.writeFileSync(SETTINGS_BACKUP_FILE, JSON.stringify(msg.data.settings), 'utf8');
@@ -285,14 +340,16 @@ client.on('message', async (topic, message) => {
     return;
   }
 
-  // 3. 상품 마스터 동기화
+  // 3. 상품 마스터 동기화 (구형 캐시/Retain으로 삭제 상품이 되살아나지 않도록 안전 병합)
   if (topic === TOPIC_PROD_1060) {
     try {
       const msg = JSON.parse(message.toString());
+      if (msg.senderId === 'BOT_INIT' || msg.senderId === 'BOT_REST_API') return;
       const products = msg.data?.products || (Array.isArray(msg) ? msg : []);
       if (products.length > 0) {
-        fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(products), 'utf8');
-        console.log(`[상품 동기화] 마스터 상품 데이터 ${products.length}건 봇 저장 완료`);
+        const merged = mergeProductsSafely(products);
+        fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(merged, null, 2), 'utf8');
+        console.log(`[상품 동기화] 마스터 상품 데이터 ${merged.length}건 봇 저장 완료`);
       }
     } catch(e){}
     return;
@@ -664,42 +721,7 @@ app.post('/api/products', (req, res) => {
   try {
     const products = req.body.products || (Array.isArray(req.body) ? req.body : []);
     if (Array.isArray(products) && products.length > 0) {
-      let currentMap = new Map();
-      if (fs.existsSync(PRODUCTS_BACKUP_FILE)) {
-        try {
-          const raw = JSON.parse(fs.readFileSync(PRODUCTS_BACKUP_FILE, 'utf8'));
-          const currentList = Array.isArray(raw) ? raw : (raw.products || []);
-          currentList.forEach(p => currentMap.set(p.barcode, p));
-        } catch(e) {}
-      }
-      
-      products.forEach(p => {
-        const exist = currentMap.get(p.barcode);
-        if (exist) {
-          const existIsCp = exist.name && (exist.name.startsWith('CP]') || exist.name.includes('쿠팡]'));
-          const incomingIsCp = p.name && (p.name.startsWith('CP]') || p.name.includes('쿠팡]'));
-          const preservedName = (existIsCp && !incomingIsCp) ? exist.name : (p.name || exist.name);
-          if (p.reviewStatus === 'MODIFIED' || p.targetStock !== undefined || p.minOrderQty !== undefined) {
-            currentMap.set(p.barcode, { ...exist, ...p, name: preservedName });
-          } else if (exist.reviewStatus === 'MODIFIED') {
-            currentMap.set(p.barcode, {
-              ...p,
-              ...exist,
-              name: preservedName,
-              targetStock: exist.targetStock,
-              minOrderQty: exist.minOrderQty,
-              reviewStatus: exist.reviewStatus,
-              updatedAt: exist.updatedAt,
-            });
-          } else {
-            currentMap.set(p.barcode, { ...exist, ...p, name: preservedName });
-          }
-        } else {
-          currentMap.set(p.barcode, p);
-        }
-      });
-
-      const merged = Array.from(currentMap.values());
+      const merged = mergeProductsSafely(products);
       fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(merged, null, 2), 'utf8');
       const seedFile = path.join(__dirname, '..', '..', 'client', 'src', 'data', 'seedProducts.json');
       if (fs.existsSync(seedFile)) {

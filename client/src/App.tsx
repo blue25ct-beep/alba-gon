@@ -56,12 +56,27 @@ export function App() {
   };
 
   useEffect(() => {
-    // Force update DB with latest seedProducts (migration)
+    // Force update DB with latest seedProducts (migration + prune removed items)
     const current = storageService.getProducts();
     const customized = storageService.getCustomizedSettings();
     const seed = seedProducts as any[];
-    const merged = [...current];
+    const seedBarcodes = new Set(seed.map((s) => s.barcode));
     let changed = false;
+
+    // 1. 시드에서 삭제된 구형/단종 상품은 로컬 캐시에서도 정리 (사용자가 직접 등록한 신상품/쿠팡 상품은 보존)
+    const merged = current.filter((p) => {
+      if (seedBarcodes.has(p.barcode)) return true;
+      const isUserCreated =
+        p.isNewProduct ||
+        p.category === '미등록신상품' ||
+        Boolean(p.name && (p.name.startsWith('CP]') || p.name.includes('쿠팡]')));
+      if (!isUserCreated) {
+        changed = true;
+        return false;
+      }
+      return true;
+    });
+
     for (const s of seed) {
       const idx = merged.findIndex(p => p.barcode === s.barcode);
       if (idx === -1) {
