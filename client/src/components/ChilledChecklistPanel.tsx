@@ -1,8 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Product, AuditItem } from '../types';
-import { Check, AlertTriangle, Plus, Minus, Send, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Plus, Minus, Send, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { soundManager } from '../services/sound';
-import { storageService } from '../services/storage';
 
 export const TRIANGLE_KIMBAP_BASIC = [
   { barcode: '8809279269031', name: '롯데)듬뿍참치마요네즈삼각김밥115g', cost: 1125, price: 1500, defaultQty: 1 },
@@ -41,15 +40,15 @@ export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklist
   '8801308470319': { targetStock: 15, zone: '🧊 얼음컵 냉장고', subLabel: '오른쪽 칸', vendor: 'chilled' }, // $우신]빅볼 얼음컵160g(냉동)
 
   // === 2. 빵 진열대 ===
-  '8809531970033': { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled' }, // 대심]신바나나향케익130g
-  '4903099201005': { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '상단·상온합동', vendor: 'younme' }, // (행사)수입]야마우치밀크롤케이크140g
-  '8809256674643': { targetStock: 5, zone: '🍞 빵 진열대', subLabel: '상단·상온합동', vendor: 'younme' }, // 미성]허쉬초코칩싱글쿠키50g
-  '8801068929003': { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '하단·D+1', vendor: 'chilled' }, // 삼립]시그니처카스테라125g(D+1)
-  '8801068938173': { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '하단·D+1', vendor: 'chilled' }, // 삼립]시그니처흑당카스테라125g(D+1)
-  '4973484034617': { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '하단·상온합동', vendor: 'younme' }, // 수입]바나나밀크카스테라90g
-  '4973484034600': { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '하단·상온합동', vendor: 'younme' }, // 수입]소프트카스테라90g
-  '8934760210053': { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '하단·상온합동', vendor: 'younme' }, // 수입]티포롤케이크80g
-  '8934760210060': { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '하단·상온합동', vendor: 'younme' }, // 수입]티포롤케이크딸기맛80g
+  '8809531970033': { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }, // 대심]신바나나향케익130g
+  '4903099201005': { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }, // (행사)수입]야마우치밀크롤케이크140g
+  '8809256674643': { targetStock: 5, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '2개 이하', value: 2 }] }, // 미성]허쉬초코칩싱글쿠키50g
+  '8801068929003': { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }, // 삼립]시그니처카스테라125g(D+1)
+  '8801068938173': { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }, // 삼립]시그니처흑당카스테라125g(D+1)
+  '4973484034617': { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }, // 수입]바나나밀크카스테라90g
+  '4973484034600': { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }, // 수입]소프트카스테라90g
+  '8934760210053': { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }, // 수입]티포롤케이크80g
+  '8934760210060': { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }, // 수입]티포롤케이크딸기맛80g
 
   // === 3. 수직 냉동고 A (왼쪽) ===
   '8809015225246': { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '3단', vendor: 'chilled' }, // $한맥]마시따데리맛닭가슴살큐브130g
@@ -83,17 +82,17 @@ export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklist
 
   // === 5. 쇼케이스 A (왼쪽 냉장) ===
   // 걸이대
-  '8801066060036': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // 대림]비엔나꼬치다90g(D+1)
-  '8801123304219': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // 롯데햄)미니비엔나140g(D+1)
-  '8801123410347': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // (행사)롯데햄]직꾸닭리얼간장100g(D+1)
-  '8801123308910': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // 롯데햄)의성마늘프랑크140g(D+1)
-  '8801123309498': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // (행사)롯데햄]의성마늘프랑크빅90g(D+1)
-  '8801066065451': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // (1+1)대림]구운마늘맛후랑크65g(D+1)
-  '8801007618807': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // (2+1)CJ]구운풍미마늘후랑크80g(D+1)
-  '8801066062405': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // (2+1)대림]크라비아스틱60g(D+1)
-  '8801066062528': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // (2+1)대림]크라비아스틱버터갈릭60g(D+1)
-  '8801066060258': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // (2+1)대림]닭가슴살네모나블랙페퍼80g(D+1)
-  '8801066056435': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대·D+1', vendor: 'chilled' }, // (2+1)대림]닭가슴살블랙페퍼100g(D+1)
+  '8801066060036': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // 대림]비엔나꼬치다90g(D+1)
+  '8801123304219': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // 롯데햄)미니비엔나140g(D+1)
+  '8801123410347': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // (행사)롯데햄]직꾸닭리얼간장100g(D+1)
+  '8801123308910': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // 롯데햄)의성마늘프랑크140g(D+1)
+  '8801123309498': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // (행사)롯데햄]의성마늘프랑크빅90g(D+1)
+  '8801066065451': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // (1+1)대림]구운마늘맛후랑크65g(D+1)
+  '8801007618807': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // (2+1)CJ]구운풍미마늘후랑크80g(D+1)
+  '8801066062405': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // (2+1)대림]크라비아스틱60g(D+1)
+  '8801066062528': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // (2+1)대림]크라비아스틱버터갈릭60g(D+1)
+  '8801066060258': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // (2+1)대림]닭가슴살네모나블랙페퍼80g(D+1)
+  '8801066056435': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }, // (2+1)대림]닭가슴살블랙페퍼100g(D+1)
   '8801155834616': { targetStock: 5, zone: '🥗 쇼케이스 A', subLabel: '걸이대(치즈존)', vendor: 'chilled' }, // (2+1)DM]인포켓치즈오리지널20g
   // 1단
   '8801104665421': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }, // (2+1)빙그레]닥터캡슐사과130ml
@@ -102,26 +101,26 @@ export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklist
   '8801121767139': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }, // 매일)바이오드링킹딸기250ml
   '8801121768105': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }, // 매일)요구르트로어슈거280ml
   '8801155744502': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }, // (2+1)DM]하이요구르트280ml
-  '8801007841113': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단·D+1', vendor: 'chilled' }, // (행사)CJ]미정당어묵떡볶이346g(D+1)
-  '8801007009377': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단·D+1', vendor: 'chilled' }, // (행사)CJ)가쓰오우동한그릇222.5g(D+1)
+  '8801007841113': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }, // (행사)CJ]미정당어묵떡볶이346g(D+1)
+  '8801007009377': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }, // (행사)CJ)가쓰오우동한그릇222.5g(D+1)
   // 2단
-  '8801066066069': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단·D+1', vendor: 'chilled' }, // (1+1)대림]크라비아데일리80g(D+1)
-  '8801066062986': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단·D+1', vendor: 'chilled' }, // (2+1)대림]로얄크랩100g(D+1)
+  '8801066066069': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }, // (1+1)대림]크라비아데일리80g(D+1)
+  '8801066062986': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }, // (2+1)대림]로얄크랩100g(D+1)
   '8809136850815': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }, // 제니코)라면쏙치즈 30g
   '8801155737580': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }, // DM]슈레드피자치즈(눈꽃)25g
   '8801069176710': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }, // 남양]드빈치체다슬라이스치즈85g
   '8801118400926': { targetStock: 1, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }, // 롯데)햄치즈게맛살샌드위치173g
   '8801118400957': { targetStock: 1, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }, // 롯데)NEW듬뿍햄샌드위치155g
   // 3단
-  '8801007635989': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단·D+1', vendor: 'chilled' }, // CJ]비비고김치볶음80g(D+1)
-  '8801024190201': { targetStock: 3, zone: '🥗 쇼케이스 A', subLabel: '3단·D+1', vendor: 'chilled' }, // 종가집]종가집맛김치컵130g(D+1)
-  '8801316124259': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단·D+1', vendor: 'chilled' }, // 한울]매운실비김치(컵)80g(D+1)
+  '8801007635989': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'chilled' }, // CJ]비비고김치볶음80g(D+1)
+  '8801024190201': { targetStock: 3, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'chilled' }, // 종가집]종가집맛김치컵130g(D+1)
+  '8801316124259': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'chilled' }, // 한울]매운실비김치(컵)80g(D+1)
   // 4단
-  '8801316100031': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단·D+1', vendor: 'chilled' }, // 한울]꼬마단무지120g(D+1)
+  '8801316100031': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'chilled' }, // 한울]꼬마단무지120g(D+1)
   '8809396600014': {
     targetStock: 4,
     zone: '🥗 쇼케이스 A',
-    subLabel: '4단·D+1',
+    subLabel: '4단',
     vendor: 'chilled',
     buttons: [
       { label: '0개', value: 0 },
@@ -130,28 +129,28 @@ export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklist
       { label: '4개+(충분)', value: 4 },
     ],
   }, // 진주)마루카네감동란(삶은계란)2구(D+1)
-  '8801392194078': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단·D+1', vendor: 'chilled' }, // CJ]훈제대란100g(2입)(D+1)
-  '8801242001716': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단·D+1', vendor: 'chilled' }, // (행사)CJ)프레쉬안오뎅한그릇360g(D+1)
-  '8801242039085': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단·D+1', vendor: 'chilled' }, // (행사)CJ)얼큰오뎅한그릇360g(D+1)
+  '8801392194078': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'chilled' }, // CJ]훈제대란100g(2입)(D+1)
+  '8801242001716': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'chilled' }, // (행사)CJ)프레쉬안오뎅한그릇360g(D+1)
+  '8801242039085': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'chilled' }, // (행사)CJ)얼큰오뎅한그릇360g(D+1)
   // 5단
   '8809106840013': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }, // 풍림)고향족발미니300g
   '8809106840044': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }, // 풍림)고향편육250g
-  '8801068939866': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단·D+1', vendor: 'chilled' }, // 삼립]로스트치킨소금구이210g(D+1)
-  '8801118879425': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단·D+1', vendor: 'chilled' }, // 롯데햄)까르보나라스파게티220g(D+1)
-  '8801118879418': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단·D+1', vendor: 'chilled' }, // 롯데햄)볼로네이즈스파게티220g(D+1)
-  '8801118005824': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단·D+1', vendor: 'chilled' }, // 롯데햄]생크림로제스파게티220g(D+1)
+  '8801068939866': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }, // 삼립]로스트치킨소금구이210g(D+1)
+  '8801118879425': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }, // 롯데햄)까르보나라스파게티220g(D+1)
+  '8801118879418': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }, // 롯데햄)볼로네이즈스파게티220g(D+1)
+  '8801118005824': { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }, // 롯데햄]생크림로제스파게티220g(D+1)
   // 6단 (상온 합동진열 음료)
-  '8801382124528': { targetStock: 3, zone: '🥗 쇼케이스 A', subLabel: '6단·상온합동', vendor: 'younme' }, // 웅진]아침햇살펫500ml
-  '8801382150992': { targetStock: 4, zone: '🥗 쇼케이스 A', subLabel: '6단·상온합동', vendor: 'younme' }, // 웅진]초록매실제로펫500ml
+  '8801382124528': { targetStock: 3, zone: '🥗 쇼케이스 A', subLabel: '6단', vendor: 'younme' }, // 웅진]아침햇살펫500ml
+  '8801382150992': { targetStock: 4, zone: '🥗 쇼케이스 A', subLabel: '6단', vendor: 'younme' }, // 웅진]초록매실제로펫500ml
 
   // === 6. 쇼케이스 B (오른쪽 냉장) ===
   // 1단
-  '8806011416142': { targetStock: 5, zone: '🥛 쇼케이스 B', subLabel: '1단·쿠팡합동', vendor: 'younme' }, // CP] 동아제약 얼박 음료
+  '8806011416142': { targetStock: 5, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme', buttons: [{ label: '2개 이하', value: 2 }] }, // CP] 동아제약 얼박 음료
   '8801056623012': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }, // 칠성]델몬트콜드오렌지250ml
   '8801056624019': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }, // 칠성]델몬트콜드포도250ml
-  '8809422042986': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단·상온합동', vendor: 'younme' }, // 이노엔]확깬다헛개컨디션병120ml
-  '8801013777468': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단·상온합동', vendor: 'younme' }, // (1+1)삼양사]큐원상쾌환부스터제로100ml
-  '8801056104641': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단·상온합동', vendor: 'younme' }, // 칠성]깨수깡캔160ml
+  '8809422042986': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }, // 이노엔]확깬다헛개컨디션병120ml
+  '8801013777468': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }, // (1+1)삼양사]큐원상쾌환부스터제로100ml
+  '8801056104641': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }, // 칠성]깨수깡캔160ml
   '8801155744472': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }, // (1+1)DM]테이크얼라이브블렌드레몬300ml
   '8801155744489': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }, // (1+1)DM]테이크얼라이브블렌드자몽300ml
   '8801155735074': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }, // (2+1)DM]테이크얼라이브(스위트자몽)250ml
@@ -174,10 +173,11 @@ export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklist
     vendor: 'chilled',
     buttons: [
       { label: '0개', value: 0 },
-      { label: '1~2개', value: 2 },
-      { label: '3개 이하', value: 3 },
+      { label: '1개', value: 1 },
+      { label: '2개', value: 2 },
+      { label: '3개', value: 3 },
       { label: '4개', value: 4 },
-      { label: '5개+(충분)', value: 5 },
+      { label: '5개+', value: 5 },
     ],
   }, // 빙그레)바나나맛우유240ml
   '8801104212205': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(단지우유)', vendor: 'chilled' }, // 빙그레)바나나라이트우유240ml
@@ -200,8 +200,8 @@ export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklist
   '8801121763940': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }, // 매일)아몬드브리즈언스위트190ml
   '8801121025666': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }, // 매일]아몬드브리즈프로틴190ml
   '8801121768068': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }, // 매일)아몬드브리즈초콜릿190ml
-  '8801392039225': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단·D+1', vendor: 'chilled' }, // (행사)CJ]얼티브비건프로틴초코250ml(D+1)
-  '8801392081484': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단·D+1', vendor: 'chilled' }, // (1+1)CJ]얼티브프로틴밤250ml(D+1)
+  '8801392039225': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }, // (행사)CJ]얼티브비건프로틴초코250ml(D+1)
+  '8801392081484': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }, // (1+1)CJ]얼티브프로틴밤250ml(D+1)
   '8801115118886': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }, // (2+1)서울]내안의진짜초코280ml
   '8801115118893': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }, // (2+1)서울]내안의진짜딸기280ml
   '8801104670876': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }, // (2+1)빙그레]더단백초코250ml
@@ -214,8 +214,8 @@ export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklist
   '8801115382003': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }, // 동서]스타벅스컵카페라떼320ml
   '8801115382157': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }, // 동서]스타벅스카페라떼설탕무첨가320ml
   '8801115224303': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }, // 동서]스타벅스컵카페모카320ml
-  '8801037086188': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단·상온합동', vendor: 'younme' }, // 동서]스타벅스프라푸치노커피병281ml
-  '8801037086195': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단·상온합동', vendor: 'younme' }, // 동서]스타벅스프라푸치노모카병281ml
+  '8801037086188': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단', vendor: 'younme' }, // 동서]스타벅스프라푸치노커피병281ml
+  '8801037086195': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단', vendor: 'younme' }, // 동서]스타벅스프라푸치노모카병281ml
   '8801121768174': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }, // (행사)매일]바리스타룰스블랙325ml
   '8801121768167': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }, // (행사)매일]바리스타룰스라떼325ml
   '8801121771402': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }, // (행사)매일]바리스타룰스바닐라라떼325ml
@@ -230,19 +230,24 @@ export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklist
   '8801104304047': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }, // (2+1)빙그레)사이즈업카페라떼350ml
   '8801104306591': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }, // (2+1)빙그레)사이즈업바닐라라떼350ml
   // 하단 외부 바구니 (상온 합동진열: 컵시리얼 / 통조림 / 케찹)
-  '8801083333304': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // 켈로그]콘푸로스트 컵시리얼40g
-  '8801083323305': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // 켈로그]첵스 컵시리얼40g
-  '8801083330303': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // 켈로그]아몬드후레이크컵시리얼40g
-  '8801007512259': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // CJ]스팸클래식200g
-  '8801007314891': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // CJ]스팸120g
-  '8801047111849': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // 동원]라이트스탠다드참치150g
-  '8801045100111': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // 오뚜기]토마토케찹300g
-  '8801047141099': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // 동원]자연산꽁치캔400g
-  '8801045880112': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니·상온합동', vendor: 'younme' }, // 오뚜기]황도캔400g
+  '8801083333304': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // 켈로그]콘푸로스트 컵시리얼40g
+  '8801083323305': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // 켈로그]첵스 컵시리얼40g
+  '8801083330303': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // 켈로그]아몬드후레이크컵시리얼40g
+  '8801007512259': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // CJ]스팸클래식200g
+  '8801007314891': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // CJ]스팸120g
+  '8801047111849': { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // 동원]라이트스탠다드참치150g
+  '8801045100111': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // 오뚜기]토마토케찹300g
+  '8801047141099': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // 동원]자연산꽁치캔400g
+  '8801045880112': { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '하단바구니', vendor: 'younme' }, // 오뚜기]황도캔400g
 };
 
-const DAY_NAMES = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-const NEXT_DAY_NAMES = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+const cleanWorkerDisplayName = (rawName: string) =>
+  rawName
+    .replace(/^CP\]\s*/i, '')
+    .replace(/쿠팡\]\s*/g, '')
+    .replace(/\(D\+1\)/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 
 export interface SubmittedChecklistItem {
   barcode: string;
@@ -265,8 +270,6 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   existingAudits,
   onSubmitChecklist,
 }) => {
-  const todayDay = new Date().getDay(); // 0=일, 1=월, 2=화, 3=수, 4=목, 5=금, 6=토
-
   // 구역별 아코디언 열림 상태 (기본: 얼음컵 열림, 버튼 클릭으로 구역별 빠른 이동/펼치기)
   const [openZones, setOpenZones] = useState<Record<string, boolean>>({
     '🧊 얼음컵 냉장고': true,
@@ -288,23 +291,6 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
 
   // 최종 확인 팝업 표시 여부
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingDPlus1Barcodes, setPendingDPlus1Barcodes] = useState<string[]>([]);
-
-  useEffect(() => {
-    fetch('http://localhost:3001/api/pending-dplus1')
-      .then((r) => r.json())
-      .then((d) => {
-        if (d && d.success && Array.isArray(d.barcodes)) {
-          setPendingDPlus1Barcodes(d.barcodes);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const yesterdayOrderedSet = useMemo(
-    () => storageService.getYesterdayOrderedBarcodes(pendingDPlus1Barcodes),
-    [pendingDPlus1Barcodes, products]
-  );
 
   const checklistItems = useMemo(() => {
     const prodMap = new Map(products.map((p) => [p.barcode, p]));
@@ -481,31 +467,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* 1. 저온 재고 체크 안내 배너 */}
-      <div className="bg-cyan-50 border border-cyan-200 rounded-2xl p-4 space-y-2.5">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-600 text-white">
-              ❄️ 저온 6구역 통합 체크리스트
-            </span>
-            <h3 className="mt-1.5 font-bold text-cyan-950 text-base">
-              오늘({DAY_NAMES[todayDay]}) 발주 ➔ 내일({NEXT_DAY_NAMES[todayDay]}) 입고
-            </h3>
-            <p className="text-xs text-cyan-800 mt-0.5 leading-relaxed">
-              상온 합동진열 상품도 함께 체크하면 자동으로 상온 발주함으로 분류됩니다.
-            </p>
-          </div>
-        </div>
-
-        {todayDay === 5 && (
-          <div className="bg-amber-100 border border-amber-300 text-amber-900 rounded-xl p-3 text-xs font-semibold flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
-            <span>오늘은 금요일(저온 발주 휴무일)입니다. 미리 재고를 체크해 두실 수 있습니다.</span>
-          </div>
-        )}
-      </div>
-
-      {/* 2. 6구역 빠른 선택 탭 */}
+      {/* 1. 6구역 빠른 선택 탭 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <div>
@@ -567,11 +529,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
                   {items.map((it) => {
                     const chosen = selectedStocks[it.barcode];
                     const isChecked = chosen !== undefined && chosen !== null;
-                    const isDPlus1 = storageService.isDPlus1Product(it.barcode, it.name);
-                    const isOrderedYesterday = isDPlus1 && yesterdayOrderedSet.has(it.barcode);
-                    const isRoomTemp = it.vendor === 'younme';
-                    const shortage = isChecked ? Math.max(0, it.targetStock - chosen) : 0;
-                    const predictedOrder = isOrderedYesterday ? 0 : (shortage > 0 ? Math.ceil(shortage / it.minOrderQty) * it.minOrderQty : 0);
+                    const displayName = cleanWorkerDisplayName(it.name);
 
                     return (
                       <div
@@ -582,48 +540,18 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              {it.subLabel && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-sunken text-ink-soft font-semibold">
-                                  {it.subLabel}
-                                </span>
-                              )}
-                              {isRoomTemp && (
-                                <span className="text-[10px] px-1.5 py-0.5 rounded font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                  🌿 상온합동
-                                </span>
-                              )}
-                              {isDPlus1 && (
-                                <span
-                                  className={`text-[10px] px-1.5 py-0.5 rounded font-bold border ${
-                                    isOrderedYesterday
-                                      ? 'bg-rose-50 text-rose-700 border-rose-300'
-                                      : 'bg-purple-50 text-purple-700 border-purple-200'
-                                  }`}
-                                >
-                                  {isOrderedYesterday ? '🚫 D+1 전날발주(오늘제외)' : '⏳ D+1 익일배송'}
-                                </span>
-                              )}
-                            </div>
-                            <p className="font-semibold text-sm text-ink leading-snug break-keep mt-1">{it.name}</p>
-                            <p className="text-[11px] text-ink-faint mt-0.5">
-                              목표 재고 {it.targetStock}개 · 최소단위 {it.minOrderQty}개
-                              {isOrderedYesterday && ' · 전날 발주분 입고 대기중(오늘 발주 제외)'}
-                            </p>
+                            {it.subLabel && (
+                              <span className="inline-block text-[10px] px-1.5 py-0.5 rounded bg-sunken text-ink-soft font-semibold mb-1">
+                                {it.subLabel}
+                              </span>
+                            )}
+                            <p className="font-semibold text-sm text-ink leading-snug break-keep">{displayName}</p>
                           </div>
 
                           {/* 현재 선택된 상태 배지 */}
                           {isChecked ? (
-                            <span
-                              className={`text-xs font-bold px-2.5 py-1 rounded-full shrink-0 tabular ${
-                                isOrderedYesterday
-                                  ? 'bg-rose-100 text-rose-800 border border-rose-300'
-                                  : predictedOrder > 0
-                                    ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                                    : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                              }`}
-                            >
-                              현재 {chosen}개 ➔ {isOrderedYesterday ? 'D+1 제외(0개)' : predictedOrder > 0 ? `발주 ${predictedOrder}개` : '충분(0개)'}
+                            <span className="text-xs font-bold px-2.5 py-1 rounded-full shrink-0 tabular bg-cyan-100 text-cyan-800 border border-cyan-300">
+                              현재 {chosen}개
                             </span>
                           ) : (
                             <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-sunken text-ink-faint shrink-0">
@@ -701,9 +629,9 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
           <div className="bg-surface rounded-t-3xl sm:rounded-3xl w-full max-w-md max-h-[90vh] flex flex-col shadow-2xl animate-rise overflow-hidden">
             <div className="p-5 border-b border-line flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-extrabold text-ink">📋 저온·합동진열 재고 최종 확인</h3>
+                <h3 className="text-lg font-extrabold text-ink">📋 저온 재고 최종 확인</h3>
                 <p className="text-xs text-ink-soft mt-0.5">
-                  입력한 재고 수량이 맞는지 확인해 주세요. (상온합동 상품은 상온 발주로 자동 분류됩니다)
+                  입력한 현재 재고 수량이 맞는지 한 번 더 확인해 주세요.
                 </p>
               </div>
               <button
@@ -730,25 +658,13 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
                 <div className="divide-y divide-line border border-line rounded-2xl overflow-hidden bg-canvas">
                   {checkedItems.map((it) => {
                     const stock = selectedStocks[it.barcode]!;
-                    const isDPlus1 = storageService.isDPlus1Product(it.barcode, it.name);
-                    const isOrderedYesterday = isDPlus1 && yesterdayOrderedSet.has(it.barcode);
-                    const shortage = Math.max(0, it.targetStock - stock);
-                    const orderQty = isOrderedYesterday ? 0 : (shortage > 0 ? Math.ceil(shortage / it.minOrderQty) * it.minOrderQty : 0);
                     return (
                       <div key={it.barcode} className="p-3 flex items-center justify-between gap-2 text-xs">
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1">
-                            {it.vendor === 'younme' && (
-                              <span className="text-[10px] px-1 py-0.2 rounded bg-emerald-100 text-emerald-700 font-bold shrink-0">상온</span>
-                            )}
-                            <p className="font-semibold text-ink truncate">{it.name}</p>
-                          </div>
-                          <p className="text-[11px] text-ink-faint mt-0.5">
-                            목표 {it.targetStock}개 ➔{' '}
-                            <strong className={isOrderedYesterday ? 'text-rose-700' : orderQty > 0 ? 'text-amber-700' : 'text-emerald-700'}>
-                              {isOrderedYesterday ? '🚫 D+1 전날발주 (오늘발주 제외)' : orderQty > 0 ? `${orderQty}개 발주 예정` : '발주 없음 (충분)'}
-                            </strong>
-                          </p>
+                          <p className="font-semibold text-ink truncate">{cleanWorkerDisplayName(it.name)}</p>
+                          {it.subLabel && (
+                            <p className="text-[11px] text-ink-faint mt-0.5">{it.zone} · {it.subLabel}</p>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-1.5 shrink-0">

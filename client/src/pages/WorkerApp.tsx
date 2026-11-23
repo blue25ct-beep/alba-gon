@@ -578,8 +578,10 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
         />
       )}
 
-      {/* 스캐너 */}
-      <BarcodeScanner onDetected={handleBarcodeDetected} isPaused={step !== 'IDLE'} />
+      {/* 스캐너 (저온 모드는 6구역 체크리스트 전용으로 카메라 숨김) */}
+      {selectedCategory !== 'CHILLED' && (
+        <BarcodeScanner onDetected={handleBarcodeDetected} isPaused={step !== 'IDLE'} />
+      )}
 
       {/* 스캔 목록 */}
       <section className="space-y-3">
@@ -622,7 +624,9 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
 
         {filteredAudits.length === 0 ? (
           <p className="py-12 text-center text-sm text-ink-faint leading-relaxed text-balance break-keep">
-            상품 바코드를 비추면 자동으로 인식합니다
+            {selectedCategory === 'CHILLED'
+              ? '위 구역별 체크표에서 재고를 선택한 뒤 최종 확인을 눌러주세요'
+              : '상품 바코드를 비추면 자동으로 인식합니다'}
           </p>
         ) : (
           <ul className="divide-y divide-line">

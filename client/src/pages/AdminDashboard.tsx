@@ -65,18 +65,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
   const [expandedArchiveDate, setExpandedArchiveDate] = useState<string | null>(null);
   const [pendingDPlus1Barcodes, setPendingDPlus1Barcodes] = useState<string[]>([]);
 
-  // 관리자 전용 삼각김밥 자동 편성 상태 (별도 조작 없으면 요일별 자동 포함: 평일 3종 / 목요일 6종)
-  const [kimbapMode, setKimbapMode] = useState<'REGULAR' | 'THURSDAY' | 'OFF'>(() =>
-    new Date().getDay() === 4 ? 'THURSDAY' : 'REGULAR'
-  );
-  const [kimbapQtys, setKimbapQtys] = useState<Record<string, number>>(() => {
-    const init: Record<string, number> = {};
-    [...TRIANGLE_KIMBAP_BASIC, ...TRIANGLE_KIMBAP_THU_EXTRA].forEach((k) => {
-      init[k.barcode] = k.defaultQty;
-    });
-    return init;
-  });
-  const [showKimbapAdjust, setShowKimbapAdjust] = useState(false);
+  // 관리자 화면에서 개별 삭제 / 목록 비우기 / 발주 완료한 자동 삼각김밥 추적 (사용자 조작 최우선 존중)
+  const [dismissedAutoKimbaps, setDismissedAutoKimbaps] = useState<Set<string>>(new Set());
 
   const historyStats = React.useMemo(() => {
     const history = orderHistory;
@@ -465,31 +455,25 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
     };
   });
 
-  const allItemsToOrder = orderItems.filter((item) => item.finalOrderQty > 0);
-  const coupangItems = allItemsToOrder.filter((item) => item.productName.includes('쿠팡]') || item.productName.startsWith('CP]'));
-  const itemsToOrder = allItemsToOrder.filter((item) => !item.productName.includes('쿠팡]') && !item.productName.startsWith('CP]'));
-  const younmeItems = itemsToOrder.filter(item => item.vendor === 'younme');
-  const chilledAuditItems = itemsToOrder.filter(item => item.vendor === 'chilled');
+  // 요일별 삼각김밥 자동 편성 (별도 조작 없으면 바로 발주 리스트에 포함: 평일 3종 / 목요일 6종)
+  const todayAutoKimbapDefs = new Date().getDay() === 4
+    ? [...TRIANGLE_KIMBAP_BASIC, ...TRIANGLE_KIMBAP_THU_EXTRA]
+    : TRIANGLE_KIMBAP_BASIC;
 
-  // 별도 조작 없이 자동 포함되는 삼각김밥 항목 (이미 실사 목록에 들어온 삼각김밥은 중복 제외)
-  const activeKimbapDefs = kimbapMode === 'OFF'
-    ? []
-    : kimbapMode === 'THURSDAY'
-      ? [...TRIANGLE_KIMBAP_BASIC, ...TRIANGLE_KIMBAP_THU_EXTRA]
-      : TRIANGLE_KIMBAP_BASIC;
-
-  const autoKimbapItems: OrderItem[] = activeKimbapDefs
-    .filter((k) => (kimbapQtys[k.barcode] ?? 1) > 0 && !audits.some((a) => a.barcode === k.barcode))
+  const auditBarcodeSet = new Set(audits.map((a) => a.barcode));
+  const autoKimbapOrderItems: OrderItem[] = todayAutoKimbapDefs
+    .filter((k) => !auditBarcodeSet.has(k.barcode) && !dismissedAutoKimbaps.has(k.barcode))
     .map((k) => {
-      const qty = kimbapQtys[k.barcode] ?? 1;
       const master = products.find((p) => p.barcode === k.barcode);
+      const recommendedQty = k.defaultQty;
+      const finalOrderQty = customQuantities[k.barcode] !== undefined ? customQuantities[k.barcode] : recommendedQty;
       return {
         barcode: k.barcode,
         productName: master?.name || k.name,
         currentStock: 0,
-        targetStock: qty,
-        recommendedQty: qty,
-        finalOrderQty: qty,
+        targetStock: recommendedQty,
+        recommendedQty,
+        finalOrderQty,
         minOrderQty: 1,
         isBelowMinQty: false,
         category: '저온냉장',
@@ -497,11 +481,17 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
         cost: master?.cost || k.cost,
         price: master?.price || k.price,
         status: 'PENDING',
-        workerName: '삼각김밥 자동',
+        workerName: '요일자동',
       };
     });
 
-  const chilledItems = [...chilledAuditItems, ...autoKimbapItems];
+  const combinedOrderItems: OrderItem[] = [...orderItems, ...autoKimbapOrderItems];
+
+  const allItemsToOrder = combinedOrderItems.filter((item) => item.finalOrderQty > 0);
+  const coupangItems = allItemsToOrder.filter((item) => item.productName.includes('쿠팡]') || item.productName.startsWith('CP]'));
+  const itemsToOrder = allItemsToOrder.filter((item) => !item.productName.includes('쿠팡]') && !item.productName.startsWith('CP]'));
+  const younmeItems = itemsToOrder.filter(item => item.vendor === 'younme');
+  const chilledItems = itemsToOrder.filter(item => item.vendor === 'chilled');
   const spchainItems = itemsToOrder.filter(item => item.vendor === 'spchain');
 
   const handleSnapToMultiple = (barcode: string, val: number, minQty: number) => {
@@ -555,6 +545,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
   };
 
   const handleRemoveFromOrder = (barcode: string) => {
+    setDismissedAutoKimbaps((prev) => new Set(prev).add(barcode));
     storageService.deleteAudit(barcode);
     const updated = storageService.getAudits();
     loadData();
@@ -563,6 +554,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
 
   const handleClearAllAudits = () => {
     if (!confirm('실사 목록을 모두 비웁니다. 매장 폰의 목록도 함께 지워집니다.')) return;
+    setDismissedAutoKimbaps(new Set([...TRIANGLE_KIMBAP_BASIC, ...TRIANGLE_KIMBAP_THU_EXTRA].map((k) => k.barcode)));
     storageService.clearAudits('관리자 목록 비우기');
     setCustomQuantities({});
     loadData();
@@ -638,11 +630,12 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
 
       if (successOriginalBarcodes.size > 0) {
         storageService.updateProductLastOrderDate(Array.from(successOriginalBarcodes));
-        // 자동 포함된 삼각김밥이 발주 완료되면 중복 발주 방지를 위해 자동 포함 해제
-        const orderedAnyAutoKimbap = autoKimbapItems.some((k) => successOriginalBarcodes.has(k.barcode));
-        if (orderedAnyAutoKimbap) {
-          setKimbapMode('OFF');
-        }
+        // 자동 포함된 삼각김밥이 발주 완료되면 목록에서 제거
+        setDismissedAutoKimbaps((prev) => {
+          const next = new Set(prev);
+          successOriginalBarcodes.forEach((b) => next.add(b));
+          return next;
+        });
         
         // Add to history
         const successItems = targetItems.filter((i) => successOriginalBarcodes.has(i.barcode));
@@ -897,7 +890,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
 
   const unmappedAudits = audits.filter((a) => a.isUnmapped);
 
-  let filteredItems = orderItems.filter((item) => {
+  let filteredItems = combinedOrderItems.filter((item) => {
     const matchesSearch =
       item.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.barcode.includes(searchQuery);
@@ -1362,105 +1355,22 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
         {(tempFilter === "ALL" || tempFilter === "CHILLED") && (
         <section className="bg-white border border-cyan-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <h3 className="text-lg font-bold text-cyan-800">❄️ 유앤미24(저온) 발주</h3>
-              <button
-                type="button"
-                onClick={() => setShowKimbapAdjust((v) => !v)}
-                className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border border-cyan-200 transition-colors"
-                title="삼각김밥 자동 포함 수량을 조절합니다 (별도 조작 없으면 요일별 자동 포함)"
-              >
-                🍙 삼각김밥 {kimbapMode === 'OFF' ? '제외됨' : `자동 ${autoKimbapItems.reduce((s, k) => s + k.finalOrderQty, 0)}개`} {showKimbapAdjust ? '▲' : '▼'}
-              </button>
-            </div>
-            <p className="text-sm text-ink-soft mb-4 break-keep">
-              저온 냉장·냉동 상품과 삼각김밥(별도 조작 없으면 평일 3종 / 목요일 6종 자동 포함)을 저온 장바구니로 발주합니다.
+            <h3 className="text-lg font-bold text-cyan-800 mb-2">❄️ 유앤미24(저온) 발주</h3>
+            <p className="text-sm text-ink-soft mb-6 break-keep">
+              저온 냉장·냉동 상품과 요일별 삼각김밥(평일 3종 / 목요일 6종)을 유앤미24 저온 장바구니로 자동 발주합니다.
             </p>
-
-            {/* 관리자 전용 삼각김밥 자동 포함 조절 패널 */}
-            {showKimbapAdjust && (
-              <div className="mb-4 p-3 rounded-2xl bg-cyan-50/70 border border-cyan-200 space-y-2.5">
-                <div className="grid grid-cols-3 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setKimbapMode('REGULAR')}
-                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all ${
-                      kimbapMode === 'REGULAR' ? 'bg-cyan-600 text-white border-cyan-600' : 'bg-white text-cyan-800 border-cyan-200'
-                    }`}
-                  >
-                    평일 3종
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setKimbapMode('THURSDAY')}
-                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all ${
-                      kimbapMode === 'THURSDAY' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-indigo-800 border-cyan-200'
-                    }`}
-                  >
-                    목요일 6종
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setKimbapMode('OFF')}
-                    className={`py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all ${
-                      kimbapMode === 'OFF' ? 'bg-slate-600 text-white border-slate-600' : 'bg-white text-slate-600 border-cyan-200'
-                    }`}
-                  >
-                    제외(0)
-                  </button>
-                </div>
-
-                {kimbapMode !== 'OFF' && (
-                  <div className="divide-y divide-cyan-100 bg-white rounded-xl border border-cyan-100 overflow-hidden">
-                    {activeKimbapDefs.map((k, idx) => {
-                      const qty = kimbapQtys[k.barcode] ?? 1;
-                      return (
-                        <div key={k.barcode} className="px-2.5 py-1.5 flex items-center justify-between gap-2 text-xs">
-                          <span className="truncate text-ink font-medium">
-                            {idx >= 3 && <span className="text-[10px] text-indigo-600 font-bold mr-1">[목]</span>}
-                            {k.name.replace(/^롯데[\])]/, '')}
-                          </span>
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => setKimbapQtys((p) => ({ ...p, [k.barcode]: Math.max(0, (p[k.barcode] ?? 1) - 1) }))}
-                              className="w-6 h-6 rounded-full bg-sunken hover:bg-line text-ink font-bold flex items-center justify-center"
-                            >
-                              -
-                            </button>
-                            <span className="w-6 text-center font-bold tabular">{qty}</span>
-                            <button
-                              type="button"
-                              onClick={() => setKimbapQtys((p) => ({ ...p, [k.barcode]: (p[k.barcode] ?? 1) + 1 }))}
-                              className="w-6 h-6 rounded-full bg-cyan-100 hover:bg-cyan-200 text-cyan-800 font-bold flex items-center justify-center"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
           <div className="flex items-center justify-between mt-auto">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Package className="w-4 h-4 text-cyan-600" />
-                <span className="text-sm font-medium text-ink">
-                  {chilledItems.length}개 대기중
-                  {autoKimbapItems.length > 0 && (
-                    <span className="text-xs text-cyan-700 ml-1">(삼각 {autoKimbapItems.length}종 포함)</span>
-                  )}
-                </span>
+                <span className="text-sm font-medium text-ink">{chilledItems.length}개 대기중</span>
               </div>
             </div>
             <button
               disabled={isYounmeOrdering || chilledItems.length === 0 || isSpchainOrdering}
               onClick={() => handleStartOrder("YOUNME", chilledItems)}
-              className="h-10 px-6 rounded-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-sunken disabled:text-ink-faint text-white text-sm font-medium transition-colors"
+              className="h-10 px-6 rounded-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-sunken disabled:text-ink-faint text-white text-sm font-medium transition-colors whitespace-nowrap"
             >
               {isYounmeOrdering ? "발주 중" : "저온 발주하기"}
             </button>
@@ -1659,7 +1569,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
 
         {filteredItems.length === 0 ? (
           <p className="py-16 text-center text-sm text-ink-faint">
-            {orderItems.length === 0
+            {combinedOrderItems.length === 0
               ? '매장에서 스캔한 재고가 아직 없습니다'
               : '검색 결과가 없습니다'}
           </p>
