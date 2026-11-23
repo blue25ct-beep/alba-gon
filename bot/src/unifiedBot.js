@@ -676,19 +676,23 @@ app.post('/api/products', (req, res) => {
       products.forEach(p => {
         const exist = currentMap.get(p.barcode);
         if (exist) {
+          const existIsCp = exist.name && (exist.name.startsWith('CP]') || exist.name.includes('쿠팡]'));
+          const incomingIsCp = p.name && (p.name.startsWith('CP]') || p.name.includes('쿠팡]'));
+          const preservedName = (existIsCp && !incomingIsCp) ? exist.name : (p.name || exist.name);
           if (p.reviewStatus === 'MODIFIED' || p.targetStock !== undefined || p.minOrderQty !== undefined) {
-            currentMap.set(p.barcode, { ...exist, ...p });
+            currentMap.set(p.barcode, { ...exist, ...p, name: preservedName });
           } else if (exist.reviewStatus === 'MODIFIED') {
             currentMap.set(p.barcode, {
               ...p,
               ...exist,
+              name: preservedName,
               targetStock: exist.targetStock,
               minOrderQty: exist.minOrderQty,
               reviewStatus: exist.reviewStatus,
               updatedAt: exist.updatedAt,
             });
           } else {
-            currentMap.set(p.barcode, { ...exist, ...p });
+            currentMap.set(p.barcode, { ...exist, ...p, name: preservedName });
           }
         } else {
           currentMap.set(p.barcode, p);

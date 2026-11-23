@@ -58,6 +58,7 @@ export function App() {
   useEffect(() => {
     // Force update DB with latest seedProducts (migration)
     const current = storageService.getProducts();
+    const customized = storageService.getCustomizedSettings();
     const seed = seedProducts as any[];
     const merged = [...current];
     let changed = false;
@@ -67,9 +68,17 @@ export function App() {
         merged.push(s);
         changed = true;
       } else {
-        if (merged[idx].category !== s.category && s.category === '주류') {
-          merged[idx].category = '주류';
+        const cust = customized[s.barcode];
+        if (merged[idx].category !== s.category && s.category) {
+          merged[idx].category = s.category;
+          changed = true;
+        }
+        if (s.minOrderQty && merged[idx].minOrderQty !== s.minOrderQty && cust?.minOrderQty === undefined) {
           merged[idx].minOrderQty = s.minOrderQty;
+          changed = true;
+        }
+        if (s.cost && merged[idx].cost !== s.cost) {
+          merged[idx].cost = s.cost;
           changed = true;
         }
         if (merged[idx].targetStock === 10 && s.targetStock === 1) {
@@ -82,17 +91,21 @@ export function App() {
       localStorage.setItem('albagom_products_v3', JSON.stringify(merged));
     }
     
-    // Migrate audits targetStock
+    // Migrate audits targetStock & minOrderQty
     const auditsStr = localStorage.getItem('albagom_audits_v1');
     if (auditsStr) {
       try {
         const audits = JSON.parse(auditsStr);
         let auditsChanged = false;
         for (const a of audits) {
-          if (a.targetStock === 10) {
-            const p = merged.find(x => x.barcode === a.barcode);
-            if (p && p.targetStock === 1) {
+          const p = merged.find(x => x.barcode === a.barcode);
+          if (p) {
+            if (a.targetStock === 10 && p.targetStock === 1) {
               a.targetStock = 1;
+              auditsChanged = true;
+            }
+            if (p.minOrderQty && a.minOrderQty !== p.minOrderQty) {
+              a.minOrderQty = p.minOrderQty;
               auditsChanged = true;
             }
           }

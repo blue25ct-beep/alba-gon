@@ -436,6 +436,7 @@ getProducts(): Product[] {
       if (customized) {
         product = {
           ...product,
+          name: (customized.name && customized.name.trim()) ? customized.name : product.name,
           targetStock: customized.targetStock !== undefined ? customized.targetStock : product.targetStock,
           minOrderQty: customized.minOrderQty !== undefined ? customized.minOrderQty : product.minOrderQty,
           reviewStatus: (customized.reviewStatus as any) || product.reviewStatus,
@@ -1135,11 +1136,12 @@ getProducts(): Product[] {
               map.set(p.barcode, { ...p });
             } else {
               // 기존 상품: 점장님이 설정한 목표재고, 발주단위, 검수기록(updatedAt)은 영구 보존!
-              map.set(p.barcode, { 
-                ...existing, 
-                name: p.name, 
-                price: p.price, 
-                cost: p.cost 
+              const keepCustomName = (existing.name && (existing.name.startsWith('CP]') || existing.name.includes('쿠팡]'))) || Boolean(this.getCustomizedSettings()[p.barcode]?.name);
+              map.set(p.barcode, {
+                ...existing,
+                name: keepCustomName ? existing.name : p.name,
+                price: p.price || existing.price,
+                cost: p.cost || existing.cost
               });
             }
           });

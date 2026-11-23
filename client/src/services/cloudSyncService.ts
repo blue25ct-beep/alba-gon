@@ -198,7 +198,10 @@ class CloudSyncService {
               prodList.forEach((p: any) => {
                 const ex = map.get(p.barcode);
                 const c = customized[p.barcode];
-                const base = ex ? { ...p, ...ex } : p;
+                const exIsCp = ex?.name && (ex.name.startsWith('CP]') || ex.name.includes('쿠팡]'));
+                const pIsCp = p.name && (p.name.startsWith('CP]') || p.name.includes('쿠팡]'));
+                const baseName = (exIsCp && !pIsCp) ? ex.name : (p.name || ex?.name);
+                const base = ex ? { ...p, ...ex, name: baseName } : p;
                 if (c) {
                   map.set(p.barcode, {
                     ...base,
@@ -208,15 +211,8 @@ class CloudSyncService {
                     reviewStatus: c.reviewStatus || base.reviewStatus,
                     updatedAt: c.updatedAt || base.updatedAt,
                   });
-                } else if (ex && (ex.reviewStatus === 'MODIFIED' || ex.targetStock !== undefined)) {
-                  map.set(p.barcode, {
-                    ...p,
-                    ...ex,
-                    targetStock: ex.targetStock,
-                    minOrderQty: ex.minOrderQty,
-                  });
                 } else {
-                  map.set(p.barcode, { ...ex, ...p });
+                  map.set(p.barcode, base);
                 }
               });
               const merged = Array.from(map.values());

@@ -287,6 +287,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               pMap.set(p.barcode, {
                 ...ex,
                 ...p,
+                name: (c.name && c.name.trim()) ? c.name : ((ex?.name && (ex.name.startsWith('CP]') || ex.name.includes('쿠팡]'))) ? ex.name : p.name),
                 targetStock: c.targetStock !== undefined ? c.targetStock : p.targetStock,
                 minOrderQty: c.minOrderQty !== undefined ? c.minOrderQty : p.minOrderQty,
                 reviewStatus: c.reviewStatus || p.reviewStatus,
