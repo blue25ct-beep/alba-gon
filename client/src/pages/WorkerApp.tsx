@@ -458,7 +458,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
             className="w-full h-24 rounded-3xl bg-sage-50 hover:bg-sage-100 border border-sage-200 text-sage-deep font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-2"
           >
             <span>🌿 상온</span>
-            <span className="text-sm font-medium text-sage opacity-80">(유앤미 상온 발주)</span>
+            <span className="text-sm font-medium text-sage opacity-80">(상온 발주)</span>
           </button>
 
           <button
@@ -466,7 +466,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
             className="w-full h-24 rounded-3xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-cyan-900 font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-2"
           >
             <span>❄️ 저온</span>
-            <span className="text-sm font-medium text-cyan-700 opacity-90">(유앤미 저온 발주 · 월화수목토일)</span>
+            <span className="text-sm font-medium text-cyan-700 opacity-90">(냉장 · 냉동 발주)</span>
           </button>
           
           <button
@@ -549,7 +549,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
       {selectedCategory === 'CHILLED' && (
         <ChilledChecklistPanel
           products={storageService.getProducts()}
-          existingAudits={filteredAudits}
+          existingAudits={audits}
           onSubmitChecklist={(items) => {
             items.forEach((it) => {
               storageService.saveAudit({
@@ -561,8 +561,8 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
                 photoUrls: [],
                 isUnmapped: false,
                 workerName,
-                vendor: 'chilled',
-                category: '저온냉장',
+                vendor: it.vendor || 'chilled',
+                category: it.category || '저온냉장',
               });
             });
             const updated = storageService.getAudits();
@@ -570,7 +570,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
             cloudSyncService.broadcastAudits(updated, 'WORKER');
             soundManager.playSaveSuccess();
             setToastMessage({
-              text: `❄️ 저온 재고 및 삼각김밥(${items.length}종) 반영 완료!`,
+              text: `❄️ 저온 재고(${items.length}종) 반영 완료!`,
               sub: '상단 [🏁 실사 완료 및 점장님 전송]을 눌러 전송해 주세요',
             });
             setTimeout(() => setToastMessage(null), 4000);
