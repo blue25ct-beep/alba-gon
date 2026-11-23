@@ -27,7 +27,7 @@ const cors = require('cors');
 const mqtt = require('mqtt');
 
 // 유앤미 주문 처리 엔진
-const { runDirectOrderAdd } = require('./orderEngine');
+const { runDirectOrderAdd, fetchPendingDPlus1Barcodes } = require('./orderEngine');
 // 생필체인 주문 처리 엔진
 const { runSpchainOrder } = require('./spchainEngine');
 
@@ -834,6 +834,15 @@ app.get('/api/latest-order', (req, res) => {
     }
   } catch (e) {}
   res.json({ success: false, order: null });
+});
+
+app.get('/api/pending-dplus1', async (req, res) => {
+  try {
+    const data = await fetchPendingDPlus1Barcodes();
+    return res.json({ success: true, barcodes: data.barcodes || [], details: data.details || [] });
+  } catch (e) {
+    return res.json({ success: false, barcodes: [], details: [] });
+  }
 });
 
 app.get('/api/health', (req, res) => {

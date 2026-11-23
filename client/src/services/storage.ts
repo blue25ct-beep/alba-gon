@@ -362,6 +362,81 @@ getProducts(): Product[] {
   },
 
   
+  // D+1(하루 뒤 배송) 상품 여부 판별
+  isDPlus1Product(barcodeOrProduct: string | Product | undefined, fallbackName?: string): boolean {
+    if (!barcodeOrProduct) {
+      return Boolean(fallbackName && fallbackName.toUpperCase().includes('D+1'));
+    }
+    const p = typeof barcodeOrProduct === 'string' ? this.findProduct(barcodeOrProduct).product : barcodeOrProduct;
+    if (p?.isDPlus1) return true;
+    const name = p?.name || fallbackName || '';
+    return name.toUpperCase().includes('D+1');
+  },
+
+  // 특정 날짜 문자열(orderDate / lastOrderDate)이 전날(어제)인지 판별
+  isDateStringYesterday(dateStr?: string): boolean {
+    if (!dateStr || typeof dateStr !== 'string') return false;
+    const yest = new Date();
+    yest.setDate(yest.getDate() - 1);
+    const yM = yest.getMonth() + 1;
+    const yD = yest.getDate();
+    const yYear = yest.getFullYear();
+    const yIso = `${yYear}-${String(yM).padStart(2, '0')}-${String(yD).padStart(2, '0')}`;
+
+    if (dateStr.includes(yIso)) return true;
+    // 예: "2026. 11. 22. 오후..." 또는 "11. 22. 오후..."
+    const m1 = dateStr.match(/(?:(\d{4})\.\s*)?(\d{1,2})\.\s*(\d{1,2})\./);
+    if (m1) {
+      const yr = m1[1] ? parseInt(m1[1], 10) : yYear;
+      const mo = parseInt(m1[2], 10);
+      const da = parseInt(m1[3], 10);
+      if (yr === yYear && mo === yM && da === yD) return true;
+    }
+    return false;
+  },
+
+  // 전날(어제) 발주된 바코드 집합 반환 (D+1 상품 오늘 발주 자동 제외용)
+  getYesterdayOrderedBarcodes(externalBarcodes?: string[]): Set<string> {
+    const result = new Set<string>(externalBarcodes || []);
+    try {
+      const history = this.getOrderHistory();
+      const yest = new Date();
+      yest.setDate(yest.getDate() - 1);
+      const yM = yest.getMonth() + 1;
+      const yD = yest.getDate();
+      const yYear = yest.getFullYear();
+
+      for (const h of history) {
+        let isYest = this.isDateStringYesterday(h.orderDate);
+        if (!isYest && h.id) {
+          const ts = parseInt(String(h.id).replace(/[^0-9]/g, ''), 10);
+          if (!isNaN(ts) && ts > 1000000000000) {
+            const d = new Date(ts);
+            if (d.getFullYear() === yYear && (d.getMonth() + 1) === yM && d.getDate() === yD) {
+              isYest = true;
+            }
+          }
+        }
+        if (isYest && Array.isArray(h.items)) {
+          for (const it of h.items) {
+            if ((it.finalOrderQty === undefined || it.finalOrderQty > 0) && it.barcode) {
+              result.add(it.barcode);
+              if (it.usingAliasBarcode) result.add(it.usingAliasBarcode);
+            }
+          }
+        }
+      }
+
+      const products = this.getProducts();
+      for (const p of products) {
+        if (p.lastOrderDate && this.isDateStringYesterday(p.lastOrderDate)) {
+          result.add(p.barcode);
+        }
+      }
+    } catch {}
+    return result;
+  },
+
   updateProductLastOrderDate(barcodes: string[]): void {
     const list = this.getProducts();
     let updated = false;

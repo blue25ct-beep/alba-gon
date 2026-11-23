@@ -14,6 +14,7 @@ interface OrderFailureModalProps {
 const FAIL_LABEL: Record<string, string> = {
   BELOW_MIN_QTY: '수량 부족',
   DISCONTINUED: '단종',
+  D_PLUS_1_PENDING: 'D+1 전날발주(입고대기)',
 };
 
 export const OrderFailureModal: React.FC<OrderFailureModalProps> = ({

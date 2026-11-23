@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { BarcodeScanner } from '../components/BarcodeScanner';
 import { QuantityModal } from '../components/QuantityModal';
 import { PhotoCaptureModal } from '../components/PhotoCaptureModal';
+import { ChilledChecklistPanel } from '../components/ChilledChecklistPanel';
 import { AuditItem, Product } from '../types';
 import { storageService } from '../services/storage';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
 import { Trash2, Camera, RefreshCw, Check, Lock, Send } from 'lucide-react';
 import { soundManager } from '../services/sound';
 
-export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void; onSwitchMode?: (mode: 'WORKER' | 'ADMIN') => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange, onSwitchMode }) => {
+export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'CHILLED' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void; onSwitchMode?: (mode: 'WORKER' | 'ADMIN') => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange, onSwitchMode }) => {
   const [audits, setAudits] = useState<AuditItem[]>([]);
   const [activeBarcode, setActiveBarcode] = useState<string | null>(null);
   const [detectedProduct, setDetectedProduct] = useState<Product | undefined>(undefined);
@@ -58,6 +59,9 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
     if (selectedCategory === 'SPCHAIN') {
       onThemeChange?.('blue');
       onTitleChange?.('🍺 주류 발주');
+    } else if (selectedCategory === 'CHILLED') {
+      onThemeChange?.('blue');
+      onTitleChange?.('❄️ 저온 발주');
     } else if (selectedCategory === 'YOUNME') {
       onThemeChange?.('sage');
       onTitleChange?.('🌿 상온 발주');
@@ -189,7 +193,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
         photoUrls: pendingPhotos,
         isUnmapped,
         workerName,
-        vendor: selectedCategory === 'SPCHAIN' ? 'spchain' : 'younme',
+        vendor: selectedCategory === 'SPCHAIN' ? 'spchain' : selectedCategory === 'CHILLED' ? 'chilled' : 'younme',
       });
 
       const isFirstScan = (audits.length === 0 || lastScanTime === null);
@@ -262,14 +266,23 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
     setIsSending(true);
     const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(주류/저온)' : '유앤미24(상온/냉장)';
 
-    // 1. 발주 필요 품목 계산
+    // 1. 발주 필요 품목 계산 (D+1 전날 발주 품목은 오늘 발주에서 자동 제외)
+    let extDPlus1: string[] = [];
+    try {
+      const res = await fetch('http://localhost:3001/api/pending-dplus1');
+      const d = await res.json();
+      if (d && d.success && Array.isArray(d.barcodes)) extDPlus1 = d.barcodes;
+    } catch {}
+    const yesterdayOrderedSet = storageService.getYesterdayOrderedBarcodes(extDPlus1);
     const orderItems = filteredAudits.map(a => {
       const p = storageService.findProduct(a.barcode).product;
       const target = a.targetStock ?? p?.targetStock ?? 1;
       const minQty = a.minOrderQty ?? p?.minOrderQty ?? 1;
+      const isDPlus1 = storageService.isDPlus1Product(p, a.productName);
+      const isOrderedYesterday = isDPlus1 && yesterdayOrderedSet.has(a.barcode);
       const shortage = Math.max(0, target - a.stockCount);
-      const orderQty = shortage > 0 ? Math.ceil(shortage / minQty) * minQty : 0;
-      return { ...a, target, minQty, orderQty };
+      const orderQty = isOrderedYesterday ? 0 : (shortage > 0 ? Math.ceil(shortage / minQty) * minQty : 0);
+      return { ...a, target, minQty, orderQty, isDPlus1, isOrderedYesterday };
     });
 
     const itemsToOrder = orderItems.filter(it => it.orderQty > 0);
@@ -317,12 +330,15 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
       return;
     }
     const vendorLabel = selectedCategory === 'SPCHAIN' ? '생필체인(주류/저온)' : '유앤미24(상온/냉장)';
+    const yesterdayOrderedSet = storageService.getYesterdayOrderedBarcodes();
     const orderItems = audits.map(a => {
       const p = storageService.findProduct(a.barcode).product;
       const target = a.targetStock ?? p?.targetStock ?? 1;
       const minQty = a.minOrderQty ?? p?.minOrderQty ?? 1;
+      const isDPlus1 = storageService.isDPlus1Product(p, a.productName);
+      const isOrderedYesterday = isDPlus1 && yesterdayOrderedSet.has(a.barcode);
       const shortage = Math.max(0, target - a.stockCount);
-      const orderQty = shortage > 0 ? Math.ceil(shortage / minQty) * minQty : 0;
+      const orderQty = isOrderedYesterday ? 0 : (shortage > 0 ? Math.ceil(shortage / minQty) * minQty : 0);
       return { ...a, target, minQty, orderQty };
     });
 
@@ -356,7 +372,9 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
 
   const filteredAudits = selectedCategory === null ? [] : audits.filter((a: AuditItem) => {
     const cat = getProductCategory(a.barcode);
-    if (selectedCategory === 'YOUNME') return a.vendor === 'younme' || (!a.vendor && (cat === '상온' || cat === '냉장' || !cat));
+    const isChilledCat = cat?.includes('저온') || cat?.includes('냉장') || cat?.includes('냉동');
+    if (selectedCategory === 'CHILLED') return a.vendor === 'chilled' || (!a.vendor && isChilledCat);
+    if (selectedCategory === 'YOUNME') return a.vendor === 'younme' || (!a.vendor && !isChilledCat && cat !== '주류');
     if (selectedCategory === 'SPCHAIN') return a.vendor === 'spchain' || (!a.vendor && cat === '주류');
     return true;
   });
@@ -439,15 +457,23 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
             onClick={() => onCategoryChange?.('YOUNME')}
             className="w-full h-24 rounded-3xl bg-sage-50 hover:bg-sage-100 border border-sage-200 text-sage-deep font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-2"
           >
-            <span>상온 / 냉장</span>
-            <span className="text-sm font-medium text-sage opacity-80">(유앤미 발주)</span>
+            <span>🌿 상온</span>
+            <span className="text-sm font-medium text-sage opacity-80">(유앤미 상온 발주)</span>
+          </button>
+
+          <button
+            onClick={() => onCategoryChange?.('CHILLED')}
+            className="w-full h-24 rounded-3xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-cyan-900 font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-2"
+          >
+            <span>❄️ 저온</span>
+            <span className="text-sm font-medium text-cyan-700 opacity-90">(유앤미 저온 발주 · 월화수목토일)</span>
           </button>
           
           <button
             onClick={() => onCategoryChange?.('SPCHAIN')}
             className="w-full h-24 rounded-3xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-2"
           >
-            <span>주류</span>
+            <span>🍺 주류</span>
             <span className="text-sm font-medium text-blue-600 opacity-80">(생필체인 발주)</span>
           </button>
         </div>
@@ -518,6 +544,39 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'SPCHAIN' | nul
           </p>
         )}
       </section>
+
+      {/* 저온(CHILLED) 전용 원터치 체크리스트 + 삼각김밥 요일별 자동 편성 */}
+      {selectedCategory === 'CHILLED' && (
+        <ChilledChecklistPanel
+          products={storageService.getProducts()}
+          existingAudits={filteredAudits}
+          onSubmitChecklist={(items) => {
+            items.forEach((it) => {
+              storageService.saveAudit({
+                barcode: it.barcode,
+                productName: it.productName,
+                stockCount: it.stockCount,
+                targetStock: it.targetStock,
+                minOrderQty: it.minOrderQty,
+                photoUrls: [],
+                isUnmapped: false,
+                workerName,
+                vendor: 'chilled',
+                category: '저온냉장',
+              });
+            });
+            const updated = storageService.getAudits();
+            setAudits(updated);
+            cloudSyncService.broadcastAudits(updated, 'WORKER');
+            soundManager.playSaveSuccess();
+            setToastMessage({
+              text: `❄️ 저온 재고 및 삼각김밥(${items.length}종) 반영 완료!`,
+              sub: '상단 [🏁 실사 완료 및 점장님 전송]을 눌러 전송해 주세요',
+            });
+            setTimeout(() => setToastMessage(null), 4000);
+          }}
+        />
+      )}
 
       {/* 스캐너 */}
       <BarcodeScanner onDetected={handleBarcodeDetected} isPaused={step !== 'IDLE'} />

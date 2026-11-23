@@ -9,7 +9,7 @@ export interface Product {
   price: number;
   cost: number;
   category: string;
-  vendor?: 'younme' | 'spchain';
+  vendor?: 'younme' | 'chilled' | 'spchain';
   targetStock: number;
   minOrderQty: number;
   photoUrl?: string;
@@ -19,13 +19,17 @@ export interface Product {
   reviewedAt?: string;
   reviewStatus?: 'APPROPRIATE' | 'MODIFIED';
   lastOrderDate?: string;
+  isChilledChecklist?: boolean;
+  isDPlus1?: boolean;
+  autoOrderDays?: number[];
+  autoOrderQty?: number;
 }
 
 export interface AuditItem {
   id: string;
   barcode: string;
   productName: string;
-  vendor?: 'younme' | 'spchain';
+  vendor?: 'younme' | 'chilled' | 'spchain';
   category?: string;
   stockCount: number;
   targetStock: number;
@@ -57,20 +61,22 @@ export interface OrderItem {
   isBelowMinQty: boolean;
   usingAliasBarcode?: string;
   category?: string;
-  vendor?: "younme" | "spchain";
+  vendor?: "younme" | "chilled" | "spchain";
   cost?: number;
   price?: number;
   status: 'PENDING' | 'ORDERED' | 'FAILED';
   failReason?: string;
   workerName?: string;
   updatedAt?: string;
+  isDPlus1?: boolean;
+  isDPlus1OrderedYesterday?: boolean;
 }
 
 export interface OrderFailure {
   id: string;
   barcode: string;
   productName: string;
-  failReason: 'OUT_OF_STOCK' | 'BELOW_MIN_QTY' | 'DISCONTINUED' | 'NOT_FOUND' | 'OTHER';
+  failReason: 'OUT_OF_STOCK' | 'BELOW_MIN_QTY' | 'DISCONTINUED' | 'NOT_FOUND' | 'D_PLUS_1_PENDING' | 'OTHER';
   failDetail: string;
   attemptedQty: number;
   minOrderQty: number;

@@ -27,7 +27,7 @@ import { ProductStockSetupModal } from '../components/ProductStockSetupModal';
 import { RestoreAuditModal } from '../components/RestoreAuditModal';
 
 
-export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' | null; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void }> = ({ initialCategory, onThemeChange, onTitleChange }) => {
+export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' | 'SPCHAIN' | null; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void }> = ({ initialCategory, onThemeChange, onTitleChange }) => {
   const [audits, setAudits] = useState<AuditItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [aliases, setAliases] = useState<BarcodeAlias[]>([]);
@@ -62,6 +62,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [orderHistory, setOrderHistory] = useState<OrderHistoryEntry[]>(() => storageService.getOrderHistory());
   const [archivedAudits, setArchivedAudits] = useState<Record<string, AuditItem[]>>({});
   const [expandedArchiveDate, setExpandedArchiveDate] = useState<string | null>(null);
+  const [pendingDPlus1Barcodes, setPendingDPlus1Barcodes] = useState<string[]>([]);
 
   const historyStats = React.useMemo(() => {
     const history = orderHistory;
@@ -179,7 +180,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const [isSpchainOrdering, setIsSpchainOrdering] = useState(false);
   const [younmeProgress, setYounmeProgress] = useState<OrderProgressEvent | null>(null);
   const [spchainProgress, setSpchainProgress] = useState<OrderProgressEvent | null>(null);
-  const [tempFilter, setTempFilter] = useState<'ALL' | 'YOUNME' | 'SPCHAIN' | 'COUPANG'>(initialCategory || 'ALL');
+  const [tempFilter, setTempFilter] = useState<'ALL' | 'YOUNME' | 'CHILLED' | 'SPCHAIN' | 'COUPANG'>(initialCategory || 'ALL');
   const [onlyOrdersFilter, setOnlyOrdersFilter] = useState(false);
 
   const loadData = () => {
@@ -220,12 +221,23 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
         }
       })
       .catch(() => {});
+    fetch('http://localhost:3001/api/pending-dplus1')
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.success && Array.isArray(d.barcodes)) {
+          setPendingDPlus1Barcodes(d.barcodes);
+        }
+      })
+      .catch(() => {});
   };
 
     useEffect(() => {
     if (tempFilter === 'SPCHAIN') {
       onThemeChange?.('blue');
       onTitleChange?.('🍺 [주류 전용] 자동발주 관리');
+    } else if (tempFilter === 'CHILLED') {
+      onThemeChange?.('blue');
+      onTitleChange?.('❄️ [저온] 자동발주 관리');
     } else if (tempFilter === 'YOUNME') {
       onThemeChange?.('sage');
       onTitleChange?.('🌿 [상온/냉장] 자동발주 관리');
@@ -368,10 +380,25 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
         ? Math.max(1, product.minOrderQty)
         : (audit.minOrderQty !== undefined ? Math.max(1, audit.minOrderQty) : 1);
 
+    const effectiveProductName =
+      (product && product.name && product.name !== '미등록 상품')
+        ? product.name
+        : audit.productName;
+
+    const yesterdayOrderedSet = storageService.getYesterdayOrderedBarcodes(pendingDPlus1Barcodes);
+    const isDPlus1 = storageService.isDPlus1Product(product, effectiveProductName);
+    const isDPlus1OrderedYesterday =
+      isDPlus1 &&
+      (yesterdayOrderedSet.has(audit.barcode) ||
+        (alias?.newBarcode ? yesterdayOrderedSet.has(alias.newBarcode) : false));
+
     const shortage = Math.max(0, targetStock - audit.stockCount);
 
-    const recommendedQty =
+    const rawRecommendedQty =
       shortage > 0 ? Math.ceil(shortage / minOrderQty) * minOrderQty : 0;
+
+    // ★ D+1(하루 뒤 배송) 상품이 전날 발주된 경우 오늘 발주에서 자동 제외 (추천 0개)
+    const recommendedQty = isDPlus1OrderedYesterday ? 0 : rawRecommendedQty;
 
     const finalOrderQty =
       customQuantities[audit.barcode] !== undefined
@@ -381,14 +408,10 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     const isBelowMinQty = finalOrderQty > 0 && finalOrderQty < minOrderQty;
     const isNotMultiple = finalOrderQty > 0 && finalOrderQty % minOrderQty !== 0;
 
-    const effectiveProductName =
-      (product && product.name && product.name !== '미등록 상품')
-        ? product.name
-        : audit.productName;
-
     const isYounmeTarget = audit.barcode === '8806016310018' || audit.barcode === '8801128503211';
-    const effectiveCategory = isYounmeTarget ? '상온' : (product ? product.category : '기타');
-    const effectiveVendor = isYounmeTarget ? 'younme' : (product?.vendor === 'spchain' || effectiveCategory === '주류' ? 'spchain' : (audit.vendor || 'younme'));
+    const effectiveCategory = isYounmeTarget ? '상온' : (product ? product.category : (audit.category || '기타'));
+    const isChilledCat = Boolean(effectiveCategory?.includes('저온') || effectiveCategory?.includes('냉장') || effectiveCategory?.includes('냉동'));
+    const effectiveVendor: 'younme' | 'chilled' | 'spchain' = isYounmeTarget ? 'younme' : (product?.vendor === 'spchain' || effectiveCategory === '주류' ? 'spchain' : (audit.vendor === 'chilled' || product?.vendor === 'chilled' || isChilledCat ? 'chilled' : (audit.vendor || 'younme')));
 
     return {
       barcode: audit.barcode,
@@ -407,6 +430,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       status: 'PENDING',
       workerName: audit.workerName,
       updatedAt: audit.updatedAt,
+      isDPlus1,
+      isDPlus1OrderedYesterday,
     };
   });
 
@@ -414,6 +439,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
   const coupangItems = allItemsToOrder.filter((item) => item.productName.includes('쿠팡]') || item.productName.startsWith('CP]'));
   const itemsToOrder = allItemsToOrder.filter((item) => !item.productName.includes('쿠팡]') && !item.productName.startsWith('CP]'));
   const younmeItems = itemsToOrder.filter(item => item.vendor === 'younme');
+  const chilledItems = itemsToOrder.filter(item => item.vendor === 'chilled');
   const spchainItems = itemsToOrder.filter(item => item.vendor === 'spchain');
 
   const handleSnapToMultiple = (barcode: string, val: number, minQty: number) => {
@@ -814,10 +840,12 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
     );
     let matchesTemp = true;
     const isCoupangItem = item.productName.includes('쿠팡]') || item.productName.startsWith('CP]');
-    const isYounmeItem = !isCoupangItem && (item.vendor === 'younme' || (!item.vendor && (item.category === '상온' || item.category === '냉장' || !item.category)));
+    const isChilledItem = !isCoupangItem && (item.vendor === 'chilled' || isChilled);
+    const isYounmeItem = !isCoupangItem && !isChilledItem && (item.vendor === 'younme' || (!item.vendor && item.category !== '주류'));
     
     if (tempFilter === 'YOUNME') matchesTemp = isYounmeItem;
-    if (tempFilter === 'SPCHAIN') matchesTemp = !isYounmeItem && !isCoupangItem;
+    if (tempFilter === 'CHILLED') matchesTemp = isChilledItem;
+    if (tempFilter === 'SPCHAIN') matchesTemp = !isYounmeItem && !isChilledItem && !isCoupangItem;
     if (tempFilter === 'COUPANG') matchesTemp = isCoupangItem;
 
     const matchesOnlyOrders = !onlyOrdersFilter || item.finalOrderQty > 0;
@@ -1223,7 +1251,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
       </section>
 
       {/* 발주 실행 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* 유앤미 발주 섹션 */}
         {(tempFilter === "ALL" || tempFilter === "YOUNME") && (
         <section className="bg-white border border-line rounded-3xl p-6 shadow-sm flex flex-col justify-between">
@@ -1262,6 +1290,69 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
               </div>
             </div>
           )}
+        </section>
+        )}
+        {(tempFilter === "ALL" || tempFilter === "CHILLED") && (
+        <section className="bg-white border border-cyan-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <h3 className="text-lg font-bold text-cyan-800">❄️ 유앤미24(저온) 발주</h3>
+              <button
+                type="button"
+                onClick={() => {
+                  const isThu = new Date().getDay() === 4;
+                  const kimbaps = [
+                    { barcode: "8809279269031", name: "롯데)듬뿍참치마요네즈삼각김밥115g" },
+                    { barcode: "8809279269048", name: "롯데)듬뿍소고기고추장삼각김밥110g" },
+                    { barcode: "8801118424984", name: "롯데]직화돼지갈비삼각김밥110g" },
+                    ...(isThu ? [
+                      { barcode: "8801118410789", name: "롯데)고추참치삼각김밥110g" },
+                      { barcode: "8801118799938", name: "롯데)전주비빔삼각김밥110g" },
+                      { barcode: "8801118410765", name: "롯데)크래미날치알삼각110g" },
+                    ] : [])
+                  ];
+                  kimbaps.forEach(k => {
+                    storageService.saveAudit({
+                      barcode: k.barcode,
+                      productName: k.name,
+                      stockCount: 0,
+                      targetStock: 1,
+                      minOrderQty: 1,
+                      photoUrls: [],
+                      isUnmapped: false,
+                      workerName: "요일자동",
+                      vendor: "chilled",
+                      category: "저온냉장"
+                    });
+                  });
+                  loadData();
+                  cloudSyncService.broadcastAudits(storageService.getAudits(), "ADMIN");
+                }}
+                className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border border-cyan-200 transition-colors"
+                title="오늘 요일에 맞는 삼각김밥(평일 3종 / 목요일 6종 각 1개)을 즉시 목록에 추가합니다"
+              >
+                🍙 삼각김밥 자동추가
+              </button>
+            </div>
+            <p className="text-sm text-ink-soft mb-6 break-keep">
+              삼각김밥(월화수토일 3종 / 목 6종) 및 저온 냉장 상품을 유앤미24 저온 장바구니로 자동 발주합니다.
+            </p>
+          </div>
+          <div className="flex items-center justify-between mt-auto">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <Package className="w-4 h-4 text-cyan-600" />
+                <span className="text-sm font-medium text-ink">{chilledItems.length}개 대기중</span>
+              </div>
+            </div>
+            <button
+              disabled={isYounmeOrdering || chilledItems.length === 0 || isSpchainOrdering}
+              onClick={() => handleStartOrder("YOUNME", chilledItems)}
+              className="h-10 px-6 rounded-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-sunken disabled:text-ink-faint text-white text-sm font-medium transition-colors"
+            >
+              {isYounmeOrdering ? "발주 중" : "저온 발주하기"}
+            </button>
+          </div>
         </section>
         )}
         {(tempFilter === "ALL" || tempFilter === "SPCHAIN") && (
@@ -1347,9 +1438,10 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
             {(
               [
                 ['ALL', '전체'],
-                ['YOUNME', '유앤미24'],
-                ['SPCHAIN', '생필체인(주류)'],
-                ['COUPANG', '쿠팡(수동)'],
+                ['YOUNME', '🌿 유앤미(상온)'],
+                ['CHILLED', '❄️ 유앤미(저온)'],
+                ['SPCHAIN', '🍺 생필체인(주류)'],
+                ['COUPANG', '📦 쿠팡(수동)'],
                 
               ] as const
             ).map(([key, label]) => (
@@ -1650,6 +1742,19 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'SPCHAIN' |
                                       {masterProduct?.lastOrderDate && (
                                         <span className="text-[11px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
                                           📦 마지막 발주: {masterProduct.lastOrderDate}
+                                        </span>
+                                      )}
+                                      {item.isDPlus1 && (
+                                        <span
+                                          className={`text-[11px] px-1.5 py-0.5 rounded font-bold border ${
+                                            item.isDPlus1OrderedYesterday
+                                              ? 'bg-rose-50 text-rose-700 border-rose-300'
+                                              : 'bg-purple-50 text-purple-700 border-purple-200'
+                                          }`}
+                                        >
+                                          {item.isDPlus1OrderedYesterday
+                                            ? '🚫 D+1 전날발주 완료 (오늘 발주 자동 제외)'
+                                            : '⏳ D+1 익일배송 상품'}
                                         </span>
                                       )}
                                     </span>

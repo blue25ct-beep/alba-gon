@@ -10,7 +10,7 @@ declare const __BUILD_TIME__: string;
 
 export function App() {
   const [mode, setMode] = useState<'WORKER' | 'ADMIN'>('WORKER');
-  const [selectedCategory, setSelectedCategory] = useState<'YOUNME' | 'SPCHAIN' | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<'YOUNME' | 'CHILLED' | 'SPCHAIN' | null>(null);
   const [theme, setTheme] = useState<'sage' | 'blue' | 'neutral'>('neutral');
   const [title, setTitle] = useState('재고 & 발주 관리');
   const [newVersionTime, setNewVersionTime] = useState<string | null>(null);
@@ -71,6 +71,14 @@ export function App() {
         const cust = customized[s.barcode];
         if (merged[idx].category !== s.category && s.category) {
           merged[idx].category = s.category;
+          changed = true;
+        }
+        if (s.vendor && merged[idx].vendor !== s.vendor) {
+          merged[idx].vendor = s.vendor;
+          changed = true;
+        }
+        if (s.isDPlus1 && !merged[idx].isDPlus1) {
+          merged[idx].isDPlus1 = true;
           changed = true;
         }
         if (s.minOrderQty && merged[idx].minOrderQty !== s.minOrderQty && cust?.minOrderQty === undefined) {
