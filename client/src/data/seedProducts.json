@@ -726,16 +726,6 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8809030112620",
-    "name": "영우]김말이소시지크래미마요김밥140g",
-    "price": 2200,
-    "cost": 1580,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801069415833",
     "name": "(2+1)남양]테이크핏고소한맛200ml",
     "price": 2900,
@@ -809,17 +799,6 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8801074010351",
-    "name": "(1+1)한성]돈부심후랑크바80g(D+1)",
-    "price": 3500,
-    "cost": 1225,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
     "barcode": "8801066060258",
     "name": "(2+1)대림]닭가슴살네모나블랙페퍼80g(D+1)",
     "price": 2700,
@@ -829,16 +808,6 @@
     "minOrderQty": 1,
     "vendor": "chilled",
     "isDPlus1": true
-  },
-  {
-    "barcode": "8801155834708",
-    "name": "(2+1)DM]인포켓치즈라이트20g",
-    "price": 1800,
-    "cost": 821,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 5,
-    "vendor": "chilled"
   },
   {
     "barcode": "8801007841113",
@@ -935,30 +904,10 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8801104669283",
-    "name": "(2+1)빙그레]닥터캡슐베리믹스130ml",
-    "price": 2300,
-    "cost": 1150,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801118400926",
     "name": "롯데)햄치즈게맛살샌드위치173g",
     "price": 2600,
     "cost": 1950,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801121768129",
-    "name": "매일)소화가잘되는우유190ml(멸균)",
-    "price": 1400,
-    "cost": 890,
     "category": "저온냉장",
     "targetStock": 1,
     "minOrderQty": 1,
@@ -1066,16 +1015,6 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8809665551986",
-    "name": "$아워홈]치즈닭갈비170g(냉동)",
-    "price": 9700,
-    "cost": 6887,
-    "category": "냉동/즉석",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801121772874",
     "name": "매일)엣지후레쉬팩우유900ml",
     "price": 3150,
@@ -1084,17 +1023,6 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled"
-  },
-  {
-    "barcode": "8801068941890",
-    "name": "삼립]에몽가미니초코롤팡95g(D+1)",
-    "price": 2200,
-    "cost": 1617,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
   },
   {
     "barcode": "8801115118893",
@@ -1167,26 +1095,6 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8801121044711",
-    "name": "매일]허쉬바나나190ml",
-    "price": 1600,
-    "cost": 1114,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8809030112682",
-    "name": "영우]숯불고기김밥250g",
-    "price": 3000,
-    "cost": 2170,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801056624019",
     "name": "칠성]델몬트콜드포도250ml",
     "price": 1800,
@@ -1216,17 +1124,6 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled"
-  },
-  {
-    "barcode": "8801068942385",
-    "name": "삼립]망나뇽의치즈머핀100g(D+1)",
-    "price": 2500,
-    "cost": 1837,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
   },
   {
     "barcode": "8801123410347",
@@ -1269,17 +1166,6 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled"
-  },
-  {
-    "barcode": "8801074255851",
-    "name": "한성)크래미90g(D+1)",
-    "price": 3500,
-    "cost": 2380,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
   },
   {
     "barcode": "8801077384305",
@@ -1357,37 +1243,6 @@
     "name": "매일]허쉬드링크쿠앤크235ml",
     "price": 1700,
     "cost": 1190,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801392118722",
-    "name": "(행사)CJ]훈제대란100g(2입)(D+1)",
-    "price": 2700,
-    "cost": 1718,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8801118400704",
-    "name": "롯데)한손불고기김밥190g",
-    "price": 2900,
-    "cost": 2175,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801118407710",
-    "name": "롯데)한손함박스테이크&참치김밥194g",
-    "price": 2900,
-    "cost": 2175,
     "category": "저온냉장",
     "targetStock": 1,
     "minOrderQty": 1,
@@ -1486,16 +1341,6 @@
     "isDPlus1": true
   },
   {
-    "barcode": "8801104301862",
-    "name": "빙그레)요구르트280ml",
-    "price": 1600,
-    "cost": 1210,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801121768174",
     "name": "(행사)매일]바리스타룰스블랙325ml",
     "price": 3500,
@@ -1536,16 +1381,6 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8801392011962",
-    "name": "(행사)$CJ]비비고김치왕교자315g(냉동)",
-    "price": 8200,
-    "cost": 2880,
-    "category": "냉동/즉석",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801121027523",
     "name": "(행사)매일]바리스타룰스디카페인라떼325ml",
     "price": 3500,
@@ -1573,16 +1408,6 @@
     "category": "저온냉장",
     "targetStock": 1,
     "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8805684003680",
-    "name": "쉐프엠]젤리블리애플망고60g",
-    "price": 900,
-    "cost": 590,
-    "category": "저온냉장",
-    "targetStock": 20,
-    "minOrderQty": 20,
     "vendor": "chilled"
   },
   {
@@ -1696,16 +1521,6 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8809674770132",
-    "name": "$한맥]리얼토핑트리플치즈피자138g(냉동)",
-    "price": 3300,
-    "cost": 2248,
-    "category": "냉동/즉석",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801088358937",
     "name": "$사조]육즙가득고기만두180g",
     "price": 3200,
@@ -1746,47 +1561,6 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8801074251372",
-    "name": "(행사)한성)크래미140g(D+1)",
-    "price": 4900,
-    "cost": 2832,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8801118419515",
-    "name": "롯데)통살치킨버거193g",
-    "price": 3900,
-    "cost": 2894,
-    "category": "냉동/즉석",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801118413377",
-    "name": "롯데]의성마늘햄&소시지도시락445g",
-    "price": 6200,
-    "cost": 4650,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8800377800348",
-    "name": "F&G]조각과일(파인애플)300g",
-    "price": 3990,
-    "cost": 3390,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801104948005",
     "name": "(2+1)빙그레]사이즈업디카페인350ml",
     "price": 2600,
@@ -1805,37 +1579,6 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled"
-  },
-  {
-    "barcode": "1176490100243",
-    "name": "더달콤]삼색과일250g",
-    "price": 5500,
-    "cost": 3995,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "1176490100250",
-    "name": "더달콤]이색과일250g",
-    "price": 5500,
-    "cost": 3995,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8809282661679",
-    "name": "리더스]카야샌드위치70g(D+1)",
-    "price": 2600,
-    "cost": 1924,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
   },
   {
     "barcode": "8809015225055",
@@ -1859,17 +1602,6 @@
     "isDPlus1": true
   },
   {
-    "barcode": "8801068942378",
-    "name": "삼립]거북왕의딥초코와플90g(D+1)",
-    "price": 2500,
-    "cost": 1837,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
     "barcode": "8801392112485",
     "name": "(1+1)$CJ)고메소바바치킨양념순살240g",
     "price": 9900,
@@ -1878,17 +1610,6 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled"
-  },
-  {
-    "barcode": "8809282661587",
-    "name": "리더스]누텔라초코샌드70g(D+1)",
-    "price": 2600,
-    "cost": 1924,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
   },
   {
     "barcode": "8801155745073",
@@ -1901,32 +1622,11 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8801077684009",
-    "name": "진주]천하장사오리지널후랑크90g(D+1)",
-    "price": 2500,
-    "cost": 1675,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
     "barcode": "8801155745080",
     "name": "(1+1)DM]쿨피스파인애플190ml",
     "price": 1400,
     "cost": 497,
     "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801007429298",
-    "name": "(행사)$CJ)비비고찐만두168g(냉동)",
-    "price": 4900,
-    "cost": 2793,
-    "category": "냉동/즉석",
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled"
@@ -1940,50 +1640,6 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled"
-  },
-  {
-    "barcode": "8801066511002",
-    "name": "대림]크라비아90g(D+1)",
-    "price": 3000,
-    "cost": 1948,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8801068941456",
-    "name": "삼립]야도란슈크림쏙빵95g(D+1)",
-    "price": 2200,
-    "cost": 1470,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8801068941425",
-    "name": "삼립]피카츄치즈롱파운드150g(D+1)",
-    "price": 2200,
-    "cost": 1470,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8809282661617",
-    "name": "리더스]트리플베리샌드70g(D+1)",
-    "price": 2600,
-    "cost": 1924,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
   },
   {
     "barcode": "8801392081484",
@@ -2007,26 +1663,6 @@
     "vendor": "chilled"
   },
   {
-    "barcode": "8801007537740",
-    "name": "(행사)$CJ)비비고청양고추찐만두168g",
-    "price": 4900,
-    "cost": 2793,
-    "category": "냉동/즉석",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801115118824",
-    "name": "서울]프로틴에너지커피240ml",
-    "price": 2900,
-    "cost": 2130,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801155834616",
     "name": "(2+1)DM]인포켓치즈오리지널20g",
     "price": 1800,
@@ -2034,16 +1670,6 @@
     "category": "저온냉장",
     "targetStock": 1,
     "minOrderQty": 5,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801118400919",
-    "name": "롯데)듬뿍햄치즈에그샌드위치163g",
-    "price": 2900,
-    "cost": 2175,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
     "vendor": "chilled"
   },
   {
@@ -2056,16 +1682,6 @@
     "minOrderQty": 1,
     "vendor": "chilled",
     "isDPlus1": true
-  },
-  {
-    "barcode": "8801118418938",
-    "name": "롯데]김치제육두루치기도시락431g",
-    "price": 6000,
-    "cost": 4500,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
   },
   {
     "barcode": "8801074008303",
@@ -2089,16 +1705,6 @@
     "isDPlus1": true
   },
   {
-    "barcode": "8801104951098",
-    "name": "(2+1)빙그레]쥬시쿨제로곤약젤리자두130g",
-    "price": 2000,
-    "cost": 1005,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
     "barcode": "8801121046142",
     "name": "매일]아몬드브리즈커피190ml",
     "price": 1600,
@@ -2120,186 +1726,11 @@
     "isDPlus1": true
   },
   {
-    "barcode": "8801118409165",
-    "name": "롯데]매콤불고기도시락425g",
-    "price": 6200,
-    "cost": 4650,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801121049280",
-    "name": "매일]바나나는원래맛있다190ml",
-    "price": 1500,
-    "cost": 1044,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801115140214",
-    "name": "(1+1)서울]킹말차스트로베리200ml",
-    "price": 2900,
-    "cost": 1060,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801155601034",
-    "name": "동원)슬라이스체다치즈100g(5매)",
-    "price": 2900,
-    "cost": 2120,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 2,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801062001255",
-    "name": "브랑]빅단팥빵105g(D+1)",
-    "price": 1600,
-    "cost": 1091,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
     "barcode": "8801024190102",
     "name": "종가집]종가집맛김치컵75g(미니컵)(D+1)",
     "price": 1800,
     "cost": 1224,
     "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8801024053667",
-    "name": "(2+1)종가집)종가집볶음김치80g(D+1)",
-    "price": 2100,
-    "cost": 931,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8801062882410",
-    "name": "브랑]한입쏙미니만쥬350g(D+1)",
-    "price": 4100,
-    "cost": 2815,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8801019998041",
-    "name": "$해태)고향만두378g(냉동)",
-    "price": 4900,
-    "cost": 3310,
-    "category": "냉동/즉석",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801526132044",
-    "name": "부산우유]900ml카톤",
-    "price": 3100,
-    "cost": 2685,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801007065946",
-    "name": "(행사)CJ)얼큰우동한그릇221g(D+1)",
-    "price": 4500,
-    "cost": 2678,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
-  },
-  {
-    "barcode": "8801155735135",
-    "name": "(2+1)DM]테이크얼라이브(블러드오렌지)250ml",
-    "price": 1800,
-    "cost": 807,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801155745004",
-    "name": "(1+1)DM]소화가잘되는바닐라라떼250ml",
-    "price": 2800,
-    "cost": 1031,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801155744991",
-    "name": "(1+1)DM]소화가잘되는카페라떼250ml",
-    "price": 2800,
-    "cost": 1031,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8805684010657",
-    "name": "쉐프엠]투움바파스타230g",
-    "price": 4200,
-    "cost": 3000,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801392146114",
-    "name": "(행사)$CJ]비비고말차호떡210g",
-    "price": 9900,
-    "cost": 3332,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8805684010633",
-    "name": "쉐프엠]라구파스타230g",
-    "price": 4700,
-    "cost": 2973,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8809282663017",
-    "name": "리더스]더블디럭스버거190g(D+1)",
-    "price": 3500,
-    "cost": 2400,
-    "category": "냉동/즉석",
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled",
@@ -2314,37 +1745,6 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled"
-  },
-  {
-    "barcode": "8809015471001",
-    "name": "영우]토핑듬뿍베이컨참치마요삼각김밥110g",
-    "price": 1200,
-    "cost": 890,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801155744441",
-    "name": "(행사)DM]소화가잘되는우유500ml",
-    "price": 2200,
-    "cost": 1511,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled"
-  },
-  {
-    "barcode": "8801068399646",
-    "name": "삼립]로스트히말라야소금구이210g(D+1)",
-    "price": 7900,
-    "cost": 5580,
-    "category": "저온냉장",
-    "targetStock": 1,
-    "minOrderQty": 1,
-    "vendor": "chilled",
-    "isDPlus1": true
   },
   {
     "barcode": "8809015471230",
