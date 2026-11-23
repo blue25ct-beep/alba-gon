@@ -17452,5 +17452,15 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "isDPlus1": false
+  },
+  {
+    "barcode": "CP_SALAMI_4500",
+    "name": "CP] 이탈리안 살라미",
+    "price": 4500,
+    "cost": 0,
+    "category": "상온",
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "isNewProduct": true
   }
 ]

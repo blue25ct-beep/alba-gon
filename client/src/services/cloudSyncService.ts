@@ -9,6 +9,8 @@ export interface AuditsSyncMessage {
   storeId: string;
   timestamp: number;
   audits: AuditItem[];
+  tombstones?: Record<string, number>;
+  clearedAt?: number;
   data?: any;
   subType?: string;
   orderedBarcodes?: string[];
@@ -55,9 +57,12 @@ class CloudSyncService {
     if (typeof window !== 'undefined') {
       const handleWakeup = () => {
         if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
-          console.log('[CloudSync] 화면 활성화/온라인 감지 - 실시간 연결 상태 점검');
+          console.log('[CloudSync] 화면 활성화/온라인 감지 - 실시간 연결 및 최신 상태 강제 동기화');
           if (!this.client || !this.client.connected) {
             this.reconnect();
+          } else {
+            // 모바일 백그라운드 중 놓친 retained 메시지 즉시 재수신
+            this.resyncRetainedState();
           }
         }
       };
@@ -67,9 +72,20 @@ class CloudSyncService {
     }
   }
 
+  public resyncRetainedState() {
+    if (!this.client || !this.client.connected) {
+      this.reconnect();
+      return;
+    }
+    const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
+    this.client.unsubscribe(topicSync, () => {
+      this.client?.subscribe(topicSync, { qos: 1 });
+    });
+  }
+
   public reconnect() {
     this.disconnect();
-    this.connect(this.currentStoreId);
+    this.connect(this.currentStoreId, this.currentRole);
   }
 
   public getSenderId(): string {
@@ -189,8 +205,11 @@ class CloudSyncService {
         if (topic === prodTopic) {
           try {
             const msg = JSON.parse(payload.toString());
-            const prodList = msg.data?.products || (Array.isArray(msg) ? msg : null);
-            if (prodList && Array.isArray(prodList) && msg.senderId !== this.mySenderId) {
+            if (msg.senderId === this.mySenderId) return;
+            const prodList = Array.isArray(msg.patch)
+              ? msg.patch
+              : (msg.data?.products || (Array.isArray(msg) ? msg : null));
+            if (prodList && Array.isArray(prodList)) {
               const local = storageService.getProducts();
               const customized = storageService.getCustomizedSettings();
               const map = new Map();
@@ -274,10 +293,13 @@ class CloudSyncService {
           } else if (msg.type === 'PRODUCTS_UPDATE') {
             this.productsUpdateListeners.forEach((l) => l());
           } else if (msg.type === 'AUDITS_UPDATE') {
-            let lastClearedAt = 0;
-            try { lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10); } catch(e){}
-            if (msg.timestamp && lastClearedAt > 0 && msg.timestamp < lastClearedAt - 5000) {
-              console.log('[CloudSync] 무시됨: 목록 비우기 이전 시각의 실사 메시지');
+            const localClearedBefore = storageService.getLastClearedAt();
+            const remoteClearedAt = typeof msg.clearedAt === 'number' ? msg.clearedAt : 0;
+            const effectiveClearedAt = storageService.mergeLastClearedAt(remoteClearedAt);
+            if (msg.timestamp && localClearedBefore > 0 && msg.timestamp < localClearedBefore - 5000 && remoteClearedAt < localClearedBefore) {
+              console.log('[CloudSync] 무시됨: 로컬 목록 비우기 이전 시각의 구형 실사 메시지');
+              // 상대 기기가 구형 상태를 들고 있으므로 최신 빈 상태/초기화 상태를 다시 전파
+              this.broadcastAudits(storageService.getAudits(), this.currentRole);
               return;
             }
             const validAudits = (msg.audits || []).map((a: any) => {
@@ -314,36 +336,46 @@ class CloudSyncService {
               return;
             }
 
+            // 근무자폰 최우선 + 삭제 기록(tombstones) + 전체 비우기 시각(clearedAt) 통합 병합
             const isWorkerDevice = this.currentRole === 'WORKER';
             const isIncomingFromWorker = msg.senderRole === 'WORKER';
-
-            // 스마트 병합: 근무자 폰 최우선 보존 (isWorkerDevice, isIncomingFromWorker)
-            const mergedAudits = storageService.mergeAudits(validAudits, isWorkerDevice, isIncomingFromWorker);
+            const mergedAudits = storageService.mergeAudits(
+              validAudits,
+              isWorkerDevice,
+              isIncomingFromWorker,
+              msg.tombstones,
+              remoteClearedAt
+            );
             this.notifySync(mergedAudits, msg);
 
-            // 근무자 폰이거나, 로컬에 원격 페이로드에 없던 최신 품목이 있다면 클라우드에 즉시 전체 목록 재동기화
-            if (isWorkerDevice) {
-              const localCount = storageService.getAudits().length;
-              if (localCount > validAudits.length || JSON.stringify(mergedAudits) !== JSON.stringify(validAudits)) {
-                console.log(`[CloudSync] 근무자 폰 실사 최우선 보존 및 클라우드 동기화 (${localCount}건)`);
-                this.broadcastAudits(mergedAudits, 'WORKER');
-              }
-            } else if (mergedAudits.length > validAudits.length) {
-              console.log(`[CloudSync] 로컬 추가 품목 보호 및 통합 클라우드 재동기화 (${validAudits.length}건 -> ${mergedAudits.length}건)`);
-              this.broadcastAudits(mergedAudits, msg.senderRole || this.currentRole);
+            // 병합 결과가 원격 메시지와 실질적으로 다를 때만(근무자폰 보존 항목이나 더 최신 삭제/초기화가 있을 때) 1회 재전파하여 모든 기기 수렴
+            const toSig = (arr: AuditItem[]) =>
+              arr
+                .map((a) => `${a.barcode}:${a.id}:${a.stockCount}`)
+                .sort()
+                .join('|');
+            const remoteFilteredSig = toSig(validAudits);
+            const mergedSig = toSig(mergedAudits);
+            const localTombstones = storageService.getDeletedTombstones();
+            const remoteTombstones = msg.tombstones || {};
+            const hasNewerTombstone = Object.entries(localTombstones).some(
+              ([bc, ts]) => ts > (remoteTombstones[bc] || 0)
+            );
+            const hasNewerClear = effectiveClearedAt > remoteClearedAt;
+
+            if (mergedSig !== remoteFilteredSig || hasNewerTombstone || hasNewerClear) {
+              console.log(`[CloudSync] 상태 차이 감지(${this.currentRole}) -> 통합 최신 상태 재동기화 (${validAudits.length}건 -> ${mergedAudits.length}건)`);
+              this.broadcastAudits(mergedAudits, this.currentRole);
             }
           } else if (msg.type === 'AUDITS_CLEAR') {
-            const clearedAt = (msg as any).clearedAt || msg.timestamp || Date.now();
-            try { localStorage.setItem('albagom_last_cleared_at', clearedAt.toString()); } catch(e){}
-            if (this.currentRole === 'WORKER') {
-              const local = storageService.getAudits();
-              const newerItems = local.filter((a) => (parseInt(a.id, 10) || 0) > clearedAt);
-              if (newerItems.length > 0) {
-                storageService.saveAudits(newerItems);
-                this.notifySync(newerItems, msg);
-                this.broadcastAudits(newerItems, 'WORKER');
-                return;
-              }
+            const clearedAt = storageService.mergeLastClearedAt((msg as any).clearedAt || msg.timestamp || Date.now());
+            const local = storageService.getAudits();
+            const newerItems = local.filter((a) => (parseInt(a.id, 10) || 0) > clearedAt);
+            if (newerItems.length > 0) {
+              storageService.saveAudits(newerItems);
+              this.notifySync(newerItems, msg);
+              this.broadcastAudits(newerItems, this.currentRole);
+              return;
             }
             storageService.clearAudits('REMOTE_CLEAR', false);
             this.clearListeners.forEach((l) => l());
@@ -419,6 +451,8 @@ class CloudSyncService {
         }
       } catch (e) {}
 
+      const tombstones = storageService.getDeletedTombstones();
+      const clearedAt = storageService.getLastClearedAt();
       const payload: AuditsSyncMessage = {
         type: 'AUDITS_UPDATE',
         senderId: this.mySenderId,
@@ -426,6 +460,8 @@ class CloudSyncService {
         storeId: this.currentStoreId,
         timestamp: Date.now(),
         audits: safeAudits,
+        tombstones,
+        clearedAt,
       };
 
       this.pendingAuditsPayload = payload;
@@ -436,7 +472,7 @@ class CloudSyncService {
           fetch('http://localhost:3001/api/audits', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ audits, senderId: this.mySenderId, senderRole: role }),
+            body: JSON.stringify({ audits, tombstones, clearedAt, senderId: this.mySenderId, senderRole: role }),
           }).catch(() => {});
         }
       } catch(e) {}
@@ -528,7 +564,7 @@ class CloudSyncService {
     this.client.publish(topicSync, JSON.stringify(payload), { qos: 1 });
   }
 
-  public broadcastProductsUpdate(role: 'WORKER' | 'ADMIN' = 'ADMIN'): Promise<boolean> {
+  public broadcastProductsUpdate(role: 'WORKER' | 'ADMIN' = 'ADMIN', changedProducts?: any[]): Promise<boolean> {
     return new Promise((resolve) => {
       const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
       const prodTopic = `albagom-v2/stores/store_${this.currentStoreId}/products_sync`;
@@ -538,14 +574,32 @@ class CloudSyncService {
         return;
       }
 
-      // 1. Publish actual master products list with retain to products_sync
+      // 1. 변경된 상품이 지정된 경우 초경량 패치(~250B)로 즉시 발행 (공용 MQTT 브로커 패킷 크기 제한 우회)
       try {
-        const products = storageService.getProducts();
-        this.client.publish(prodTopic, JSON.stringify({
-          senderId: this.mySenderId,
-          data: { products },
-          timestamp: Date.now(),
-        }), { qos: 1, retain: true });
+        if (Array.isArray(changedProducts) && changedProducts.length > 0 && changedProducts.length <= 50) {
+          this.client.publish(prodTopic, JSON.stringify({
+            senderId: this.mySenderId,
+            patch: changedProducts,
+            timestamp: Date.now(),
+          }), { qos: 1, retain: false });
+        } else {
+          // 전체 동기화 시에도 400KB 초과 패킷 손실 방지를 위해 최근 수정된(updatedAt/reviewStatus) 상품 위주 패치 전송
+          const products = storageService.getProducts();
+          const recentlyEdited = products.filter((p) => p.updatedAt || p.reviewStatus);
+          if (recentlyEdited.length > 0 && recentlyEdited.length <= 200) {
+            this.client.publish(prodTopic, JSON.stringify({
+              senderId: this.mySenderId,
+              patch: recentlyEdited,
+              timestamp: Date.now(),
+            }), { qos: 1, retain: false });
+          } else {
+            this.client.publish(prodTopic, JSON.stringify({
+              senderId: this.mySenderId,
+              data: { products },
+              timestamp: Date.now(),
+            }), { qos: 1, retain: true });
+          }
+        }
       } catch (e) {
         console.error('[CloudSync] products_sync 발행 오류:', e);
       }
@@ -576,17 +630,21 @@ class CloudSyncService {
       const topicSync = `albagom-v2/stores/store_${this.currentStoreId}/audits_sync`;
       const clearedAt = Date.now();
       try { localStorage.setItem('albagom_last_cleared_at', clearedAt.toString()); } catch(e){}
-      const payload: any = {
+      const payload: AuditsSyncMessage = {
         type: 'AUDITS_CLEAR',
         senderId: this.mySenderId,
         senderRole: role,
         storeId: this.currentStoreId,
         timestamp: clearedAt,
         clearedAt: clearedAt,
+        tombstones: storageService.getDeletedTombstones(),
         audits: [],
       };
 
+      this.pendingAuditsPayload = payload;
+
       if (!this.client || !this.client.connected) {
+        this.connect(this.currentStoreId, role);
         resolve(false);
         return;
       }
@@ -596,6 +654,7 @@ class CloudSyncService {
           console.error('[CloudSync] 초기화 발행 실패:', err);
           resolve(false);
         } else {
+          this.pendingAuditsPayload = null;
           resolve(true);
         }
       });

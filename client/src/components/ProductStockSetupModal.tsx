@@ -6,7 +6,7 @@ import { analyzeAndRecommend } from '../services/smartRecommendation';
 
 interface ProductStockSetupModalProps {
   onClose: () => void;
-  onUpdated: () => void;
+  onUpdated: (changedProducts?: Product[]) => void;
 }
 
 export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
@@ -58,8 +58,10 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
 
   const handleMarkReviewed = (barcode: string) => {
     storageService.markProductAsReviewed(barcode);
-    setProducts(storageService.getProducts());
-    onUpdated();
+    const updatedList = storageService.getProducts();
+    setProducts(updatedList);
+    const changed = updatedList.find((p) => p.barcode === barcode);
+    onUpdated(changed ? [changed] : undefined);
   };
 
   const handleStartEditName = (barcode: string, currentName: string) => {
@@ -71,11 +73,13 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     const trimmed = editingName.trim();
     if (trimmed) {
       storageService.registerProductName(barcode, trimmed);
-      setProducts(storageService.getProducts());
+      const updatedList = storageService.getProducts();
+      setProducts(updatedList);
       setSessionEdited(prev => new Set(prev).add(barcode));
       setSavedId(barcode);
       setTimeout(() => setSavedId(null), 1000);
-      onUpdated();
+      const changed = updatedList.find((p) => p.barcode === barcode);
+      onUpdated(changed ? [changed] : undefined);
     }
     setEditingBarcode(null);
     setEditingName('');
@@ -110,11 +114,13 @@ export const ProductStockSetupModal: React.FC<ProductStockSetupModalProps> = ({
     } else {
       storageService.updateProductMinOrderQty(barcode, safeVal);
     }
-    setProducts(storageService.getProducts());
+    const updatedList = storageService.getProducts();
+    setProducts(updatedList);
     setSessionEdited(prev => new Set(prev).add(barcode));
     setSavedId(barcode);
     setTimeout(() => setSavedId(null), 1000);
-    onUpdated();
+    const changed = updatedList.find((p) => p.barcode === barcode);
+    onUpdated(changed ? [changed] : undefined);
   };
 
   const handleBatchUpdateTargetStock = () => {

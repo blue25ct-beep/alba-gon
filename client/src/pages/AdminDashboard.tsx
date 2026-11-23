@@ -281,8 +281,8 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
     fetch('http://localhost:3001/api/audits')
       .then(res => res.json())
       .then(data => {
-        if (data && data.success && Array.isArray(data.audits) && data.audits.length > 0) {
-          const merged = storageService.mergeAudits(data.audits);
+        if (data && data.success && Array.isArray(data.audits) && (data.audits.length > 0 || data.clearedAt || data.tombstones)) {
+          const merged = storageService.mergeAudits(data.audits, false, false, data.tombstones, data.clearedAt);
           setAudits(merged);
         }
       })
@@ -564,6 +564,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
   const handleRefreshCloudSync = () => {
     setIsRefreshingSync(true);
     cloudSyncService.connect(undefined, 'ADMIN');
+    cloudSyncService.resyncRetainedState();
     loadData();
     setTimeout(() => setIsRefreshingSync(false), 600);
   };
@@ -1456,7 +1457,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
       {/* 목록 */}
       <section className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-1 text-sm">
+          <div className="flex flex-wrap items-center gap-1.5 text-sm">
             {(
               [
                 ['ALL', '전체'],
@@ -1470,7 +1471,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
               <button
                 key={key}
                 onClick={() => setTempFilter(key)}
-                className={`h-9 px-4 rounded-full font-medium transition-colors ${
+                className={`h-9 px-3.5 rounded-full font-medium whitespace-nowrap shrink-0 transition-colors ${
                   tempFilter === key
                     ? 'bg-ink text-white'
                     : 'text-ink-soft hover:bg-sunken'
@@ -1484,7 +1485,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
               <button
                 type="button"
                 onClick={() => setOnlyOrdersFilter(false)}
-                className="h-9 px-3.5 rounded-full font-medium text-xs text-sage-800 bg-sage-100 hover:bg-sage-200 transition-colors flex items-center gap-1.5 shadow-sm"
+                className="h-9 px-3.5 rounded-full font-medium text-xs text-sage-800 bg-sage-100 hover:bg-sage-200 transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0"
                 title="전체 실사 목록으로 돌아가기"
               >
                 <span>🛒 발주 예정만 보는 중</span>
@@ -1494,9 +1495,9 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
             {audits.length === 0 && (
             <button
               onClick={handleRestoreAudits}
-              className="h-9 px-4 rounded-full font-medium text-red-600 bg-red-100 hover:bg-red-200 transition-colors flex items-center gap-1.5 shadow-sm"
+              className="h-9 px-3.5 rounded-full font-medium text-red-600 bg-red-100 hover:bg-red-200 transition-colors flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-4 h-4 shrink-0" />
               🚨 삭제/발주 데이터 복구하기
             </button>
           )}
@@ -1504,15 +1505,15 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
             <>
               <button
                 onClick={handleRestoreAudits}
-                className="h-9 px-4 rounded-full font-medium text-amber-700 bg-amber-100/70 hover:bg-amber-200/80 transition-colors flex items-center gap-1.5"
+                className="h-9 px-3.5 rounded-full font-medium text-amber-700 bg-amber-100/70 hover:bg-amber-200/80 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
                 title="직전 발주 품목 또는 실수로 지운 실사 목록 복구"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-3.5 h-3.5 shrink-0" />
                 데이터 복구
               </button>
               <button
                 onClick={handleClearAllAudits}
-                className="h-9 px-4 rounded-full font-medium text-ink-faint hover:text-brick hover:bg-brick-soft transition-colors"
+                className="h-9 px-3.5 rounded-full font-medium text-ink-faint hover:text-brick hover:bg-brick-soft transition-colors whitespace-nowrap shrink-0"
               >
                 목록 비우기
               </button>
@@ -1521,9 +1522,9 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
             {/* Worker Management Button */}
             <button
               onClick={() => setShowWorkerModal(true)}
-              className="h-9 px-4 rounded-full font-medium text-white bg-blue-500 hover:bg-blue-600 transition-colors flex items-center gap-2"
+              className="h-9 px-3.5 rounded-full font-medium text-white bg-blue-500 hover:bg-blue-600 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
             >
-              <Users className="w-4 h-4" />
+              <Users className="w-4 h-4 shrink-0" />
               👥 근무자 관리
             </button>
           </div>
@@ -1984,7 +1985,7 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
       {showStockSetupModal && (
         <ProductStockSetupModal
           onClose={() => setShowStockSetupModal(false)}
-          onUpdated={() => { cloudSyncService.broadcastProductsUpdate('ADMIN'); loadData(); }}
+          onUpdated={(changed) => { cloudSyncService.broadcastProductsUpdate('ADMIN', changed); loadData(); }}
         />
       )}
 

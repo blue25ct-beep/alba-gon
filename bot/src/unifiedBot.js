@@ -340,15 +340,39 @@ client.on('message', async (topic, message) => {
     return;
   }
 
-  // 3. 상품 마스터 동기화 (구형 캐시/Retain으로 삭제 상품이 되살아나지 않도록 안전 병합)
+  // 3. 상품 마스터 동기화 (초경량 단건 패치 + 전체 안전 병합 지원)
   if (topic === TOPIC_PROD_1060) {
     try {
       const msg = JSON.parse(message.toString());
       if (msg.senderId === 'BOT_INIT' || msg.senderId === 'BOT_REST_API') return;
+      const seedFile = path.join(__dirname, '..', '..', 'client', 'src', 'data', 'seedProducts.json');
+      if (Array.isArray(msg.patch) && msg.patch.length > 0) {
+        let baseList = [];
+        if (fs.existsSync(PRODUCTS_BACKUP_FILE)) {
+          baseList = JSON.parse(fs.readFileSync(PRODUCTS_BACKUP_FILE, 'utf8'));
+        }
+        const map = new Map(baseList.map(p => [p.barcode, p]));
+        msg.patch.forEach(p => {
+          if (!p || !p.barcode) return;
+          const ex = map.get(p.barcode);
+          map.set(p.barcode, ex ? { ...ex, ...p } : p);
+        });
+        const merged = Array.from(map.values());
+        fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(merged, null, 2), 'utf8');
+        if (fs.existsSync(seedFile)) {
+          try { fs.writeFileSync(seedFile, JSON.stringify(merged, null, 2), 'utf8'); } catch(e){}
+        }
+        const first = msg.patch[0];
+        console.log(`[상품 수정 동기화] ${first.name || first.barcode} 등 ${msg.patch.length}건 봇 저장 완료 (목표:${first.targetStock}, 단위:${first.minOrderQty})`);
+        return;
+      }
       const products = msg.data?.products || (Array.isArray(msg) ? msg : []);
       if (products.length > 0) {
         const merged = mergeProductsSafely(products);
         fs.writeFileSync(PRODUCTS_BACKUP_FILE, JSON.stringify(merged, null, 2), 'utf8');
+        if (fs.existsSync(seedFile)) {
+          try { fs.writeFileSync(seedFile, JSON.stringify(merged, null, 2), 'utf8'); } catch(e){}
+        }
         console.log(`[상품 동기화] 마스터 상품 데이터 ${merged.length}건 봇 저장 완료`);
       }
     } catch(e){}
@@ -621,6 +645,12 @@ client.on('reconnect', () => {
 // PC 로컬 REST API 서버 (포트 3001) - 발주 내역 영구 보존 및 실시간 조회용
 // ========================================================
 const app = express();
+app.use((req, res, next) => {
+  if (req.headers['access-control-request-private-network']) {
+    res.setHeader('Access-Control-Allow-Private-Network', 'true');
+  }
+  next();
+});
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
@@ -727,6 +757,7 @@ app.post('/api/products', (req, res) => {
       if (fs.existsSync(seedFile)) {
         try { fs.writeFileSync(seedFile, JSON.stringify(merged, null, 2), 'utf8'); } catch(e){}
       }
+      console.log(`[PC 저장소] 마스터 상품 ${merged.length}건 영구 저장 완료`);
 
       if (client && client.connected) {
         client.publish(TOPIC_PROD_1060, JSON.stringify({
@@ -785,18 +816,20 @@ app.get('/api/audits', (req, res) => {
         success: true,
         count: audits.length,
         timestamp: data.timestamp,
+        tombstones: data.tombstones || {},
+        clearedAt: data.clearedAt || 0,
         audits
       });
     }
   } catch (e) {
     console.error('[PC 저장소] audits 읽기 오류:', e.message);
   }
-  res.json({ success: true, count: 0, audits: [] });
+  res.json({ success: true, count: 0, tombstones: {}, clearedAt: 0, audits: [] });
 });
 
 app.post('/api/audits', (req, res) => {
   try {
-    const { audits, senderId, senderRole, isClear, broadcast } = req.body || {};
+    const { audits, tombstones, clearedAt, senderId, senderRole, isClear, broadcast } = req.body || {};
     if (isClear) {
       try {
         if (fs.existsSync(AUDITS_BACKUP_FILE)) {
@@ -814,6 +847,8 @@ app.post('/api/audits', (req, res) => {
         senderRole: senderRole || 'ADMIN',
         storeId: '1060',
         timestamp: Date.now(),
+        tombstones: tombstones || {},
+        clearedAt: clearedAt || 0,
         audits,
       };
       fs.writeFileSync(AUDITS_BACKUP_FILE, JSON.stringify(payload), 'utf8');

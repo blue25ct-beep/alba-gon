@@ -727,29 +727,73 @@ getProducts(): Product[] {
     localStorage.removeItem(KEYS.DELETED_TOMBSTONES);
   },
 
-  // 스마트 병합: 근무자 폰 최우선 보존 (isWorkerDevice) 및 원격 근무자 실사 최우선 반영 (isIncomingFromWorker)
-  mergeAudits(incoming: AuditItem[], isWorkerDevice = false, isIncomingFromWorker = false): AuditItem[] {
-    const local = this.getAudits(); // 이미 오늘 실사만 반환됨
-    const tombstones = this.getDeletedTombstones();
-    let lastClearedAt = 0;
+  mergeDeletedTombstones(remoteTombstones?: Record<string, number>): Record<string, number> {
+    const local = this.getDeletedTombstones();
+    const cutoff = Date.now() - 48 * 60 * 60 * 1000; // 48시간 이내 삭제 기록 유지
+    const merged: Record<string, number> = {};
+    for (const [bc, ts] of Object.entries(local)) {
+      if (typeof ts === 'number' && ts >= cutoff) merged[bc] = ts;
+    }
+    if (remoteTombstones && typeof remoteTombstones === 'object') {
+      for (const [bc, ts] of Object.entries(remoteTombstones)) {
+        if (typeof ts === 'number' && ts >= cutoff) {
+          merged[bc] = Math.max(merged[bc] || 0, ts);
+        }
+      }
+    }
     try {
-      lastClearedAt = parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10);
+      localStorage.setItem(KEYS.DELETED_TOMBSTONES, JSON.stringify(merged));
     } catch (e) {}
+    return merged;
+  },
+
+  getLastClearedAt(): number {
+    try {
+      return parseInt(localStorage.getItem('albagom_last_cleared_at') || '0', 10) || 0;
+    } catch {
+      return 0;
+    }
+  },
+
+  mergeLastClearedAt(remoteClearedAt?: number): number {
+    const local = this.getLastClearedAt();
+    const effective = Math.max(local, typeof remoteClearedAt === 'number' ? remoteClearedAt : 0);
+    if (effective > local) {
+      try {
+        localStorage.setItem('albagom_last_cleared_at', String(effective));
+      } catch (e) {}
+    }
+    return effective;
+  },
+
+  // 결정론적 + 근무자폰 최우선 병합:
+  // 1) 명시적 삭제(tombstones)·전체 비우기(clearedAt)는 양쪽 기기에 동일 반영
+  // 2) 그 외 충돌(기기 간 시계 오차 포함)에서는 항상 근무자폰(WORKER)의 실사 리스트를 최우선 보존
+  mergeAudits(
+    incoming: AuditItem[],
+    isWorkerDevice = false,
+    isIncomingFromWorker = false,
+    remoteTombstones?: Record<string, number>,
+    remoteClearedAt?: number
+  ): AuditItem[] {
+    const local = this.getAudits(); // 이미 오늘 실사만 반환됨
+    const tombstones = this.mergeDeletedTombstones(remoteTombstones);
+    const lastClearedAt = this.mergeLastClearedAt(remoteClearedAt);
 
     const map = new Map<string, AuditItem>();
 
-    // 1. 로컬 실사 보존 (오늘 실사만)
+    // 1. 로컬 실사 반영 (오늘 실사만, 삭제/비우기 이후 항목만)
     for (const item of local) {
       if (!item || !item.barcode) continue;
       if (!isTodayAudit(item)) continue;
       const itemTime = parseInt(item.id, 10) || 0;
-      if (lastClearedAt > 0 && itemTime > 0 && itemTime < lastClearedAt) continue;
+      if (lastClearedAt > 0 && itemTime > 0 && itemTime <= lastClearedAt) continue;
       const deletedAt = tombstones[item.barcode] || 0;
       if (deletedAt > 0 && itemTime <= deletedAt) continue;
       map.set(item.barcode, item);
     }
 
-    // 2. 원격 수신 실사 스마트 병합 (오늘 실사만)
+    // 2. 원격 수신 실사 병합 (근무자폰 최우선 보존)
     const pastIncoming: AuditItem[] = [];
     for (const inc of incoming) {
       if (!inc || !inc.barcode) continue;
@@ -758,23 +802,23 @@ getProducts(): Product[] {
         continue;
       }
       const incTime = parseInt(inc.id, 10) || 0;
-      if (lastClearedAt > 0 && incTime > 0 && incTime < lastClearedAt) continue;
+      if (lastClearedAt > 0 && incTime > 0 && incTime <= lastClearedAt) continue;
       const deletedAt = tombstones[inc.barcode] || 0;
       if (deletedAt > 0 && incTime <= deletedAt) continue;
 
       const existing = map.get(inc.barcode);
       if (!existing) {
         map.set(inc.barcode, inc);
+      } else if (isWorkerDevice && !isIncomingFromWorker) {
+        // 근무자폰이 관리자 메시지를 받을 때: 근무자폰 로컬 항목을 항상 우선 보존
+        continue;
+      } else if (!isWorkerDevice && isIncomingFromWorker) {
+        // 관리자 PC가 근무자폰 메시지를 받을 때: 근무자폰 항목으로 항상 우선 반영
+        map.set(inc.barcode, { ...existing, ...inc });
       } else {
-        if (isWorkerDevice) {
-          continue;
-        } else if (isIncomingFromWorker) {
+        const existingTime = parseInt(existing.id, 10) || 0;
+        if (incTime >= existingTime) {
           map.set(inc.barcode, { ...existing, ...inc });
-        } else {
-          const existingTime = parseInt(existing.id, 10) || 0;
-          if (incTime >= existingTime) {
-            map.set(inc.barcode, { ...existing, ...inc });
-          }
         }
       }
     }
