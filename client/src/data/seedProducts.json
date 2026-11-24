@@ -150,7 +150,8 @@
       4,
       6
     ],
-    "autoOrderQty": 1
+    "autoOrderQty": 1,
+    "lastOrderDate": "11. 24. 오후 10:02"
   },
   {
     "barcode": "8809279269031",
@@ -169,7 +170,8 @@
       4,
       6
     ],
-    "autoOrderQty": 1
+    "autoOrderQty": 1,
+    "lastOrderDate": "11. 24. 오후 10:02"
   },
   {
     "barcode": "8801118410765",
@@ -661,7 +663,8 @@
       4,
       6
     ],
-    "autoOrderQty": 1
+    "autoOrderQty": 1,
+    "lastOrderDate": "11. 24. 오후 10:02"
   },
   {
     "barcode": "8801121768105",
@@ -812,7 +815,8 @@
     "isDPlus1": true,
     "reviewStatus": "APPROPRIATE",
     "reviewedAt": "11. 24. 오후 09:46",
-    "updatedAt": "11. 24. 오후 09:46"
+    "updatedAt": "11. 24. 오후 09:46",
+    "lastOrderDate": "11. 24. 오후 10:02"
   },
   {
     "barcode": "8801007841113",
@@ -1142,7 +1146,8 @@
     "isDPlus1": true,
     "reviewStatus": "APPROPRIATE",
     "reviewedAt": "11. 24. 오후 09:44",
-    "updatedAt": "11. 24. 오후 09:44"
+    "updatedAt": "11. 24. 오후 09:44",
+    "lastOrderDate": "11. 24. 오후 10:02"
   },
   {
     "barcode": "8801115224303",
@@ -1166,7 +1171,8 @@
     "isDPlus1": true,
     "reviewStatus": "APPROPRIATE",
     "reviewedAt": "11. 24. 오후 09:44",
-    "updatedAt": "11. 24. 오후 09:44"
+    "updatedAt": "11. 24. 오후 09:44",
+    "lastOrderDate": "11. 24. 오후 10:02"
   },
   {
     "barcode": "8809106840044",
