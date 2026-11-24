@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Product, AuditItem } from '../types';
 import { Check, Plus, Minus, Send, X, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { soundManager } from '../services/sound';
@@ -264,6 +264,49 @@ const cleanWorkerDisplayName = (rawName: string) =>
     .replace(/\s{2,}/g, ' ')
     .trim();
 
+export const CHILLED_DRAFT_STORAGE_KEY = 'albagom_chilled_draft_v1';
+
+const getTodayKstDateKey = () =>
+  new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+
+export const clearChilledDraftStorage = () => {
+  try {
+    localStorage.removeItem(CHILLED_DRAFT_STORAGE_KEY);
+  } catch {}
+};
+
+const readChilledDraft = (): Record<string, number> => {
+  try {
+    const raw = localStorage.getItem(CHILLED_DRAFT_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || parsed.date !== getTodayKstDateKey() || typeof parsed.stocks !== 'object') {
+      localStorage.removeItem(CHILLED_DRAFT_STORAGE_KEY);
+      return {};
+    }
+    return parsed.stocks || {};
+  } catch {
+    return {};
+  }
+};
+
+const writeChilledDraft = (stocks: Record<string, number | null>) => {
+  try {
+    const clean: Record<string, number> = {};
+    Object.entries(stocks).forEach(([bc, val]) => {
+      if (val !== undefined && val !== null) clean[bc] = val;
+    });
+    if (Object.keys(clean).length === 0) {
+      localStorage.removeItem(CHILLED_DRAFT_STORAGE_KEY);
+    } else {
+      localStorage.setItem(
+        CHILLED_DRAFT_STORAGE_KEY,
+        JSON.stringify({ date: getTodayKstDateKey(), stocks: clean })
+      );
+    }
+  } catch {}
+};
+
 export interface SubmittedChecklistItem {
   barcode: string;
   productName: string;
@@ -278,12 +321,16 @@ interface ChilledChecklistPanelProps {
   products: Product[];
   existingAudits: AuditItem[];
   onSubmitChecklist: (items: SubmittedChecklistItem[]) => void;
+  onAutoSaveChecklist?: (items: SubmittedChecklistItem[]) => void;
+  onRemoveAuditBarcodes?: (barcodes: string[]) => void;
 }
 
 export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   products,
   existingAudits,
   onSubmitChecklist,
+  onAutoSaveChecklist,
+  onRemoveAuditBarcodes,
 }) => {
   // 구역별 아코디언 열림 상태 (기본: 얼음컵 열림, 버튼 클릭으로 구역별 빠른 이동/펼치기)
   const [openZones, setOpenZones] = useState<Record<string, boolean>>({
@@ -296,17 +343,29 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
     '🧺 하단 바구니': false,
   });
 
-  // 체크리스트 상품별 근무자 선택 재고 상태 (null = 아직 버튼 안 누름)
+  // 체크리스트 상품별 근무자 선택 재고 상태 (existingAudits + 오늘 날짜 임시저장 자동 복원)
   const [selectedStocks, setSelectedStocks] = useState<Record<string, number | null>>(() => {
     const init: Record<string, number | null> = {};
     existingAudits.forEach((a) => {
       init[a.barcode] = a.stockCount;
+    });
+    const draft = readChilledDraft();
+    Object.entries(draft).forEach(([bc, val]) => {
+      init[bc] = val;
     });
     return init;
   });
 
   // 최종 확인 팝업 표시 여부
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // 초저리소스 저장용 ref (디바운스 & 구역/카테고리 이탈 시 변경분만 1회 전송)
+  const isDirtyRef = useRef(false);
+  const latestStocksRef = useRef(selectedStocks);
+  latestStocksRef.current = selectedStocks;
+  const onAutoSaveRef = useRef(onAutoSaveChecklist);
+  onAutoSaveRef.current = onAutoSaveChecklist;
+  const prevExistingCountRef = useRef(existingAudits.length);
 
   const checklistItems = useMemo(() => {
     const prodMap = new Map(products.map((p) => [p.barcode, p]));
@@ -421,11 +480,97 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
     return groups;
   }, [checklistItems]);
 
+  const latestChecklistItemsRef = useRef(checklistItems);
+  latestChecklistItemsRef.current = checklistItems;
+
+  const buildPayloadFromStocks = (stocks: Record<string, number | null>): SubmittedChecklistItem[] => {
+    const payload: SubmittedChecklistItem[] = [];
+    latestChecklistItemsRef.current.forEach((it) => {
+      const stock = stocks[it.barcode];
+      if (stock !== undefined && stock !== null) {
+        payload.push({
+          barcode: it.barcode,
+          productName: it.name,
+          stockCount: stock,
+          targetStock: it.targetStock,
+          minOrderQty: it.minOrderQty,
+          vendor: it.vendor,
+          category: it.category,
+        });
+      }
+    });
+    return payload;
+  };
+
+  // 변경분이 있을 때만 클라우드(실사 목록)로 1회 일괄 동기화 (리소스 최소화)
+  const flushAutoSaveToCloud = () => {
+    if (!isDirtyRef.current || !onAutoSaveRef.current) return;
+    const payload = buildPayloadFromStocks(latestStocksRef.current);
+    isDirtyRef.current = false;
+    if (payload.length > 0) {
+      onAutoSaveRef.current(payload);
+    }
+  };
+
+  // 1단계: 300ms 디바운스 휴대폰 내부 localStorage 임시저장 (통신 0바이트, ~2KB)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      writeChilledDraft(selectedStocks);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [selectedStocks]);
+
+  // 앱 백그라운드 전환 / 닫기 / 카테고리 이탈 시 즉시 로컬 flush + 변경분 1회 클라우드 동기화
+  useEffect(() => {
+    const handleBackgroundFlush = () => {
+      writeChilledDraft(latestStocksRef.current);
+      if (document.visibilityState === 'hidden') {
+        flushAutoSaveToCloud();
+      }
+    };
+    const handlePageHide = () => {
+      writeChilledDraft(latestStocksRef.current);
+      flushAutoSaveToCloud();
+    };
+    document.addEventListener('visibilitychange', handleBackgroundFlush);
+    window.addEventListener('pagehide', handlePageHide);
+    return () => {
+      document.removeEventListener('visibilitychange', handleBackgroundFlush);
+      window.removeEventListener('pagehide', handlePageHide);
+      writeChilledDraft(latestStocksRef.current);
+      flushAutoSaveToCloud();
+    };
+  }, []);
+
+  // 앱 재실행 직후 클라우드/로컬 existingAudits가 비동기 도착하거나 원격 초기화될 때 체크표 동기화
+  useEffect(() => {
+    if (existingAudits.length === 0 && prevExistingCountRef.current > 0) {
+      const draft = readChilledDraft();
+      if (Object.keys(draft).length === 0) {
+        setSelectedStocks({});
+      }
+    } else if (existingAudits.length > 0) {
+      setSelectedStocks((prev) => {
+        let changed = false;
+        const next = { ...prev };
+        existingAudits.forEach((a) => {
+          if (next[a.barcode] === undefined) {
+            next[a.barcode] = a.stockCount;
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }
+    prevExistingCountRef.current = existingAudits.length;
+  }, [existingAudits]);
+
   const handleSelectStock = (barcode: string, val: number) => {
     soundManager.playScanSuccess();
+    isDirtyRef.current = true;
+    const safeVal = Math.max(0, val);
+    const willClear = selectedStocks[barcode] === safeVal;
     setSelectedStocks((prev) => {
-      const safeVal = Math.max(0, val);
-      // 이미 선택된 같은 버튼을 한 번 더 누르면 선택 해제(미선택)
       if (prev[barcode] === safeVal) {
         return { ...prev, [barcode]: null };
       }
@@ -434,13 +579,21 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
         [barcode]: safeVal,
       };
     });
+    if (willClear && onRemoveAuditBarcodes && existingAudits.some((a) => a.barcode === barcode)) {
+      onRemoveAuditBarcodes([barcode]);
+    }
   };
 
   const handleClearItem = (barcode: string) => {
-    setSelectedStocks((prev) => ({
-      ...prev,
-      [barcode]: null,
-    }));
+    isDirtyRef.current = true;
+    setSelectedStocks((prev) => {
+      const next = { ...prev, [barcode]: null };
+      writeChilledDraft(next);
+      return next;
+    });
+    if (onRemoveAuditBarcodes && existingAudits.some((a) => a.barcode === barcode)) {
+      onRemoveAuditBarcodes([barcode]);
+    }
   };
 
   const handleResetZone = (zoneTitle: string, items: { barcode: string }[]) => {
@@ -449,16 +602,24 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
     );
     if (checkedInZone.length === 0) return;
     if (!confirm(`"${zoneTitle}"의 체크된 재고 ${checkedInZone.length}건을 모두 초기화할까요?`)) return;
+    isDirtyRef.current = true;
+    const clearedBarcodes = checkedInZone.map((it) => it.barcode);
     setSelectedStocks((prev) => {
       const next = { ...prev };
       items.forEach((it) => {
         next[it.barcode] = null;
       });
+      writeChilledDraft(next);
       return next;
     });
+    if (onRemoveAuditBarcodes) {
+      const savedInZone = clearedBarcodes.filter((bc) => existingAudits.some((a) => a.barcode === bc));
+      if (savedInZone.length > 0) onRemoveAuditBarcodes(savedInZone);
+    }
   };
 
   const handleAdjustStock = (barcode: string, targetStock: number, delta: number) => {
+    isDirtyRef.current = true;
     setSelectedStocks((prev) => {
       const current = prev[barcode] ?? targetStock;
       return {
@@ -469,10 +630,12 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   };
 
   const toggleZone = (zoneTitle: string) => {
+    flushAutoSaveToCloud();
     setOpenZones((prev) => ({ ...prev, [zoneTitle]: !prev[zoneTitle] }));
   };
 
   const focusZone = (zoneTitle: string) => {
+    flushAutoSaveToCloud();
     setOpenZones((prev) => {
       const next: Record<string, boolean> = {};
       Object.keys(prev).forEach((k) => {
@@ -488,24 +651,9 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   const checkedCount = checkedItems.length;
 
   const handleFinalConfirm = () => {
-    const finalPayload: SubmittedChecklistItem[] = [];
-
-    // 체크리스트 항목 (저온/상온 합동진열 각각의 vendor·category 유지)
-    checklistItems.forEach((it) => {
-      const stock = selectedStocks[it.barcode];
-      if (stock !== undefined && stock !== null) {
-        finalPayload.push({
-          barcode: it.barcode,
-          productName: it.name,
-          stockCount: stock,
-          targetStock: it.targetStock,
-          minOrderQty: it.minOrderQty,
-          vendor: it.vendor,
-          category: it.category,
-        });
-      }
-    });
-
+    const finalPayload = buildPayloadFromStocks(selectedStocks);
+    isDirtyRef.current = false;
+    clearChilledDraftStorage();
     setShowConfirmModal(false);
     onSubmitChecklist(finalPayload);
   };

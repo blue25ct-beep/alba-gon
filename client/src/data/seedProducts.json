@@ -331,9 +331,11 @@
     "price": 2400,
     "cost": 1800,
     "category": "저온냉장",
-    "targetStock": 1,
+    "targetStock": 0,
     "minOrderQty": 1,
-    "vendor": "chilled"
+    "vendor": "chilled",
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 24. 오후 09:46"
   },
   {
     "barcode": "8801118879425",
@@ -807,7 +809,10 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled",
-    "isDPlus1": true
+    "isDPlus1": true,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "11. 24. 오후 09:46",
+    "updatedAt": "11. 24. 오후 09:46"
   },
   {
     "barcode": "8801007841113",
@@ -1134,7 +1139,10 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled",
-    "isDPlus1": true
+    "isDPlus1": true,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "11. 24. 오후 09:44",
+    "updatedAt": "11. 24. 오후 09:44"
   },
   {
     "barcode": "8801115224303",
@@ -1155,7 +1163,10 @@
     "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled",
-    "isDPlus1": true
+    "isDPlus1": true,
+    "reviewStatus": "APPROPRIATE",
+    "reviewedAt": "11. 24. 오후 09:44",
+    "updatedAt": "11. 24. 오후 09:44"
   },
   {
     "barcode": "8809106840044",
@@ -6191,10 +6202,10 @@
     "price": 1700,
     "cost": 1020,
     "category": "상온",
-    "targetStock": 4,
+    "targetStock": 2,
     "minOrderQty": 8,
     "reviewStatus": "MODIFIED",
-    "updatedAt": "11. 16. 오후 08:15",
+    "updatedAt": "11. 24. 오후 08:39",
     "lastOrderDate": "11. 23. 오후 09:07"
   },
   {
@@ -13002,8 +13013,10 @@
     "price": 2350,
     "cost": 1528,
     "category": "상온",
-    "targetStock": 1,
-    "minOrderQty": 6
+    "targetStock": 3,
+    "minOrderQty": 6,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 24. 오후 09:43"
   },
   {
     "barcode": "8801056050269",
@@ -17394,9 +17407,11 @@
     "cost": 3969,
     "category": "저온냉장",
     "vendor": "chilled",
-    "targetStock": 1,
+    "targetStock": 0,
     "minOrderQty": 1,
-    "isDPlus1": false
+    "isDPlus1": false,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 24. 오후 09:46"
   },
   {
     "barcode": "8801392187070",
@@ -17459,8 +17474,10 @@
     "price": 4500,
     "cost": 0,
     "category": "상온",
-    "targetStock": 2,
-    "minOrderQty": 1,
-    "isNewProduct": true
+    "targetStock": 1,
+    "minOrderQty": 3,
+    "isNewProduct": true,
+    "reviewStatus": "MODIFIED",
+    "updatedAt": "11. 24. 오후 09:47"
   }
 ]
