@@ -85,16 +85,22 @@ function httpRequest(options, postData = null) {
 /**
  * 유앤미24 상온(app1) 사이트에서 바코드로 실시간 공식 공급단가(price) 및 단위(unit) 조회
  */
-async function fetchYounmeProductInfo(sessionCookie, folder, barcode, orderDate) {
+async function fetchYounmeProductInfo(sessionCookie, folder, barcode, orderDate, shipDate1 = '', shipDate2 = '') {
   try {
-    const searchPayload = querystring.stringify({
+    const payloadObj = {
       order_date: orderDate,
       order_dev: folder === 'app3' ? 'h' : 'j',
       order_type: '1',
       search_dev: 'product_name',
       search_word: '',
       search_word2: barcode,
-    });
+    };
+    if (folder === 'app3') {
+      payloadObj.ship_date1 = shipDate1 || orderDate;
+      payloadObj.ship_date2 = shipDate2 || shipDate1 || orderDate;
+      payloadObj.view_type = 'l';
+    }
+    const searchPayload = querystring.stringify(payloadObj);
 
     const res = await httpRequest({
       hostname: 'www.younme24.com',
@@ -108,6 +114,10 @@ async function fetchYounmeProductInfo(sessionCookie, folder, barcode, orderDate)
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
       },
     }, searchPayload);
+
+    if (res.statusCode !== 200) {
+      console.warn(`[orderEngine] ${folder}/product_list.asp 비정상 응답 (${res.statusCode}) - 바코드: ${barcode}`);
+    }
 
     const html = iconv.decode(res.body, 'EUC-KR');
     const esc = barcode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -365,7 +375,7 @@ async function runDirectOrderAdd(items, onProgress, overrideCredentials = null) 
       });
       // ★ 유앤미 저온(app3) 전용 장바구니 담기 (POST /app3/apiOrder.asp, order_dev=h)
       try {
-        const live3 = await fetchYounmeProductInfo(sessionCookie, 'app3', targetBarcode, app3OrderDate);
+        const live3 = await fetchYounmeProductInfo(sessionCookie, 'app3', targetBarcode, app3OrderDate, app3ShipDate1, app3ShipDate2);
         if (!live3) {
           failures.push({
             id: `fail_${Date.now()}_${item.barcode}`,
