@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BarcodeScanner } from '../components/BarcodeScanner';
 import { QuantityModal } from '../components/QuantityModal';
 import { PhotoCaptureModal } from '../components/PhotoCaptureModal';
-import { ChilledChecklistPanel } from '../components/ChilledChecklistPanel';
+import { ChilledChecklistPanel, clearChilledDraftStorage } from '../components/ChilledChecklistPanel';
 import { AuditItem, Product } from '../types';
 import { storageService } from '../services/storage';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
@@ -10,7 +10,7 @@ import { Trash2, Camera, RefreshCw, Check, Lock, Send } from 'lucide-react';
 import { soundManager } from '../services/sound';
 
 export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'CHILLED' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void; onSwitchMode?: (mode: 'WORKER' | 'ADMIN') => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange, onSwitchMode }) => {
-  const [audits, setAudits] = useState<AuditItem[]>([]);
+  const [audits, setAudits] = useState<AuditItem[]>(() => storageService.getAudits());
   const [activeBarcode, setActiveBarcode] = useState<string | null>(null);
   const [detectedProduct, setDetectedProduct] = useState<Product | undefined>(undefined);
   const [pendingPhotos, setPendingPhotos] = useState<string[]>([]);
@@ -113,6 +113,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
     });
   
     const unsubClear = cloudSyncService.onClearCommand(() => {
+      clearChilledDraftStorage();
       const current = storageService.getAudits();
       setAudits(current);
     });
@@ -545,11 +546,37 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
         )}
       </section>
 
-      {/* 저온(CHILLED) 전용 원터치 체크리스트 + 삼각김밥 요일별 자동 편성 */}
+      {/* 저온(CHILLED) 전용 원터치 체크리스트 */}
       {selectedCategory === 'CHILLED' && (
         <ChilledChecklistPanel
           products={storageService.getProducts()}
           existingAudits={audits}
+          onAutoSaveChecklist={(items) => {
+            if (items.length === 0) return;
+            items.forEach((it) => {
+              storageService.saveAudit({
+                barcode: it.barcode,
+                productName: it.productName,
+                stockCount: it.stockCount,
+                targetStock: it.targetStock,
+                minOrderQty: it.minOrderQty,
+                photoUrls: [],
+                isUnmapped: false,
+                workerName,
+                vendor: it.vendor || 'chilled',
+                category: it.category || '저온냉장',
+              });
+            });
+            const updated = storageService.getAudits();
+            setAudits(updated);
+            cloudSyncService.broadcastAudits(updated, 'WORKER');
+          }}
+          onRemoveAuditBarcodes={(barcodes) => {
+            barcodes.forEach((bc) => storageService.deleteAudit(bc));
+            const updated = storageService.getAudits();
+            setAudits(updated);
+            cloudSyncService.broadcastAudits(updated, 'WORKER');
+          }}
           onSubmitChecklist={(items) => {
             items.forEach((it) => {
               storageService.saveAudit({
