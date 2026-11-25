@@ -33,6 +33,12 @@ export const CHILLED_ZONES = [
   { id: 'BASKET', label: '🧺 하단 바구니' },
 ] as const;
 
+// 우선 테스트 기간 동안 노출할 구역 (나머지 구역은 데이터 보존 상태로 임시 숨김 — 여기에 구역명만 추가하면 즉시 복원)
+const ACTIVE_CHILLED_ZONES = new Set<string>([
+  '🥗 쇼케이스 A',
+  '🥛 쇼케이스 B',
+]);
+
 // 매장 실사진 6구역 배치도 기준 저온 + 합동진열 상온 통합 체크리스트
 export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][] = [
   // === 1. 얼음컵 냉장고 ===
@@ -332,13 +338,13 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   onAutoSaveChecklist,
   onRemoveAuditBarcodes,
 }) => {
-  // 구역별 아코디언 열림 상태 (기본: 얼음컵 열림, 버튼 클릭으로 구역별 빠른 이동/펼치기)
+  // 구역별 아코디언 열림 상태 (기본: 쇼케이스 A 열림)
   const [openZones, setOpenZones] = useState<Record<string, boolean>>({
-    '🧊 얼음컵 냉장고': true,
+    '🧊 얼음컵 냉장고': false,
     '🍞 빵 진열대': false,
     '🥶 수직 냉동고 A': false,
     '🥶 수직 냉동고 B': false,
-    '🥗 쇼케이스 A': false,
+    '🥗 쇼케이스 A': true,
     '🥛 쇼케이스 B': false,
     '🧺 하단 바구니': false,
   });
@@ -382,6 +388,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
     }[] = [];
 
     DEFAULT_CHILLED_CHECKLIST_ENTRIES.forEach(([barcode, cfg]) => {
+      if (!ACTIVE_CHILLED_ZONES.has(cfg.zone)) return;
       const p = prodMap.get(barcode);
       const target = (p && p.targetStock > 1) ? p.targetStock : cfg.targetStock;
       const minQty = Math.max(1, p?.minOrderQty || 1);
@@ -660,11 +667,11 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* 1. 7구역 빠른 선택 탭 */}
+      {/* 1. 구역 빠른 선택 탭 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <div>
-            <h4 className="font-bold text-ink text-base">🗺️ 구역별 재고 체크표 (7구역)</h4>
+            <h4 className="font-bold text-ink text-base">🗺️ 구역별 재고 체크표 ({Object.keys(groupedChecklist).length}구역)</h4>
             <p className="text-xs text-ink-faint mt-0.5">
               서 계신 구역을 눌러 부족한 상품의 현재 재고만 톡톡 눌러주세요.
             </p>
@@ -674,7 +681,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className={`grid gap-1.5 ${Object.keys(groupedChecklist).length <= 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
           {Object.entries(groupedChecklist).map(([zoneTitle, zItems]) => {
             const zChecked = zItems.filter((it) => selectedStocks[it.barcode] !== undefined && selectedStocks[it.barcode] !== null).length;
             const isOpen = !!openZones[zoneTitle];
