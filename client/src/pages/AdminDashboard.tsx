@@ -25,7 +25,7 @@ import { BarcodeAliasModal } from '../components/BarcodeAliasModal';
 import { OrderFailureModal } from '../components/OrderFailureModal';
 import { ProductStockSetupModal } from '../components/ProductStockSetupModal';
 import { RestoreAuditModal } from '../components/RestoreAuditModal';
-import { TRIANGLE_KIMBAP_BASIC, TRIANGLE_KIMBAP_THU_EXTRA } from '../components/ChilledChecklistPanel';
+import { TRIANGLE_KIMBAP_BASIC, TRIANGLE_KIMBAP_THU_EXTRA, DEFAULT_CHILLED_CHECKLIST_BARCODES } from '../components/ChilledChecklistPanel';
 
 
 export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' | 'SPCHAIN' | null; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void }> = ({ initialCategory, onThemeChange, onTitleChange }) => {
@@ -391,10 +391,14 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
   const orderItems: OrderItem[] = audits.map((audit) => {
     const { product, alias } = storageService.findProduct(audit.barcode);
 
+    const chilledCfg = DEFAULT_CHILLED_CHECKLIST_BARCODES[audit.barcode];
+    const dayOverrideTarget = chilledCfg?.targetStockByDay?.[new Date().getDay()];
     const targetStock =
-      product && product.targetStock !== undefined
-        ? product.targetStock
-        : (audit.targetStock !== undefined ? audit.targetStock : 1);
+      dayOverrideTarget !== undefined
+        ? dayOverrideTarget
+        : (product && product.targetStock !== undefined
+            ? product.targetStock
+            : (audit.targetStock !== undefined ? audit.targetStock : 1));
 
     const minOrderQty =
       product && product.minOrderQty !== undefined

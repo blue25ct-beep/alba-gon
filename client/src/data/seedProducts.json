@@ -224,7 +224,7 @@
     "price": 2700,
     "cost": 1998,
     "category": "저온냉장",
-    "targetStock": 1,
+    "targetStock": 3,
     "minOrderQty": 1,
     "vendor": "chilled",
     "isDPlus1": true
@@ -246,7 +246,7 @@
     "price": 2700,
     "cost": 1910,
     "category": "저온냉장",
-    "targetStock": 1,
+    "targetStock": 3,
     "minOrderQty": 1,
     "vendor": "chilled",
     "isDPlus1": true

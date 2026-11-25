@@ -17,6 +17,7 @@ export const TRIANGLE_KIMBAP_THU_EXTRA = [
 
 export interface ChilledChecklistEntry {
   targetStock: number;
+  targetStockByDay?: Record<number, number>; // 요일별 목표재고 오버라이드 (예: { 3: 5 } = 수요일만 5개)
   zone: string;
   subLabel?: string;
   vendor?: 'chilled' | 'younme';
@@ -171,37 +172,55 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8801155737580', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }], // DM]슈레드피자치즈(눈꽃)25g
   ['8801069176710', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }], // 남양]드빈치체다슬라이스치즈85g
   ['8801118400926', { targetStock: 1, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }], // 롯데)햄치즈게맛살샌드위치173g
-  ['8801118400957', { targetStock: 1, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled' }], // 롯데)NEW듬뿍햄샌드위치155g
+  ['8801118400957', { targetStock: 1, zone: '🥗 쇼케이스 A', subLabel: '2단', vendor: 'chilled', activeDays: [4] }], // 롯데)NEW듬뿍햄샌드위치155g (목요일만 노출)
   // 3단
   ['8801007635989', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'chilled' }], // CJ]비비고김치볶음80g(D+1)
   ['8801024190201', { targetStock: 3, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'chilled' }], // 종가집]종가집맛김치컵130g(D+1)
   ['8801316124259', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'chilled' }], // 한울]매운실비김치(컵)80g(D+1)
   ['CP_SALAMI_4500', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'younme' }], // CP] 이탈리안 살라미 (쿠팡 수동발주)
-  ['8801118034909', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'chilled' }], // 롯데]쩝쩝박사6찬전통비빔밥385g
+  ['8801118034909', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '3단', vendor: 'chilled', activeDays: [4] }], // 롯데]쩝쩝박사6찬전통비빔밥385g (목요일만 노출)
   // 4단
   ['8801316100031', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'chilled' }], // 한울]꼬마단무지120g(D+1)
+  ['8801005482820', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'younme' }], // 샘표]우리엄마돼지고기장조림110g
+  ['8801005484824', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'younme' }], // 샘표]메추리알장조림130g
+  ['8801005483827', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'younme' }], // 샘표]우리엄마쇠고기장조림110g
+  ['8801005302838', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'younme' }], // 샘표]깨끗한깻잎70g
   ['8809396600014', {
-    targetStock: 4,
+    targetStock: 3,
+    targetStockByDay: { 3: 5 }, // 평소 3개, 수요일(주말 대비) 5개
     zone: '🥗 쇼케이스 A',
     subLabel: '4단',
     vendor: 'chilled',
     buttons: [
       { label: '0개', value: 0 },
-      { label: '1~2개', value: 2 },
-      { label: '3개 이하', value: 3 },
-      { label: '4개+(충분)', value: 4 },
+      { label: '1개', value: 1 },
+      { label: '2개', value: 2 },
+      { label: '3개', value: 3 },
+      { label: '4개', value: 4 },
+      { label: '5개+', value: 5 },
     ],
   }], // 진주)마루카네감동란(삶은계란)2구(D+1)
-  ['8801392194078', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'chilled' }], // CJ]훈제대란100g(2입)(D+1)
+  ['8801392194078', {
+    targetStock: 3,
+    targetStockByDay: { 3: 5 }, // 평소 3개, 수요일(주말 대비) 5개
+    zone: '🥗 쇼케이스 A',
+    subLabel: '4단',
+    vendor: 'chilled',
+    buttons: [
+      { label: '0개', value: 0 },
+      { label: '1개', value: 1 },
+      { label: '2개', value: 2 },
+      { label: '3개', value: 3 },
+      { label: '4개', value: 4 },
+      { label: '5개+', value: 5 },
+    ],
+  }], // CJ]훈제대란100g(2입)(D+1)
   ['8801242001716', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'chilled' }], // (행사)CJ)프레쉬안오뎅한그릇360g(D+1)
   ['8801242039085', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'chilled' }], // (행사)CJ)얼큰오뎅한그릇360g(D+1)
-  ['8801005484824', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'younme' }], // 샘표]메추리알장조림130g
-  ['8801005482820', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'younme' }], // 샘표]우리엄마돼지고기장조림110g
-  ['8801005483827', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'younme' }], // 샘표]우리엄마쇠고기장조림110g
-  ['8801005302838', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '4단', vendor: 'younme' }], // 샘표]깨끗한깻잎70g
   // 5단
-  ['8809106840013', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }], // 풍림)고향족발미니300g
+  ['8801910684005', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }], // 풍림)왕족발400g
   ['8809106840044', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }], // 풍림)고향편육250g
+  ['8809106840037', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }], // 풍림)왕방산족발슬라이스400g
   ['8801068939866', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }], // 삼립]로스트치킨소금구이210g(D+1)
   ['8801118879425', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }], // 롯데햄)까르보나라스파게티220g(D+1)
   ['8801118879418', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }], // 롯데햄)볼로네이즈스파게티220g(D+1)
@@ -445,7 +464,8 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
       if (!ACTIVE_CHILLED_ZONES.has(cfg.zone)) return;
       if (cfg.activeDays && !cfg.activeDays.includes(todayDay)) return;
       const p = prodMap.get(barcode);
-      const target = (p && p.targetStock > 1) ? p.targetStock : cfg.targetStock;
+      const dayOverride = cfg.targetStockByDay?.[todayDay];
+      const target = dayOverride !== undefined ? dayOverride : ((p && p.targetStock > 1) ? p.targetStock : cfg.targetStock);
       const minQty = Math.max(1, p?.minOrderQty || 1);
       const name = p?.name || barcode;
       const vendor: 'chilled' | 'younme' = cfg.vendor || (p?.vendor === 'younme' ? 'younme' : 'chilled');
