@@ -6,8 +6,24 @@ import { ChilledChecklistPanel, clearChilledDraftStorage } from '../components/C
 import { AuditItem, Product } from '../types';
 import { storageService } from '../services/storage';
 import { cloudSyncService, SyncStatus } from '../services/cloudSyncService';
-import { Trash2, Camera, RefreshCw, Check, Lock, Send } from 'lucide-react';
+import { Trash2, Camera, RefreshCw, Check, Lock, Send, Clock, X } from 'lucide-react';
 import { soundManager } from '../services/sound';
+
+const CHILLED_START_MIN = 22 * 60 + 30; // 오후 10:30 (KST)
+const CHILLED_END_MIN = 1 * 60;         // 오전 01:00 (KST)
+
+function isChilledCheckWindowOpen(nowMs: number = Date.now()): boolean {
+  const kst = new Date(nowMs + 9 * 60 * 60 * 1000);
+  const mins = kst.getUTCHours() * 60 + kst.getUTCMinutes();
+  return mins >= CHILLED_START_MIN || mins < CHILLED_END_MIN;
+}
+
+function formatKstTime(nowMs: number = Date.now()): string {
+  const kst = new Date(nowMs + 9 * 60 * 60 * 1000);
+  const hh = String(kst.getUTCHours()).padStart(2, '0');
+  const mm = String(kst.getUTCMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
 
 export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SPCHAIN' | null; onCategoryChange?: (c: 'YOUNME' | 'CHILLED' | 'SPCHAIN' | null) => void; onThemeChange?: (theme: 'sage' | 'blue' | 'neutral') => void; onTitleChange?: (title: string) => void; onSwitchMode?: (mode: 'WORKER' | 'ADMIN') => void }> = ({ selectedCategory, onCategoryChange, onThemeChange, onTitleChange, onSwitchMode }) => {
   const [audits, setAudits] = useState<AuditItem[]>(() => storageService.getAudits());
@@ -29,6 +45,42 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
   const [lastScanTime, setLastScanTime] = useState<number | null>(null);
   const [isCheckFinished, setIsCheckFinished] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<{ text: string; sub?: string } | null>(null);
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  const [chilledAdminBypass, setChilledAdminBypass] = useState<boolean>(false);
+  const [showChilledLockModal, setShowChilledLockModal] = useState<boolean>(false);
+  const [chilledUnlockPin, setChilledUnlockPin] = useState<string>('');
+  const [chilledUnlockError, setChilledUnlockError] = useState<string>('');
+
+  const isChilledWindowOpen = isChilledCheckWindowOpen(nowMs);
+  const isChilledAllowed = isChilledWindowOpen || chilledAdminBypass;
+
+  useEffect(() => {
+    const refreshNow = () => setNowMs(Date.now());
+    const timer = setInterval(refreshNow, 30000);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refreshNow();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, []);
+
+  const handleChilledAdminUnlock = (e: React.FormEvent) => {
+    e.preventDefault();
+    const managerPin = storageService.getSettings().managerPin || '1180';
+    if (chilledUnlockPin === managerPin) {
+      setChilledAdminBypass(true);
+      setShowChilledLockModal(false);
+      setChilledUnlockPin('');
+      setChilledUnlockError('');
+      onCategoryChange?.('CHILLED');
+    } else {
+      setChilledUnlockError('관리자 PIN이 일치하지 않습니다.');
+      setChilledUnlockPin('');
+    }
+  };
   
   const sendDiscordNotification = (message: string) => {
     const webhookUrl = storageService.getSettings().discordWebhookUrl;
@@ -463,11 +515,37 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
           </button>
 
           <button
-            onClick={() => onCategoryChange?.('CHILLED')}
-            className="w-full h-24 rounded-3xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 text-cyan-900 font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-2"
+            onClick={() => {
+              if (isChilledAllowed) {
+                onCategoryChange?.('CHILLED');
+              } else {
+                setChilledUnlockPin('');
+                setChilledUnlockError('');
+                setShowChilledLockModal(true);
+              }
+            }}
+            className={`w-full h-24 rounded-3xl border font-bold text-xl transition-colors shadow-sm flex flex-col items-center justify-center gap-1.5 ${
+              isChilledAllowed
+                ? 'bg-cyan-50 hover:bg-cyan-100 border-cyan-200 text-cyan-900'
+                : 'bg-sunken/80 hover:bg-sunken border-line text-ink-soft'
+            }`}
           >
-            <span>❄️ 저온</span>
-            <span className="text-sm font-medium text-cyan-700 opacity-90">(냉장 · 냉동 발주)</span>
+            <span className="inline-flex items-center gap-2">
+              {!isChilledAllowed && <Lock className="w-5 h-5 text-ink-faint" />}
+              <span>❄️ 저온</span>
+            </span>
+            {isChilledAllowed ? (
+              <span className="text-sm font-medium text-cyan-700 opacity-90">
+                {!isChilledWindowOpen && chilledAdminBypass
+                  ? '🔓 관리자 임시 해제됨 (냉장 · 냉동 발주)'
+                  : '(냉장 · 냉동 발주 · 22:30~01:00)'}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-ink-faint">
+                <Clock className="w-3.5 h-3.5" />
+                오후 10:30 ~ 오전 1:00 체크 가능 (현재 {formatKstTime(nowMs)})
+              </span>
+            )}
           </button>
           
           <button
@@ -478,6 +556,73 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
             <span className="text-sm font-medium text-blue-600 opacity-80">(생필체인 발주)</span>
           </button>
         </div>
+
+        {/* 저온 체크 시간 제한 안내 + 점장님 PIN 임시 해제 모달 */}
+        {showChilledLockModal && (
+          <div className="fixed inset-0 z-50 bg-ink/50 backdrop-blur-[2px] flex items-center justify-center p-5">
+            <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl border border-line animate-rise">
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-11 h-11 rounded-2xl bg-cyan-50 border border-cyan-100 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-cyan-700" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowChilledLockModal(false)}
+                  className="w-8 h-8 rounded-full text-ink-faint hover:text-ink hover:bg-sunken flex items-center justify-center"
+                  aria-label="닫기"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <h3 className="text-lg font-extrabold text-ink">저온 체크 시간이 아닙니다</h3>
+              <p className="text-sm text-ink-soft mt-1.5 leading-relaxed break-keep">
+                저온 체크는 <strong className="text-cyan-800">오후 10시 30분 ~ 오전 1시</strong> 사이에만 진행할 수 있습니다.
+              </p>
+              <div className="mt-3 px-3.5 py-2 rounded-xl bg-sunken text-xs font-semibold text-ink-soft flex items-center justify-between">
+                <span>현재 한국 시각</span>
+                <span className="tabular font-bold text-ink">{formatKstTime(nowMs)}</span>
+              </div>
+
+              <form onSubmit={handleChilledAdminUnlock} className="mt-5 pt-4 border-t border-line space-y-2.5">
+                <label className="block text-[11px] font-bold text-ink-faint">
+                  🔑 점장님 PIN으로 임시 해제 (테스트·예외용)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    pattern="[0-9]*"
+                    inputMode="numeric"
+                    placeholder="관리자 PIN"
+                    value={chilledUnlockPin}
+                    onChange={(e) => {
+                      setChilledUnlockPin(e.target.value);
+                      setChilledUnlockError('');
+                    }}
+                    className="flex-1 h-10 px-3 rounded-xl bg-sunken text-center text-sm tracking-[0.25em] font-mono focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:bg-white"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!chilledUnlockPin}
+                    className="px-4 h-10 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold transition-colors disabled:opacity-40 shrink-0"
+                  >
+                    해제
+                  </button>
+                </div>
+                {chilledUnlockError && (
+                  <p className="text-xs font-medium text-clay">{chilledUnlockError}</p>
+                )}
+              </form>
+
+              <button
+                type="button"
+                onClick={() => setShowChilledLockModal(false)}
+                className="mt-4 w-full h-11 rounded-2xl bg-sunken hover:bg-line/60 text-ink font-bold text-sm transition-colors"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -502,7 +647,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
             ← 뒤로가기
           </button>
 
-          {!isCheckFinished && (
+          {!isCheckFinished && !(selectedCategory === 'CHILLED' && !isChilledAllowed) && (
             <button
               type="button"
               onClick={handleCompleteAuditAndSend}
@@ -546,8 +691,53 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
         )}
       </section>
 
-      {/* 저온(CHILLED) 전용 원터치 체크리스트 */}
-      {selectedCategory === 'CHILLED' && (
+      {/* 저온(CHILLED) 전용 원터치 체크리스트 — 허용 시간(22:30~01:00) 외 2중 잠금 */}
+      {selectedCategory === 'CHILLED' && !isChilledAllowed && (
+        <div className="bg-surface border border-line rounded-3xl p-6 shadow-sm text-center space-y-4">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-sunken flex items-center justify-center">
+            <Lock className="w-7 h-7 text-ink-soft" />
+          </div>
+          <div>
+            <h3 className="text-lg font-extrabold text-ink">저온 체크 가능 시간이 아닙니다</h3>
+            <p className="text-sm text-ink-soft mt-1.5 leading-relaxed break-keep">
+              저온 체크는 <strong className="text-cyan-800">오후 10:30 ~ 오전 1:00</strong> 사이에만 가능합니다.
+              <br />
+              <span className="text-xs text-ink-faint">현재 한국 시각: {formatKstTime(nowMs)} · 작성 중이던 임시 내역은 안전하게 보관됩니다.</span>
+            </p>
+          </div>
+          <form onSubmit={handleChilledAdminUnlock} className="pt-3 border-t border-line space-y-2 text-left">
+            <label className="block text-[11px] font-bold text-ink-faint">
+              🔑 점장님 PIN으로 임시 해제
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="password"
+                pattern="[0-9]*"
+                inputMode="numeric"
+                placeholder="관리자 PIN"
+                value={chilledUnlockPin}
+                onChange={(e) => {
+                  setChilledUnlockPin(e.target.value);
+                  setChilledUnlockError('');
+                }}
+                className="flex-1 h-10 px-3 rounded-xl bg-sunken text-center text-sm tracking-[0.25em] font-mono focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:bg-white"
+              />
+              <button
+                type="submit"
+                disabled={!chilledUnlockPin}
+                className="px-4 h-10 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold transition-colors disabled:opacity-40 shrink-0"
+              >
+                해제
+              </button>
+            </div>
+            {chilledUnlockError && (
+              <p className="text-xs font-medium text-clay">{chilledUnlockError}</p>
+            )}
+          </form>
+        </div>
+      )}
+
+      {selectedCategory === 'CHILLED' && isChilledAllowed && (
         <ChilledChecklistPanel
           products={storageService.getProducts()}
           existingAudits={audits}
