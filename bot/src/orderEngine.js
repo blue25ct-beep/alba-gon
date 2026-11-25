@@ -8,6 +8,10 @@ const iconv = require('iconv-lite');
 const fs = require('fs');
 const { reconcileOrders } = require('./orderReconciler');
 
+function getTodayKstD8() {
+  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10).replace(/-/g, '');
+}
+
 function getYounmeCredentials(overrideCredentials = null) {
   if (overrideCredentials && overrideCredentials.pw) {
     return {
@@ -202,7 +206,7 @@ async function runDirectOrderAdd(items, onProgress, overrideCredentials = null) 
   });
   const appHtml = appRes.body.toString('latin1');
   const mDate = appHtml.match(/name=["']order_date["']\s+value=["'](\d+)["']/);
-  const orderDate = mDate ? mDate[1] : '20261124';
+  const orderDate = mDate ? mDate[1] : getTodayKstD8();
 
   // 2-2. 저온(app3) 발주 일자 및 지점코드(branch_code) 확인 + D+1 전날 발주 품목 실시간 조회 (중복 발주 방지)
   let app3OrderDate = orderDate;
@@ -753,7 +757,7 @@ async function fetchPendingDPlus1Barcodes(overrideCredentials = null) {
     const app3Html = iconv.decode(app3Res.body, 'EUC-KR');
     const m3Order = app3Html.match(/name=["']order_date["']\s+value=["'](\d{8})["']/);
     const m3Ship1 = app3Html.match(/name=["']ship_date1["']\s+value=["'](\d{8})["']/);
-    const app3OrderDate = m3Order ? m3Order[1] : '20261124';
+    const app3OrderDate = m3Order ? m3Order[1] : getTodayKstD8();
     const app3ShipDate1 = m3Ship1 ? m3Ship1[1] : app3OrderDate;
 
     const fmtDate = (d8) => `${d8.slice(0, 4)}-${d8.slice(4, 6)}-${d8.slice(6, 8)}`;

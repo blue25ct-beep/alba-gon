@@ -65,8 +65,30 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
   const [expandedArchiveDate, setExpandedArchiveDate] = useState<string | null>(null);
   const [pendingDPlus1Barcodes, setPendingDPlus1Barcodes] = useState<string[]>([]);
 
-  // 관리자 화면에서 개별 삭제 / 목록 비우기 / 발주 완료한 자동 삼각김밥 추적 (사용자 조작 최우선 존중)
-  const [dismissedAutoKimbaps, setDismissedAutoKimbaps] = useState<Set<string>>(new Set());
+  // 관리자 화면에서 개별 삭제 / 목록 비우기 / 발주 완료한 자동 삼각김밥 추적 (오늘 KST 날짜 기준 영구 저장 → 새로고침 후 부활 방지)
+  const [dismissedAutoKimbaps, setDismissedAutoKimbaps] = useState<Set<string>>(() => {
+    try {
+      const todayKey = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+      const raw = localStorage.getItem('albagom_dismissed_kimbaps_v1');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.date === todayKey && Array.isArray(parsed.barcodes)) {
+          return new Set<string>(parsed.barcodes);
+        }
+      }
+    } catch {}
+    return new Set();
+  });
+
+  useEffect(() => {
+    try {
+      const todayKey = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+      localStorage.setItem(
+        'albagom_dismissed_kimbaps_v1',
+        JSON.stringify({ date: todayKey, barcodes: Array.from(dismissedAutoKimbaps) })
+      );
+    } catch {}
+  }, [dismissedAutoKimbaps]);
 
   const historyStats = React.useMemo(() => {
     const history = orderHistory;
@@ -189,29 +211,6 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
   const [onlyOrdersFilter, setOnlyOrdersFilter] = useState(false);
 
   const loadData = () => {
-    // 부채표/왕뚜껑 발주처 캐시 강제 정상화 (younme)
-    const cachedAudits = storageService.getAudits();
-    let auditsChanged = false;
-    const fixedAudits = cachedAudits.map(a => {
-      if ((a.barcode === '8806016310018' || a.barcode === '8801128503211') && (a.vendor !== 'younme' || a.category === '주류')) {
-        auditsChanged = true;
-        return { ...a, vendor: 'younme' as const, category: '상온' };
-      }
-      return a;
-    });
-    if (auditsChanged) storageService.saveAudits(fixedAudits);
-
-    const cachedProds = storageService.getProducts();
-    let prodsChanged = false;
-    const fixedProds = cachedProds.map(p => {
-      if ((p.barcode === '8806016310018' || p.barcode === '8801128503211') && (p.vendor !== 'younme' || p.category === '주류')) {
-        prodsChanged = true;
-        return { ...p, vendor: 'younme' as const, category: '상온' };
-      }
-      return p;
-    });
-    if (prodsChanged) storageService.saveProducts(fixedProds, false);
-
     setAudits(storageService.getAudits());
     setProducts(storageService.getProducts());
     setAliases(storageService.getAliases());
@@ -433,10 +432,9 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
     const isBelowMinQty = finalOrderQty > 0 && finalOrderQty < minOrderQty;
     const isNotMultiple = finalOrderQty > 0 && finalOrderQty % minOrderQty !== 0;
 
-    const isYounmeTarget = audit.barcode === '8806016310018' || audit.barcode === '8801128503211';
-    const effectiveCategory = isYounmeTarget ? '상온' : (product ? product.category : (audit.category || '기타'));
+    const effectiveCategory = product ? product.category : (audit.category || '기타');
     const isChilledCat = Boolean(effectiveCategory?.includes('저온') || effectiveCategory?.includes('냉장') || effectiveCategory?.includes('냉동'));
-    const effectiveVendor: 'younme' | 'chilled' | 'spchain' = isYounmeTarget ? 'younme' : (product?.vendor === 'spchain' || effectiveCategory === '주류' ? 'spchain' : (audit.vendor === 'chilled' || product?.vendor === 'chilled' || isChilledCat ? 'chilled' : (audit.vendor || 'younme')));
+    const effectiveVendor: 'younme' | 'chilled' | 'spchain' = product?.vendor === 'spchain' || effectiveCategory === '주류' ? 'spchain' : (audit.vendor === 'chilled' || product?.vendor === 'chilled' || isChilledCat ? 'chilled' : (audit.vendor || 'younme'));
 
     return {
       barcode: audit.barcode,
@@ -460,14 +458,28 @@ export const AdminDashboard: React.FC<{ initialCategory?: 'YOUNME' | 'CHILLED' |
     };
   });
 
-  // 요일별 삼각김밥 자동 편성 (별도 조작 없으면 바로 발주 리스트에 포함: 평일 3종 / 목요일 6종)
-  const todayAutoKimbapDefs = new Date().getDay() === 4
-    ? [...TRIANGLE_KIMBAP_BASIC, ...TRIANGLE_KIMBAP_THU_EXTRA]
-    : TRIANGLE_KIMBAP_BASIC;
+  // 요일별 삼각김밥 자동 편성 (금요일 저온 휴무일 제외 / 평일 3종 / 목요일 6종 / 오늘 이미 발주·삭제한 품목은 자동 제외)
+  const todayDayNum = new Date().getDay();
+  const todayAutoKimbapDefs =
+    todayDayNum === 5
+      ? []
+      : todayDayNum === 4
+        ? [...TRIANGLE_KIMBAP_BASIC, ...TRIANGLE_KIMBAP_THU_EXTRA]
+        : TRIANGLE_KIMBAP_BASIC;
+
+  const todayPrefixKr = `${new Date().getMonth() + 1}. ${new Date().getDate()}.`;
+  const todayOrderedBarcodes = new Set<string>();
+  orderHistory.forEach((h) => {
+    if (h.orderDate && h.orderDate.includes(todayPrefixKr)) {
+      (h.items || []).forEach((it: any) => {
+        if (it.barcode) todayOrderedBarcodes.add(it.barcode);
+      });
+    }
+  });
 
   const auditBarcodeSet = new Set(audits.map((a) => a.barcode));
   const autoKimbapOrderItems: OrderItem[] = todayAutoKimbapDefs
-    .filter((k) => !auditBarcodeSet.has(k.barcode) && !dismissedAutoKimbaps.has(k.barcode))
+    .filter((k) => !auditBarcodeSet.has(k.barcode) && !dismissedAutoKimbaps.has(k.barcode) && !todayOrderedBarcodes.has(k.barcode))
     .map((k) => {
       const master = products.find((p) => p.barcode === k.barcode);
       const recommendedQty = k.defaultQty;

@@ -37,15 +37,15 @@ export const CHILLED_ZONES = [
   { id: 'BASKET', label: '🧺 하단 바구니' },
 ] as const;
 
-// 대분류 2탭(저온 냉장 / 저온 냉동) + 소구역 구성 (총 7구역 전체 활성화)
+// 대분류 2탭(저온 냉장 / 냉동 및 기타) + 소구역 구성 (총 7구역 전체 활성화)
 const CHILLED_GROUPS = {
   FRIDGE: {
     label: '🥗 저온 냉장',
-    zones: ['🥗 쇼케이스 A', '🥛 쇼케이스 B', '🍞 빵 진열대', '🧺 하단 바구니'],
+    zones: ['🥗 쇼케이스 A', '🥛 쇼케이스 B'],
   },
   FREEZER: {
-    label: '🥶 저온 냉동',
-    zones: ['🥶 수직 냉동고 A', '🥶 수직 냉동고 B', '🧊 얼음컵 냉장고'],
+    label: '🥶 냉동 및 기타',
+    zones: ['🥶 수직 냉동고 A', '🥶 수직 냉동고 B', '🧊 얼음컵 냉장고', '🍞 빵 진열대', '🧺 하단 바구니'],
   },
 } as const;
 
@@ -850,7 +850,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
         </div>
 
         {/* 선택된 대분류의 소구역 버튼 */}
-        <div className={`grid gap-1.5 ${activeGroupZoneList.length === 4 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+        <div className={`grid gap-1.5 ${activeGroupZoneList.length <= 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
           {activeGroupZoneList.map(([zoneTitle, zItems]) => {
             const zChecked = zItems.filter((it) => selectedStocks[it.barcode] !== undefined && selectedStocks[it.barcode] !== null).length;
             const isOpen = !!openZones[zoneTitle];

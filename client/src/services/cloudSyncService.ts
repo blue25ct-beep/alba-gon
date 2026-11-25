@@ -303,11 +303,7 @@ class CloudSyncService {
               return;
             }
             const validAudits = (msg.audits || []).map((a: any) => {
-              let itemObj = { ...a };
-              if (itemObj.barcode === '8806016310018' || itemObj.barcode === '8801128503211') {
-                itemObj.vendor = 'younme';
-                itemObj.category = '상온';
-              }
+              const itemObj = { ...a };
               // 미등록 상품 자동 마스터 복원 및 점장님 설정 목표재고/발주단위 최우선 보존
               const { product } = storageService.findProduct(itemObj.barcode);
               if (product && product.name && product.name !== '미등록 상품') {

@@ -5,8 +5,8 @@ import { readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf8'))
-const now = new Date()
-const buildTimeStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+const buildTimeStr = `${kst.getUTCFullYear()}.${String(kst.getUTCMonth() + 1).padStart(2, '0')}.${String(kst.getUTCDate()).padStart(2, '0')}_${String(kst.getUTCHours()).padStart(2, '0')}:${String(kst.getUTCMinutes()).padStart(2, '0')}`
 
 function generateVersionJsonPlugin(): Plugin {
   return {
