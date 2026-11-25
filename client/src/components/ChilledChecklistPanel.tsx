@@ -23,6 +23,7 @@ export interface ChilledChecklistEntry {
   vendor?: 'chilled' | 'younme';
   buttons?: { label: string; value: number }[];
   activeDays?: number[]; // 특정 요일만 노출 (0=일, 1=월, 2=화, 3=수, 4=목, 5=금, 6=토)
+  workerNote?: string; // 발주 필요 시 근무자에게 표시할 안내 문구 (예: '창고 재고 확인')
 }
 
 export const CHILLED_ZONES = [
@@ -234,6 +235,7 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8806011416142', { targetStock: 5, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme', buttons: [{ label: '2개 이하', value: 2 }] }], // CP] 동아제약 얼박 음료
   ['8801056623012', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // 칠성]델몬트콜드오렌지250ml
   ['8801056624019', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // 칠성]델몬트콜드포도250ml
+  ['8809422046045', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }], // *이노엔]컨디션스파클링제로자몽병100ml
   ['8809422042986', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }], // 이노엔]확깬다헛개컨디션병120ml
   ['8801013777468', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }], // (1+1)삼양사]큐원상쾌환부스터제로100ml
   ['8801056104641', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }], // 칠성]깨수깡캔160ml
@@ -247,11 +249,11 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8801121101582', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(우유)', vendor: 'chilled' }], // 매일)ESL우유200ml
   ['8801121101568', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(우유)', vendor: 'chilled' }], // 매일)ESL우유500ml
   ['8801121772874', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(우유)', vendor: 'chilled' }], // 매일)엣지후레쉬팩우유900ml
-  ['8801121772898', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(우유)', vendor: 'chilled' }], // 매일]엣지저지방1% 우유 900ml
   ['8801115114154', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(우유)', vendor: 'chilled' }], // 서울)서울우유1000ml
   ['8801155742393', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(우유)', vendor: 'chilled' }], // (행사)DM]소화가잘되는우유190ml
   ['8801121768440', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(두유)', vendor: 'chilled' }], // 매일]매일두유(99.9) 190ml
   ['8801121768464', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(두유)', vendor: 'chilled' }], // 매일]매일두유식이섬유190ml
+  ['8801121025710', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(두유)', vendor: 'younme', workerNote: '창고 재고 확인' }], // CP] 매일]매일두유검은콩190ml
   ['88002798', {
     targetStock: 5,
     zone: '🥛 쇼케이스 B',
@@ -267,15 +269,16 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
     ],
   }], // 빙그레)바나나맛우유240ml
   ['8801104212205', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(단지우유)', vendor: 'chilled' }], // 빙그레)바나나라이트우유240ml
-  ['8801104948272', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(단지우유)', vendor: 'chilled' }], // 빙그레)바나나맛우유무가당240ml
   ['8801104221467', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(단지우유)', vendor: 'chilled' }], // 빙그레)딸기맛우유240ml
   ['8801104940870', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(단지우유)', vendor: 'chilled' }], // 빙그레]메로나맛우유240ml
-  // 3단 (허쉬/에몽/비요뜨/쿨피스)
-  ['8801121190197', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // 매일]허쉬드링크(팩]235ml
+  ['8801104948272', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(단지우유)', vendor: 'chilled' }], // 빙그레)바나나맛우유무가당240ml
+  // 3단 (허쉬/에몽/말차/비요뜨/쿨피스)
   ['8801121759943', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // 매일]허쉬드링크쿠앤크235ml
   ['8801121032435', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // 매일]허쉬드링크프로틴235ml
+  ['8801121190197', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // 매일]허쉬드링크(팩]235ml
   ['8801069180977', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // 남양]딸기에몽190ml
   ['8801069171067', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // 남양)초코에몽190ml
+  ['8801104952910', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // 빙그레]왕실말차드링크190ml
   ['8801115212713', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // (2+1)서울]비요뜨초코링138g
   ['8801115213604', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // (2+1)서울]비요뜨쿠키앤크림131g
   ['8801155745073', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // (1+1)DM]쿨피스복숭아190ml
@@ -283,38 +286,47 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8801155743758', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '3단', vendor: 'chilled' }], // (1+1)DM]쿨피스에이드복숭아300ml
   // 4단 (아몬드브리즈/프로틴)
   ['8801121763933', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // 매일)아몬드브리즈오리지널190ml
-  ['8801121763940', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // 매일)아몬드브리즈언스위트190ml
   ['8801121025666', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // 매일]아몬드브리즈프로틴190ml
+  ['8801121763940', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // 매일)아몬드브리즈언스위트190ml
   ['8801121768068', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // 매일)아몬드브리즈초콜릿190ml
-  ['8801392039225', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (행사)CJ]얼티브비건프로틴초코250ml(D+1)
+  ['8801121046142', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // 매일]아몬드브리즈커피190ml
   ['8801392081484', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (1+1)CJ]얼티브프로틴밤250ml(D+1)
+  ['8801392081507', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (행사)CJ]얼티브프로틴고소한맛250ml(D+1)
+  ['8801392039225', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (행사)CJ]얼티브비건프로틴초코250ml(D+1)
   ['8801115118886', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (2+1)서울]내안의진짜초코280ml
   ['8801115118893', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (2+1)서울]내안의진짜딸기280ml
   ['8801104670876', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (2+1)빙그레]더단백초코250ml
   ['8801104942935', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (2+1)빙그레]더단백딸기250ml
   ['8801104673211', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (2+1)빙그레]더단백커피250ml
   ['8801069415833', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (2+1)남양]테이크핏고소한맛200ml
+  ['8801069419619', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (2+1)남양]테이크핏호박고구마맛200ml
   ['8801069416007', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '4단', vendor: 'chilled' }], // (2+1)남양]테이크핏초코맛200ml
   // 5단 (컵커피/병커피)
   ['8801115382102', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // 동서]스타벅스컵바닐라라떼320ml
   ['8801115382003', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // 동서]스타벅스컵카페라떼320ml
-  ['8801115382157', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // 동서]스타벅스카페라떼설탕무첨가320ml
   ['8801115224303', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // 동서]스타벅스컵카페모카320ml
+  ['8801115382157', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // 동서]스타벅스카페라떼설탕무첨가320ml
   ['8801037086188', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단', vendor: 'younme' }], // 동서]스타벅스프라푸치노커피병281ml
   ['8801037086195', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단', vendor: 'younme' }], // 동서]스타벅스프라푸치노모카병281ml
+  ['8801037077698', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단', vendor: 'younme' }], // 동서]스타벅스프라푸치노돌체병281ml
   ['8801121768174', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // (행사)매일]바리스타룰스블랙325ml
+  ['8801121027523', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // (행사)매일]바리스타룰스디카페인라떼325ml
   ['8801121768167', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // (행사)매일]바리스타룰스라떼325ml
-  ['8801121771402', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // (행사)매일]바리스타룰스바닐라라떼325ml
+  ['8801121761823', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '5단(커피)', vendor: 'chilled' }], // 매일)바리스타컵로슈거에스프레소라떼250ml
   // 6단 (푸딩/대용량커피)
+  ['8809447501659', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'younme' }], // CP]바로먹는 발효곤약 냉모밀, 350g
+  ['8805684011715', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // 쉐프엠]젤리블리제로애플망고60g
   ['8809064498431', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // 뚜또)코코딸기푸딩230g
   ['8809064498646', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // 뚜또)후르츠믹스푸딩230g
   ['8809064498639', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // 뚜또)포도푸딩230g
   ['8809064498370', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // 뚜또)밀감푸딩230g
   ['8801121031834', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (행사)매일]바리스타그란데아메리카노475ml
   ['8801121031858', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (행사)매일]바리스타그란데라떼475ml
-  ['8801104304023', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업아메리카노350ml
   ['8801104304047', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업카페라떼350ml
+  ['8801104940931', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레]사이즈업연유라떼350ml
   ['8801104306591', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업바닐라라떼350ml
+  ['8801104304023', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업아메리카노350ml
+  ['8801104948005', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레]사이즈업디카페인350ml
   // === 7. 하단 바구니 (상온 합동진열: 컵시리얼 3종 / 통조림 / 케찹) ===
   ['8801083333304', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]콘푸로스트 컵시리얼40g
   ['8801083323305', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]첵스 컵시리얼40g
@@ -457,6 +469,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
       vendor: 'chilled' | 'younme';
       category: string;
       buttons: { label: string; value: number }[];
+      workerNote?: string;
     }[] = [];
 
     const todayDay = new Date().getDay();
@@ -517,7 +530,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
         }
       }
 
-      list.push({ barcode, name, targetStock: target, minOrderQty: minQty, zone: cfg.zone, subLabel: cfg.subLabel, vendor, category, buttons });
+      list.push({ barcode, name, targetStock: target, minOrderQty: minQty, zone: cfg.zone, subLabel: cfg.subLabel, vendor, category, buttons, workerNote: cfg.workerNote });
     });
 
     // 추가로 점장님이 isChilledChecklist = true로 지정한 기타 저온 상품
@@ -841,6 +854,11 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
                               </span>
                             )}
                             <p className="font-semibold text-sm text-ink leading-snug break-keep">{displayName}</p>
+                            {it.workerNote && isChecked && chosen! < it.targetStock && (
+                              <p className="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300 text-[11px] font-bold">
+                                📦 {it.workerNote}
+                              </p>
+                            )}
                           </div>
 
                           {/* 현재 선택된 상태 배지 (누르면 개별 해제) */}

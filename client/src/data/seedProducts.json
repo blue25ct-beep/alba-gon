@@ -2511,12 +2511,13 @@
   },
   {
     "barcode": "8801121025710",
-    "name": "매일]매일두유검은콩190ml",
+    "name": "CP] 매일]매일두유검은콩190ml",
     "price": 1400,
     "cost": 968,
-    "category": "유제품/음료",
+    "category": "상온",
     "targetStock": 1,
-    "minOrderQty": 1
+    "minOrderQty": 1,
+    "vendor": "younme"
   },
   {
     "barcode": "8801118019357",
@@ -17506,6 +17507,18 @@
     "vendor": "younme",
     "targetStock": 2,
     "minOrderQty": 1,
+    "isChilledChecklist": true
+  },
+  {
+    "barcode": "8809447501659",
+    "name": "CP]바로먹는 발효곤약 냉모밀, 350g",
+    "price": 0,
+    "cost": 0,
+    "category": "상온",
+    "vendor": "younme",
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "isNewProduct": true,
     "isChilledChecklist": true
   }
 ]
