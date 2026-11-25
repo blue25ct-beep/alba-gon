@@ -450,8 +450,9 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   // 최종 확인 팝업 표시 여부
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  // 초저리소스 저장용 ref (디바운스 & 구역/카테고리 이탈 시 변경분만 1회 전송)
+  // 초저리소스 저장용 ref (디바운스 & 10건마다 / 구역·카테고리 이탈 시 변경분만 1회 전송)
   const isDirtyRef = useRef(false);
+  const dirtyCountRef = useRef(0);
   const latestStocksRef = useRef(selectedStocks);
   latestStocksRef.current = selectedStocks;
   const onAutoSaveRef = useRef(onAutoSaveChecklist);
@@ -603,10 +604,11 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   };
 
   // 변경분이 있을 때만 클라우드(실사 목록)로 1회 일괄 동기화 (리소스 최소화)
-  const flushAutoSaveToCloud = () => {
+  const flushAutoSaveToCloud = (overrideStocks?: Record<string, number | null>) => {
     if (!isDirtyRef.current || !onAutoSaveRef.current) return;
-    const payload = buildPayloadFromStocks(latestStocksRef.current);
+    const payload = buildPayloadFromStocks(overrideStocks || latestStocksRef.current);
     isDirtyRef.current = false;
+    dirtyCountRef.current = 0;
     if (payload.length > 0) {
       onAutoSaveRef.current(payload);
     }
@@ -670,17 +672,21 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
     isDirtyRef.current = true;
     const safeVal = Math.max(0, val);
     const willClear = selectedStocks[barcode] === safeVal;
-    setSelectedStocks((prev) => {
-      if (prev[barcode] === safeVal) {
-        return { ...prev, [barcode]: null };
+    const nextStocks: Record<string, number | null> = {
+      ...selectedStocks,
+      [barcode]: willClear ? null : safeVal,
+    };
+    latestStocksRef.current = nextStocks;
+    setSelectedStocks(nextStocks);
+    if (willClear) {
+      if (onRemoveAuditBarcodes && existingAudits.some((a) => a.barcode === barcode)) {
+        onRemoveAuditBarcodes([barcode]);
       }
-      return {
-        ...prev,
-        [barcode]: safeVal,
-      };
-    });
-    if (willClear && onRemoveAuditBarcodes && existingAudits.some((a) => a.barcode === barcode)) {
-      onRemoveAuditBarcodes([barcode]);
+    } else {
+      dirtyCountRef.current += 1;
+      if (dirtyCountRef.current >= 10) {
+        flushAutoSaveToCloud(nextStocks);
+      }
     }
   };
 
@@ -720,13 +726,17 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
 
   const handleAdjustStock = (barcode: string, targetStock: number, delta: number) => {
     isDirtyRef.current = true;
-    setSelectedStocks((prev) => {
-      const current = prev[barcode] ?? targetStock;
-      return {
-        ...prev,
-        [barcode]: Math.max(0, current + delta),
-      };
-    });
+    const current = selectedStocks[barcode] ?? targetStock;
+    const nextStocks: Record<string, number | null> = {
+      ...selectedStocks,
+      [barcode]: Math.max(0, current + delta),
+    };
+    latestStocksRef.current = nextStocks;
+    setSelectedStocks(nextStocks);
+    dirtyCountRef.current += 1;
+    if (dirtyCountRef.current >= 10) {
+      flushAutoSaveToCloud(nextStocks);
+    }
   };
 
   const toggleZone = (zoneTitle: string) => {
@@ -753,6 +763,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   const handleFinalConfirm = () => {
     const finalPayload = buildPayloadFromStocks(selectedStocks);
     isDirtyRef.current = false;
+    dirtyCountRef.current = 0;
     clearChilledDraftStorage();
     setShowConfirmModal(false);
     onSubmitChecklist(finalPayload);
