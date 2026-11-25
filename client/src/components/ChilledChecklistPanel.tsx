@@ -24,6 +24,7 @@ export interface ChilledChecklistEntry {
   buttons?: { label: string; value: number }[];
   activeDays?: number[]; // 특정 요일만 노출 (0=일, 1=월, 2=화, 3=수, 4=목, 5=금, 6=토)
   workerNote?: string; // 발주 필요 시 근무자에게 표시할 안내 문구 (예: '창고 재고 확인')
+  displayName?: string; // 근무자 체크리스트 화면 전용 표시명 (마스터 상품명은 유지)
 }
 
 export const CHILLED_ZONES = [
@@ -228,7 +229,7 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8801118005824', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '5단', vendor: 'chilled' }], // 롯데햄]생크림로제스파게티220g(D+1)
   // 6단 (상온 합동진열 음료)
   ['8801382124528', { targetStock: 3, zone: '🥗 쇼케이스 A', subLabel: '6단', vendor: 'younme' }], // 웅진]아침햇살펫500ml
-  ['8801105941227', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '6단', vendor: 'younme' }], // 해태음료]과일촌오포사선물세트(병)
+  ['8801105941227', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '6단', vendor: 'younme', displayName: '해태음료]과일촌음료수병(한병)' }], // 상온 마스터(해태음료]과일촌오포사선물세트(병)) 유지, 저온 체크표는 단품 1종 표기
 
   // === 6. 쇼케이스 B (오른쪽 냉장) ===
   // 1단
@@ -241,9 +242,9 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8801056104641', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }], // 칠성]깨수깡캔160ml
   ['8801155744472', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // (1+1)DM]테이크얼라이브블렌드레몬300ml
   ['8801155744489', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // (1+1)DM]테이크얼라이브블렌드자몽300ml
-  ['8801155735074', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // (2+1)DM]테이크얼라이브(스위트자몽)250ml
-  ['8801155735081', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // (2+1)DM]테이크얼라이브(망고)250ml
-  ['8801155732769', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // (2+1)DM]테이크얼라이브머스캣청포도250ml
+  ['8809848280436', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // (1+1)DM]얼라이브아사이베리200ml
+  ['8801155735647', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // (1+1)DM]얼라이브망고200ml
+  ['8801155744762', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // (1+1)DM]얼라이브스위티자몽200ml
   // 2단 (우유/단지우유)
   ['8801115114031', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(우유)', vendor: 'chilled' }], // 서울)서울우유200ml
   ['8801121101582', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '2단(우유)', vendor: 'chilled' }], // 매일)ESL우유200ml
@@ -480,7 +481,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
       const dayOverride = cfg.targetStockByDay?.[todayDay];
       const target = dayOverride !== undefined ? dayOverride : ((p && p.targetStock > 1) ? p.targetStock : cfg.targetStock);
       const minQty = Math.max(1, p?.minOrderQty || 1);
-      const name = p?.name || barcode;
+      const name = cfg.displayName || p?.name || barcode;
       const vendor: 'chilled' | 'younme' = cfg.vendor || (p?.vendor === 'younme' ? 'younme' : 'chilled');
       const category = p?.category || (vendor === 'younme' ? '상온' : '저온냉장');
 
