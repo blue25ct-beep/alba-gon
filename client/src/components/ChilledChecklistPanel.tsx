@@ -479,7 +479,11 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
       if (cfg.activeDays && !cfg.activeDays.includes(todayDay)) return;
       const p = prodMap.get(barcode);
       const dayOverride = cfg.targetStockByDay?.[todayDay];
-      const target = dayOverride !== undefined ? dayOverride : ((p && p.targetStock > 1) ? p.targetStock : cfg.targetStock);
+      const isReviewed = Boolean(p && (p.reviewStatus || p.updatedAt));
+      const target =
+        dayOverride !== undefined
+          ? dayOverride
+          : (isReviewed && p ? Math.max(1, p.targetStock) : ((p && p.targetStock > 1) ? p.targetStock : cfg.targetStock));
       const minQty = Math.max(1, p?.minOrderQty || 1);
       const name = cfg.displayName || p?.name || barcode;
       const vendor: 'chilled' | 'younme' = cfg.vendor || (p?.vendor === 'younme' ? 'younme' : 'chilled');

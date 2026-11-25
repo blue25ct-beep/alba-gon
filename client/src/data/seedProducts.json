@@ -380,7 +380,7 @@
     "price": 2400,
     "cost": 1800,
     "category": "저온냉장",
-    "targetStock": 0,
+    "targetStock": 1,
     "minOrderQty": 1,
     "vendor": "chilled",
     "reviewStatus": "MODIFIED",
@@ -684,7 +684,9 @@
     "category": "저온냉장",
     "targetStock": 1,
     "minOrderQty": 1,
-    "vendor": "chilled"
+    "vendor": "chilled",
+    "reviewStatus": "APPROPRIATE",
+    "updatedAt": "11. 26. 오전 12:10"
   },
   {
     "barcode": "8801155744472",
@@ -1472,7 +1474,9 @@
     "category": "저온냉장",
     "targetStock": 1,
     "minOrderQty": 1,
-    "vendor": "chilled"
+    "vendor": "chilled",
+    "reviewStatus": "APPROPRIATE",
+    "updatedAt": "11. 26. 오전 12:10"
   },
   {
     "barcode": "8801115382157",
@@ -1570,7 +1574,9 @@
     "category": "저온냉장",
     "targetStock": 1,
     "minOrderQty": 1,
-    "vendor": "chilled"
+    "vendor": "chilled",
+    "reviewStatus": "APPROPRIATE",
+    "updatedAt": "11. 26. 오전 12:10"
   },
   {
     "barcode": "8809064498431",
@@ -1968,7 +1974,9 @@
     "category": "저온냉장",
     "targetStock": 1,
     "minOrderQty": 1,
-    "vendor": "chilled"
+    "vendor": "chilled",
+    "reviewStatus": "APPROPRIATE",
+    "updatedAt": "11. 26. 오전 12:10"
   },
   {
     "barcode": "8801155834616",
@@ -17762,7 +17770,7 @@
     "cost": 3969,
     "category": "저온냉장",
     "vendor": "chilled",
-    "targetStock": 0,
+    "targetStock": 1,
     "minOrderQty": 1,
     "isDPlus1": false,
     "reviewStatus": "MODIFIED",
