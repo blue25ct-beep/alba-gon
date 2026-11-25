@@ -21,6 +21,7 @@ export interface ChilledChecklistEntry {
   subLabel?: string;
   vendor?: 'chilled' | 'younme';
   buttons?: { label: string; value: number }[];
+  activeDays?: number[]; // 특정 요일만 노출 (0=일, 1=월, 2=화, 3=수, 4=목, 5=금, 6=토)
 }
 
 export const CHILLED_ZONES = [
@@ -92,6 +93,7 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   // 걸이대
   ['8801066060036', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // 대림]비엔나꼬치다90g(D+1)
   ['8801123304219', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // 롯데햄)미니비엔나140g(D+1)
+  ['8801123000586', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // (1+1)롯데햄]켄터키직화핟빠65g(D+1)
   ['8801123410347', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // (행사)롯데햄]직꾸닭리얼간장100g(D+1)
   ['8801123308910', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // 롯데햄)의성마늘프랑크140g(D+1)
   ['8801123309498', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // (행사)롯데햄]의성마늘프랑크빅90g(D+1)
@@ -101,12 +103,63 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8801066062528', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // (2+1)대림]크라비아스틱버터갈릭60g(D+1)
   ['8801066060258', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // (2+1)대림]닭가슴살네모나블랙페퍼80g(D+1)
   ['8801066056435', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '걸이대', vendor: 'chilled' }], // (2+1)대림]닭가슴살블랙페퍼100g(D+1)
+  ['8801121020388', {
+    targetStock: 2,
+    zone: '🥗 쇼케이스 A',
+    subLabel: '걸이대(치즈존)',
+    vendor: 'younme',
+    buttons: [
+      { label: '0개(품절)', value: 0 },
+      { label: '1개', value: 1 },
+      { label: '2개+(충분)', value: 2 },
+    ],
+  }], // CP] 매일]상하치즈크림치즈48g
+  ['8801121027431', {
+    targetStock: 1,
+    zone: '🥗 쇼케이스 A',
+    subLabel: '걸이대(치즈존)',
+    vendor: 'younme',
+    buttons: [
+      { label: '0개(품절)', value: 0 },
+      { label: '1개+(충분)', value: 1 },
+    ],
+  }], // CP] 매일]상하치즈아몬드고다48g
   ['8801155834616', { targetStock: 5, zone: '🥗 쇼케이스 A', subLabel: '걸이대(치즈존)', vendor: 'chilled' }], // (2+1)DM]인포켓치즈오리지널20g
   // 1단
-  ['8801104665421', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }], // (2+1)빙그레]닥터캡슐사과130ml
-  ['8801104302739', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }], // (2+1)빙그레]닥터캡슐플레인130ml
+  ['8801104951302', {
+    targetStock: 1,
+    zone: '🥗 쇼케이스 A',
+    subLabel: '1단',
+    vendor: 'chilled',
+    activeDays: [4], // 목요일만 노출
+    buttons: [
+      { label: '0개(품절)', value: 0 },
+      { label: '1개+(충분)', value: 1 },
+    ],
+  }], // (2+1)빙그레]닥터캡슐복숭아130ml
+  ['8801104665421', {
+    targetStock: 1,
+    zone: '🥗 쇼케이스 A',
+    subLabel: '1단',
+    vendor: 'chilled',
+    buttons: [
+      { label: '0개(품절)', value: 0 },
+      { label: '1개+(충분)', value: 1 },
+    ],
+  }], // (2+1)빙그레]닥터캡슐사과130ml
+  ['8801104302739', {
+    targetStock: 1,
+    zone: '🥗 쇼케이스 A',
+    subLabel: '1단',
+    vendor: 'chilled',
+    buttons: [
+      { label: '0개(품절)', value: 0 },
+      { label: '1개+(충분)', value: 1 },
+    ],
+  }], // (2+1)빙그레]닥터캡슐플레인130ml
   ['8801121767122', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }], // 매일)바이오드링킹플레인250ml
   ['8801121767139', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }], // 매일)바이오드링킹딸기250ml
+  ['8801121764176', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }], // 매일)BIO플레인요거트150g
   ['8801121768105', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }], // 매일)요구르트로어슈거280ml
   ['8801155744502', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }], // (2+1)DM]하이요구르트280ml
   ['8801007841113', { targetStock: 2, zone: '🥗 쇼케이스 A', subLabel: '1단', vendor: 'chilled' }], // (행사)CJ]미정당어묵떡볶이346g(D+1)
@@ -387,8 +440,10 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
       buttons: { label: string; value: number }[];
     }[] = [];
 
+    const todayDay = new Date().getDay();
     DEFAULT_CHILLED_CHECKLIST_ENTRIES.forEach(([barcode, cfg]) => {
       if (!ACTIVE_CHILLED_ZONES.has(cfg.zone)) return;
+      if (cfg.activeDays && !cfg.activeDays.includes(todayDay)) return;
       const p = prodMap.get(barcode);
       const target = (p && p.targetStock > 1) ? p.targetStock : cfg.targetStock;
       const minQty = Math.max(1, p?.minOrderQty || 1);

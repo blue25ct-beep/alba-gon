@@ -17485,5 +17485,27 @@
     "isNewProduct": true,
     "reviewStatus": "MODIFIED",
     "updatedAt": "11. 24. 오후 09:47"
+  },
+  {
+    "barcode": "8801121027431",
+    "name": "CP] 매일]상하치즈아몬드고다48g",
+    "price": 0,
+    "cost": 0,
+    "category": "상온",
+    "vendor": "younme",
+    "targetStock": 1,
+    "minOrderQty": 1,
+    "isChilledChecklist": true
+  },
+  {
+    "barcode": "8801121020388",
+    "name": "CP] 매일]상하치즈크림치즈48g",
+    "price": 0,
+    "cost": 0,
+    "category": "상온",
+    "vendor": "younme",
+    "targetStock": 2,
+    "minOrderQty": 1,
+    "isChilledChecklist": true
   }
 ]
