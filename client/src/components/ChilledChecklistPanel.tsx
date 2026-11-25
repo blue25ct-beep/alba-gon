@@ -37,10 +37,21 @@ export const CHILLED_ZONES = [
   { id: 'BASKET', label: '🧺 하단 바구니' },
 ] as const;
 
-// 우선 테스트 기간 동안 노출할 구역 (나머지 구역은 데이터 보존 상태로 임시 숨김 — 여기에 구역명만 추가하면 즉시 복원)
+// 대분류 2탭(저온 냉장 / 저온 냉동) + 소구역 구성 (총 7구역 전체 활성화)
+const CHILLED_GROUPS = {
+  FRIDGE: {
+    label: '🥗 저온 냉장',
+    zones: ['🥗 쇼케이스 A', '🥛 쇼케이스 B', '🍞 빵 진열대', '🧺 하단 바구니'],
+  },
+  FREEZER: {
+    label: '🥶 저온 냉동',
+    zones: ['🥶 수직 냉동고 A', '🥶 수직 냉동고 B', '🧊 얼음컵 냉장고'],
+  },
+} as const;
+
 const ACTIVE_CHILLED_ZONES = new Set<string>([
-  '🥗 쇼케이스 A',
-  '🥛 쇼케이스 B',
+  ...CHILLED_GROUPS.FRIDGE.zones,
+  ...CHILLED_GROUPS.FREEZER.zones,
 ]);
 
 // 매장 실사진 6구역 배치도 기준 저온 + 합동진열 상온 통합 체크리스트
@@ -423,6 +434,9 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
   onAutoSaveChecklist,
   onRemoveAuditBarcodes,
 }) => {
+  // 상단 대분류 탭 (저온 냉장 / 저온 냉동)
+  const [activeGroup, setActiveGroup] = useState<'FRIDGE' | 'FREEZER'>('FRIDGE');
+
   // 구역별 아코디언 열림 상태 (기본: 쇼케이스 A 열림)
   const [openZones, setOpenZones] = useState<Record<string, boolean>>({
     '🧊 얼음컵 냉장고': false,
@@ -756,6 +770,25 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
     });
   };
 
+  const handleSelectGroup = (groupKey: 'FRIDGE' | 'FREEZER') => {
+    if (groupKey === activeGroup) return;
+    flushAutoSaveToCloud();
+    setActiveGroup(groupKey);
+    const firstZone = CHILLED_GROUPS[groupKey].zones[0];
+    setOpenZones((prev) => {
+      const next: Record<string, boolean> = {};
+      Object.keys(prev).forEach((k) => {
+        next[k] = k === firstZone;
+      });
+      next[firstZone] = true;
+      return next;
+    });
+  };
+
+  const activeGroupZoneList: [string, typeof checklistItems][] = CHILLED_GROUPS[activeGroup].zones
+    .filter((z) => groupedChecklist[z] && groupedChecklist[z].length > 0)
+    .map((z) => [z, groupedChecklist[z]]);
+
   const checkedItems = checklistItems.filter((it) => selectedStocks[it.barcode] !== undefined && selectedStocks[it.barcode] !== null);
   const uncheckedItems = checklistItems.filter((it) => selectedStocks[it.barcode] === undefined || selectedStocks[it.barcode] === null);
   const checkedCount = checkedItems.length;
@@ -771,13 +804,13 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* 1. 구역 빠른 선택 탭 */}
+      {/* 1. 대분류 2탭(저온 냉장 / 저온 냉동) + 소구역 선택 */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <div>
-            <h4 className="font-bold text-ink text-base">🗺️ 구역별 재고 체크표 ({Object.keys(groupedChecklist).length}구역)</h4>
+            <h4 className="font-bold text-ink text-base">🗺️ 구역별 재고 체크표</h4>
             <p className="text-xs text-ink-faint mt-0.5">
-              서 계신 구역을 눌러 부족한 상품의 현재 재고만 톡톡 눌러주세요.
+              냉장·냉동을 고른 뒤 서 계신 구역의 재고만 톡톡 눌러주세요.
             </p>
           </div>
           <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-cyan-100 text-cyan-800 tabular shrink-0">
@@ -785,8 +818,40 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
           </span>
         </div>
 
-        <div className={`grid gap-1.5 ${Object.keys(groupedChecklist).length <= 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-          {Object.entries(groupedChecklist).map(([zoneTitle, zItems]) => {
+        {/* 대분류 2탭: 저온 냉장 / 저온 냉동 */}
+        <div className="grid grid-cols-2 gap-2">
+          {(['FRIDGE', 'FREEZER'] as const).map((gKey) => {
+            const grp = CHILLED_GROUPS[gKey];
+            const gItems = grp.zones.flatMap((z) => groupedChecklist[z] || []);
+            const gChecked = gItems.filter(
+              (it) => selectedStocks[it.barcode] !== undefined && selectedStocks[it.barcode] !== null
+            ).length;
+            const isSelected = activeGroup === gKey;
+            return (
+              <button
+                key={gKey}
+                type="button"
+                onClick={() => handleSelectGroup(gKey)}
+                className={`py-2.5 px-3 rounded-2xl text-sm font-extrabold border transition-all flex items-center justify-between ${
+                  isSelected
+                    ? 'bg-cyan-600 text-white border-cyan-600 shadow-sm'
+                    : 'bg-surface text-ink-soft border-line hover:bg-sunken'
+                }`}
+              >
+                <span>{grp.label}</span>
+                <span className={`text-xs font-bold tabular px-2 py-0.5 rounded-full ${
+                  isSelected ? 'bg-white/20 text-white' : 'bg-sunken text-ink-faint'
+                }`}>
+                  {gChecked}/{gItems.length}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 선택된 대분류의 소구역 버튼 */}
+        <div className={`grid gap-1.5 ${activeGroupZoneList.length === 4 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+          {activeGroupZoneList.map(([zoneTitle, zItems]) => {
             const zChecked = zItems.filter((it) => selectedStocks[it.barcode] !== undefined && selectedStocks[it.barcode] !== null).length;
             const isOpen = !!openZones[zoneTitle];
             return (
@@ -794,14 +859,14 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
                 key={zoneTitle}
                 type="button"
                 onClick={() => focusZone(zoneTitle)}
-                className={`py-2 px-2 rounded-xl text-[11px] font-bold border transition-all flex flex-col items-center gap-0.5 ${
+                className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-between gap-1 ${
                   isOpen
-                    ? 'bg-cyan-600 text-white border-cyan-600 shadow-sm'
+                    ? 'bg-cyan-50 text-cyan-900 border-cyan-400 shadow-xs'
                     : 'bg-surface text-ink-soft border-line hover:bg-sunken'
                 }`}
               >
-                <span className="truncate max-w-full">{zoneTitle}</span>
-                <span className={`text-[10px] tabular ${isOpen ? 'text-cyan-100' : 'text-ink-faint'}`}>
+                <span className="truncate">{zoneTitle}</span>
+                <span className={`text-[11px] tabular shrink-0 ${isOpen ? 'text-cyan-700 font-extrabold' : 'text-ink-faint'}`}>
                   {zChecked}/{zItems.length}
                 </span>
               </button>
@@ -809,7 +874,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
           })}
         </div>
 
-        {Object.entries(groupedChecklist).map(([zoneTitle, items]) => {
+        {activeGroupZoneList.map(([zoneTitle, items]) => {
           const isOpen = !!openZones[zoneTitle];
           const zChecked = items.filter((it) => selectedStocks[it.barcode] !== undefined && selectedStocks[it.barcode] !== null).length;
           return (
