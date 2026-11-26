@@ -93,15 +93,15 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   }], // $우신]빅볼 얼음컵160g(냉동)
 
   // === 2. 빵 진열대 ===
-  ['8801068929003', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 삼립]시그니처카스테라125g(D+1)
-  ['8801068938173', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 삼립]시그니처흑당카스테라125g(D+1)
-  ['4973484034617', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]바나나밀크카스테라90g
-  ['4973484034600', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]소프트카스테라90g
-  ['8934760210053', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]티포롤케이크80g
-  ['8934760210060', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]티포롤케이크딸기맛80g
-  ['8809531970033', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 대심]신바나나향케익130g
-  ['4903099201005', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // (행사)수입]야마우치밀크롤케이크140g
-  ['4933121401097', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // (행사)수입]시아와세도밀크케익180g
+  ['8801068929003', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled' }], // 삼립]시그니처카스테라125g(D+1)
+  ['8801068938173', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled' }], // 삼립]시그니처흑당카스테라125g(D+1)
+  ['4973484034617', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme' }], // 수입]바나나밀크카스테라90g
+  ['4973484034600', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme' }], // 수입]소프트카스테라90g
+  ['8934760210053', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme' }], // 수입]티포롤케이크80g
+  ['8934760210060', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme' }], // 수입]티포롤케이크딸기맛80g
+  ['8809531970033', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'chilled' }], // 대심]신바나나향케익130g
+  ['4903099201005', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme' }], // (행사)수입]야마우치밀크롤케이크140g
+  ['4933121401097', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme' }], // (행사)수입]시아와세도밀크케익180g
   ['8809256674643', { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme' }], // 미성]허쉬초코칩싱글쿠키50g
 
   // === 3. 수직 냉동고 A (왼쪽) ===
@@ -114,8 +114,8 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8809665551986', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '4단', vendor: 'chilled' }], // $아워홈]치즈닭갈비170g(냉동)
   ['8809674770132', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '5단', vendor: 'chilled' }], // $한맥]리얼토핑트리플치즈피자138g(냉동)
   ['8809674770149', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '5단', vendor: 'chilled' }], // $한맥]리얼토핑트러플불고기피자138g
-  ['8809674770309', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // $한맥]클래식토마토피자미니75g
-  ['8809674770323', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '7단', vendor: 'chilled' }], // $한맥]콰트로바질피자미니70g(냉동)
+  ['8809674770309', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '5단', vendor: 'chilled' }], // $한맥]클래식토마토피자미니75g
+  ['8809674770323', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '5단', vendor: 'chilled' }], // $한맥]콰트로바질피자미니70g(냉동)
   ['8801123724680', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // $롯데햄)마늘퐁닭매콤마늘치킨200g
   ['8801392112485', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // (1+1)$CJ)고메소바바치킨양념순살240g
   ['8801392087073', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // (1+1)$CJ)고메소바바치킨허니순살240g
@@ -284,7 +284,7 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
 
   // === 6. 쇼케이스 B (오른쪽 냉장) ===
   // 1단
-  ['8806011416142', { targetStock: 5, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme', buttons: [{ label: '2개 이하', value: 2 }] }], // CP] 동아제약 얼박 음료
+  ['8806011416142', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }], // CP] 동아제약 얼박 음료
   ['8801056623012', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // 칠성]델몬트콜드오렌지250ml
   ['8801056624019', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'chilled' }], // 칠성]델몬트콜드포도250ml
   ['8809422046045', { targetStock: 3, zone: '🥛 쇼케이스 B', subLabel: '1단', vendor: 'younme' }], // *이노엔]컨디션스파클링제로자몽병100ml
@@ -551,6 +551,15 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
             { label: '0개', value: 0 },
             { label: `${Math.round(target * 0.3)}개`, value: Math.round(target * 0.3) },
             { label: `${Math.round(target * 0.6)}개`, value: Math.round(target * 0.6) },
+            { label: `${target}개+(충분)`, value: target },
+          ];
+        } else if (target >= 6) {
+          const step = Math.max(1, Math.round(target / 4));
+          buttons = [
+            { label: '0개', value: 0 },
+            { label: `${step}개`, value: step },
+            { label: `${step * 2}개`, value: step * 2 },
+            { label: `${step * 3}개`, value: step * 3 },
             { label: `${target}개+(충분)`, value: target },
           ];
         } else if (target >= 5) {
