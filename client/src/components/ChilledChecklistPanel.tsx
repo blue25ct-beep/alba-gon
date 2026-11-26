@@ -25,6 +25,7 @@ export interface ChilledChecklistEntry {
   activeDays?: number[]; // 특정 요일만 노출 (0=일, 1=월, 2=화, 3=수, 4=목, 5=금, 6=토)
   workerNote?: string; // 발주 필요 시 근무자에게 표시할 안내 문구 (예: '창고 재고 확인')
   displayName?: string; // 근무자 체크리스트 화면 전용 표시명 (마스터 상품명은 유지)
+  hideStepper?: boolean; // 낱개 [-][+] 미세조절 숨김 (얼음컵 등 박스/상태 단위 체크용)
 }
 
 export const CHILLED_ZONES = [
@@ -57,51 +58,90 @@ const ACTIVE_CHILLED_ZONES = new Set<string>([
 // 매장 실사진 6구역 배치도 기준 저온 + 합동진열 상온 통합 체크리스트
 export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][] = [
   // === 1. 얼음컵 냉장고 ===
-  ['8801308449940', { targetStock: 12, zone: '🧊 얼음컵 냉장고', subLabel: '왼쪽 칸', vendor: 'chilled' }], // $우신]큰얼음컵230g(냉동)
-  ['8801308442026', { targetStock: 15, zone: '🧊 얼음컵 냉장고', subLabel: '오른쪽 칸', vendor: 'chilled' }], // $우신]작은얼음컵185g(냉동)
-  ['8801308470319', { targetStock: 15, zone: '🧊 얼음컵 냉장고', subLabel: '오른쪽 칸', vendor: 'chilled' }], // $우신]빅볼 얼음컵160g(냉동)
+  ['8801308449940', {
+    targetStock: 12,
+    zone: '🧊 얼음컵 냉장고',
+    subLabel: '🔵 파란 뚜껑 · 왼쪽 칸',
+    vendor: 'chilled',
+    hideStepper: true,
+    buttons: [
+      { label: '1줄 이상 비어있음 (1박스 발주)', value: 0 },
+      { label: '충분', value: 12 },
+    ],
+  }], // $우신]큰얼음컵230g(냉동)
+  ['8801308442026', {
+    targetStock: 15,
+    zone: '🧊 얼음컵 냉장고',
+    subLabel: '🩷 분홍 뚜껑 · 오른쪽 칸',
+    vendor: 'chilled',
+    hideStepper: true,
+    buttons: [
+      { label: '1줄 이상 비어있음 (1박스 발주)', value: 0 },
+      { label: '충분', value: 15 },
+    ],
+  }], // $우신]작은얼음컵185g(냉동)
+  ['8801308470319', {
+    targetStock: 15,
+    zone: '🧊 얼음컵 냉장고',
+    subLabel: '⚫ 검정 뚜껑 · 오른쪽 칸',
+    vendor: 'chilled',
+    hideStepper: true,
+    buttons: [
+      { label: '1줄 이상 비어있음 (1박스 발주)', value: 0 },
+      { label: '충분', value: 15 },
+    ],
+  }], // $우신]빅볼 얼음컵160g(냉동)
 
   // === 2. 빵 진열대 ===
-  ['8809531970033', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 대심]신바나나향케익130g
-  ['4903099201005', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // (행사)수입]야마우치밀크롤케이크140g
-  ['4933121401097', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // (행사)수입]시아와세도밀크케익180g
-  ['8809256674643', { targetStock: 5, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '2개 이하', value: 2 }] }], // 미성]허쉬초코칩싱글쿠키50g
-  ['8801068929003', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 삼립]시그니처카스테라125g(D+1)
-  ['8801068938173', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 삼립]시그니처흑당카스테라125g(D+1)
-  ['4973484034617', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]바나나밀크카스테라90g
-  ['4973484034600', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]소프트카스테라90g
-  ['8934760210053', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]티포롤케이크80g
-  ['8934760210060', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]티포롤케이크딸기맛80g
+  ['8801068929003', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 삼립]시그니처카스테라125g(D+1)
+  ['8801068938173', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 삼립]시그니처흑당카스테라125g(D+1)
+  ['4973484034617', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]바나나밀크카스테라90g
+  ['4973484034600', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]소프트카스테라90g
+  ['8934760210053', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]티포롤케이크80g
+  ['8934760210060', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '상단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // 수입]티포롤케이크딸기맛80g
+  ['8809531970033', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'chilled', buttons: [{ label: '0개(품절)', value: 0 }] }], // 대심]신바나나향케익130g
+  ['4903099201005', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // (행사)수입]야마우치밀크롤케이크140g
+  ['4933121401097', { targetStock: 1, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme', buttons: [{ label: '0개(품절)', value: 0 }] }], // (행사)수입]시아와세도밀크케익180g
+  ['8809256674643', { targetStock: 2, zone: '🍞 빵 진열대', subLabel: '하단', vendor: 'younme' }], // 미성]허쉬초코칩싱글쿠키50g
 
   // === 3. 수직 냉동고 A (왼쪽) ===
-  ['8809015225246', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '3단', vendor: 'chilled' }], // $한맥]마시따데리맛닭가슴살큐브130g
-  ['8801074606059', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '3단', vendor: 'chilled' }], // $한성)롤피자스틱치즈90g
-  ['8801074606028', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '3단', vendor: 'chilled' }], // $한성)롤피자스틱불고기80g
+  ['8809015225246', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '3단', vendor: 'chilled' }], // $한맥]마시따데리맛닭가슴살큐브130g
   ['8801074606035', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '3단', vendor: 'chilled' }], // $한성)롤피자스틱콤비네이션80g
-  ['8801045931036', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '4단', vendor: 'chilled' }], // $오뚜기]오감포차직화닭발150g
-  ['8801045931043', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '4단', vendor: 'chilled' }], // $오뚜기]오감포차직화오돌뼈150g
-  ['8809674770309', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '5단', vendor: 'chilled' }], // $한맥]클래식토마토피자미니75g
-  ['8809674770149', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '5단', vendor: 'chilled' }], // $한맥]리얼토핑트러플불고기피자138g
-  ['8801123724680', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // $롯데햄)마늘퐁닭매콤마늘치킨200g
-  ['8801392112485', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // (1+1)$CJ)고메소바바치킨양념순살240g
-  ['8801392087073', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // (1+1)$CJ)고메소바바치킨허니순살240g
+  ['8801074606028', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '3단', vendor: 'chilled' }], // $한성)롤피자스틱불고기80g
+  ['8801074606059', { targetStock: 2, zone: '🥶 수직 냉동고 A', subLabel: '3단', vendor: 'chilled' }], // $한성)롤피자스틱치즈90g
+  ['8801045931043', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '4단', vendor: 'chilled' }], // $오뚜기]오감포차직화오돌뼈150g
+  ['8801045931036', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '4단', vendor: 'chilled' }], // $오뚜기]오감포차직화닭발150g
+  ['8809665551986', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '4단', vendor: 'chilled' }], // $아워홈]치즈닭갈비170g(냉동)
+  ['8809674770132', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '5단', vendor: 'chilled' }], // $한맥]리얼토핑트리플치즈피자138g(냉동)
+  ['8809674770149', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '5단', vendor: 'chilled' }], // $한맥]리얼토핑트러플불고기피자138g
+  ['8809674770309', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // $한맥]클래식토마토피자미니75g
+  ['8809674770323', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '7단', vendor: 'chilled' }], // $한맥]콰트로바질피자미니70g(냉동)
+  ['8801123724680', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // $롯데햄)마늘퐁닭매콤마늘치킨200g
+  ['8801392112485', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // (1+1)$CJ)고메소바바치킨양념순살240g
+  ['8801392087073', { targetStock: 1, zone: '🥶 수직 냉동고 A', subLabel: '6단', vendor: 'chilled' }], // (1+1)$CJ)고메소바바치킨허니순살240g
 
   // === 4. 수직 냉동고 B (오른쪽) ===
-  ['8809015225055', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '1단', vendor: 'chilled' }], // $한맥]포켓치킨양념치킨맛180g
-  ['8809015225048', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '1단', vendor: 'chilled' }], // $한맥]포켓치킨데리야끼맛180g
-  ['8809015225031', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '1단', vendor: 'chilled' }], // $한맥]포켓치킨핫후라이드180g
-  ['8801045941103', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '2단', vendor: 'chilled' }], // $오뚜기]맛있는새우볶음밥230g
-  ['8801007353395', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '2단', vendor: 'chilled' }], // (2+1)$CJ)스팸김치볶음밥220g
-  ['8801045750217', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '2단', vendor: 'chilled' }], // $오뚜기)콤비네이션컵피자150g
+  ['8809015225055', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '1단', vendor: 'chilled' }], // $한맥]포켓치킨양념치킨맛180g
+  ['8809015225048', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '1단', vendor: 'chilled' }], // $한맥]포켓치킨데리야끼맛180g
+  ['8809015225031', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '1단', vendor: 'chilled' }], // $한맥]포켓치킨핫후라이드180g
+  ['8801045941103', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '2단', vendor: 'chilled' }], // $오뚜기]맛있는새우볶음밥230g
+  ['8801007353395', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '2단', vendor: 'chilled' }], // (2+1)$CJ)스팸김치볶음밥220g
+  ['8801045750217', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '2단', vendor: 'chilled' }], // $오뚜기)콤비네이션컵피자150g
+  ['8801088358937', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '3단', vendor: 'chilled' }], // $사조]육즙가득고기만두180g
+  ['8801019505225', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '3단', vendor: 'chilled' }], // $해태)샤오롱180g(냉동)
   ['8801392186967', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '3단', vendor: 'chilled' }], // (행사)$CJ)비비고찐만두168g
   ['8801392187070', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '3단', vendor: 'chilled' }], // (행사)$CJ)비비고청양고추찐만두168g
-  ['8801123701445', { targetStock: 3, zone: '🥶 수직 냉동고 B', subLabel: '4단', vendor: 'chilled' }], // $롯데햄)켄터키핫도그75g
-  ['8801227180030', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '4단', vendor: 'chilled' }], // $사조)고기포자만두180g
+  ['8801123701445', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '4단', vendor: 'chilled' }], // $롯데햄)켄터키핫도그75g
   ['8801227180047', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '4단', vendor: 'chilled' }], // $사조)김치포자만두180g
-  ['8809015220159', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '5단', vendor: 'chilled' }], // $한맥]불벅145g(냉동햄버거)
-  ['8801392011887', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '6단', vendor: 'chilled' }], // (행사)$CJ]비비고왕교자315g
-  ['8801007429052', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '6단', vendor: 'chilled' }], // (행사)$CJ)비비고김치왕교자385g
-  ['8801308447847', { targetStock: 4, zone: '🥶 수직 냉동고 B', subLabel: '7단(바닥)', vendor: 'chilled' }], // $우신]각얼음1KG(냉동)
+  ['8801227180030', { targetStock: 2, zone: '🥶 수직 냉동고 B', subLabel: '4단', vendor: 'chilled' }], // $사조)고기포자만두180g
+  ['8809015225161', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '5단', vendor: 'chilled' }], // $한맥]잉글리쉬머핀140g(냉동)
+  ['8801074008303', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '5단', vendor: 'chilled' }], // $한성]미니시카고피자데리야끼80g(냉동)
+  ['8801074008310', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '5단', vendor: 'chilled' }], // $한성]미니시카고피자체다치즈80g(냉동)
+  ['8809015220159', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '5단', vendor: 'chilled' }], // $한맥]불벅145g(냉동햄버거)
+  ['8801019998041', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '6단', vendor: 'chilled' }], // $해태)고향만두378g(냉동)
+  ['8801392011887', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '6단', vendor: 'chilled' }], // (행사)$CJ]비비고왕교자315g
+  ['8801007429052', { targetStock: 1, zone: '🥶 수직 냉동고 B', subLabel: '6단', vendor: 'chilled' }], // (행사)$CJ)비비고김치왕교자385g
+  ['8801308447847', { targetStock: 8, zone: '🥶 수직 냉동고 B', subLabel: '7단(바닥)', vendor: 'chilled' }], // $우신]각얼음1KG(냉동)
 
   // === 5. 쇼케이스 A (왼쪽 냉장) ===
   // 걸이대
@@ -339,19 +379,18 @@ export const DEFAULT_CHILLED_CHECKLIST_ENTRIES: [string, ChilledChecklistEntry][
   ['8801104306591', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업바닐라라떼350ml
   ['8801104304023', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레)사이즈업아메리카노350ml
   ['8801104948005', { targetStock: 2, zone: '🥛 쇼케이스 B', subLabel: '6단', vendor: 'chilled' }], // (2+1)빙그레]사이즈업디카페인350ml
-  // === 7. 하단 바구니 (상온 합동진열: 컵시리얼 3종 / 통조림 / 케찹) ===
-  ['8801083333304', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]콘푸로스트 컵시리얼40g
-  ['8801083323305', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]첵스 컵시리얼40g
-  ['8801083330303', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]아몬드후레이크컵시리얼40g
-  ['8801007314891', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // CJ]스팸120g (작은거)
-  ['8801047111849', { targetStock: 3, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]라이트스탠다드참치150g
-  ['8801047121350', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]야채참치150g
-  ['8801047123750', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]고추참치150g
-  ['8801045360034', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 오뚜기]초당옥수수스위트콘340g
-  ['8801047141099', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]자연산꽁치캔400g
-  ['8801123600519', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 롯데햄]장조림80g
-  ['8801045100111', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '소스', vendor: 'younme' }], // 오뚜기]토마토케찹300g
-  ['8801045880112', { targetStock: 2, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 오뚜기]황도캔400g
+  // === 7. 하단 바구니 (상온 합동진열: 컵시리얼 3종 / 통조림 7종 / 케찹) ===
+  ['8801083333304', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]콘푸로스트 컵시리얼40g
+  ['8801083323305', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]첵스 컵시리얼40g
+  ['8801083330303', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '컵시리얼', vendor: 'younme' }], // 켈로그]아몬드후레이크컵시리얼40g
+  ['8801007314891', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // CJ]스팸120g (작은거)
+  ['8801047111849', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]라이트스탠다드참치150g
+  ['8801047121350', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]야채참치150g
+  ['8801047123750', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]고추참치150g
+  ['8801045360034', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 오뚜기]초당옥수수스위트콘340g
+  ['8801047141099', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 동원]자연산꽁치캔400g
+  ['8801123600519', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '통조림', vendor: 'younme' }], // 롯데햄]장조림80g
+  ['8801045100111', { targetStock: 1, zone: '🧺 하단 바구니', subLabel: '소스', vendor: 'younme' }], // 오뚜기]토마토케찹300g
 ];
 
 export const DEFAULT_CHILLED_CHECKLIST_BARCODES: Record<string, ChilledChecklistEntry> = Object.fromEntries(
@@ -486,6 +525,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
       category: string;
       buttons: { label: string; value: number }[];
       workerNote?: string;
+      hideStepper?: boolean;
     }[] = [];
 
     const todayDay = new Date().getDay();
@@ -550,7 +590,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
         }
       }
 
-      list.push({ barcode, name, targetStock: target, minOrderQty: minQty, zone: cfg.zone, subLabel: cfg.subLabel, vendor, category, buttons, workerNote: cfg.workerNote });
+      list.push({ barcode, name, targetStock: target, minOrderQty: minQty, zone: cfg.zone, subLabel: cfg.subLabel, vendor, category, buttons, workerNote: cfg.workerNote, hideStepper: cfg.hideStepper });
     });
 
     // 추가로 점장님이 isChilledChecklist = true로 지정한 기타 저온 상품
@@ -915,10 +955,23 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
 
               {isOpen && (
                 <div className="divide-y divide-line">
+                  {zoneTitle === '🧊 얼음컵 냉장고' && (
+                    <div className="px-4 py-3 bg-cyan-50/90 border-b border-cyan-200 flex items-start gap-2.5">
+                      <span className="text-base leading-none shrink-0 mt-0.5">📢</span>
+                      <div className="text-xs leading-relaxed text-cyan-950 break-keep">
+                        <p className="font-extrabold">수직냉동고 아래에서 재고를 채워 주세요.</p>
+                        <p className="text-cyan-800 mt-0.5">
+                          채운 뒤에도 <strong>1줄 이상 자리가 비어 있으면</strong> 아래 발주 버튼을 눌러주세요.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   {items.map((it) => {
                     const chosen = selectedStocks[it.barcode];
                     const isChecked = chosen !== undefined && chosen !== null;
                     const displayName = cleanWorkerDisplayName(it.name);
+                    const matchedBtn = isChecked ? it.buttons.find((b) => b.value === chosen) : undefined;
+                    const badgeLabel = it.hideStepper && matchedBtn ? matchedBtn.label : `현재 ${chosen}개`;
 
                     return (
                       <div
@@ -950,7 +1003,7 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
                               className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full shrink-0 tabular bg-cyan-100 text-cyan-800 border border-cyan-300 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
                               title="누르면 선택 해제"
                             >
-                              <span>현재 {chosen}개</span>
+                              <span>{badgeLabel}</span>
                               <X className="w-3 h-3" />
                             </button>
                           ) : (
@@ -980,28 +1033,30 @@ export const ChilledChecklistPanel: React.FC<ChilledChecklistPanelProps> = ({
                             );
                           })}
 
-                          {/* 미세 조정 [-][+] */}
-                          <div className="inline-flex items-center border border-line rounded-xl bg-canvas overflow-hidden h-10 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => handleAdjustStock(it.barcode, it.targetStock, -1)}
-                              className="w-8 h-full flex items-center justify-center text-ink-soft hover:bg-sunken"
-                              aria-label="재고 1 감소"
-                            >
-                              <Minus className="w-3.5 h-3.5" />
-                            </button>
-                            <span className="w-8 text-center text-xs font-bold tabular text-ink">
-                              {isChecked ? chosen : '-'}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleAdjustStock(it.barcode, it.targetStock, 1)}
-                              className="w-8 h-full flex items-center justify-center text-ink-soft hover:bg-sunken"
-                              aria-label="재고 1 증가"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
+                          {/* 미세 조정 [-][+] (hideStepper 항목은 숨김) */}
+                          {!it.hideStepper && (
+                            <div className="inline-flex items-center border border-line rounded-xl bg-canvas overflow-hidden h-10 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => handleAdjustStock(it.barcode, it.targetStock, -1)}
+                                className="w-8 h-full flex items-center justify-center text-ink-soft hover:bg-sunken"
+                                aria-label="재고 1 감소"
+                              >
+                                <Minus className="w-3.5 h-3.5" />
+                              </button>
+                              <span className="w-8 text-center text-xs font-bold tabular text-ink">
+                                {isChecked ? chosen : '-'}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleAdjustStock(it.barcode, it.targetStock, 1)}
+                                className="w-8 h-full flex items-center justify-center text-ink-soft hover:bg-sunken"
+                                aria-label="재고 1 증가"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
