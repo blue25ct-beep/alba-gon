@@ -238,7 +238,7 @@ export const WorkerApp: React.FC<{ selectedCategory?: 'YOUNME' | 'CHILLED' | 'SP
 
     try {
       storageService.saveAudit({
-        barcode: activeBarcode,
+        barcode: detectedProduct ? detectedProduct.barcode : activeBarcode,
         productName,
         stockCount: quantity,
         targetStock: detectedProduct ? detectedProduct.targetStock : 1,

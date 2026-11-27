@@ -1035,11 +1035,35 @@ getProducts(): Product[] {
 
   // --- ?泥?諛붿퐫??留ㅽ븨 (Aliases: 援ы삎 諛붿퐫???∽툘 ?좉퇋 諛쒖＜??諛붿퐫?? ---
   getAliases(): BarcodeAlias[] {
+    const defaultAliases: BarcodeAlias[] = [
+      {
+        id: 'default_8801105995428',
+        oldBarcode: '8801105995428',
+        newBarcode: '8801105914382',
+        productName: '해태음료]영진구론산바몬드병150ml',
+        note: '박스코드(10입)',
+        updatedAt: '기본등록',
+      },
+      {
+        id: 'default_8801105995763',
+        oldBarcode: '8801105995763',
+        newBarcode: '8801105914382',
+        productName: '해태음료]영진구론산바몬드병150ml',
+        note: '인박스코드(20입)',
+        updatedAt: '기본등록',
+      },
+    ];
     try {
       const data = localStorage.getItem(KEYS.ALIASES);
-      return data ? JSON.parse(data) : [];
+      const saved: BarcodeAlias[] = data ? JSON.parse(data) : [];
+      const savedOldSet = new Set(saved.map(a => a.oldBarcode));
+      const merged = [...saved];
+      defaultAliases.forEach(def => {
+        if (!savedOldSet.has(def.oldBarcode)) merged.push(def);
+      });
+      return merged;
     } catch {
-      return [];
+      return defaultAliases;
     }
   },
 
